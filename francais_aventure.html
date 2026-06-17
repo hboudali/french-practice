@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Français Aventure!</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;600;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; background: #0f0e17; color: #fffffe; min-height: 100vh; }
+  .bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse at 20% 50%, #1a0533 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, #001833 0%, transparent 50%), #0f0e17; }
+  .container { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; padding: 20px; }
+  .header { text-align: center; padding: 24px 0 16px; }
+  .header h1 { font-family: 'Baloo 2', cursive; font-size: 2.4rem; font-weight: 800;
+    background: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.1; }
+  .header p { color: #a8a4c8; margin-top: 4px; font-size: 0.95rem; }
+  .xp-bar-wrap { background: #1a1830; border-radius: 30px; padding: 10px 18px;
+    display: flex; align-items: center; gap: 12px; margin-bottom: 8px; border: 1px solid #2e2b4a; }
+  .xp-label { font-weight: 700; font-size: 0.82rem; color: #feca57; white-space: nowrap; }
+  .xp-track { flex: 1; height: 9px; background: #2e2b4a; border-radius: 20px; overflow: hidden; }
+  .xp-fill { height: 100%; background: linear-gradient(90deg, #ff6b6b, #feca57); border-radius: 20px; transition: width 0.6s ease; }
+  .score-badge { background: linear-gradient(135deg, #ff6b6b, #feca57); color: #0f0e17; font-weight: 800;
+    font-size: 0.85rem; padding: 3px 11px; border-radius: 20px; white-space: nowrap; }
+  .save-note { text-align: right; font-size: 0.74rem; color: #4a4870; margin-bottom: 16px; }
+  .save-note span { color: #6a6890; }
+  .mode-tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .mode-tab { flex: 1; min-width: 110px; background: #1a1830; border: 2px solid #2e2b4a;
+    color: #a8a4c8; padding: 11px 8px; border-radius: 14px; cursor: pointer;
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.88rem; text-align: center; transition: all 0.2s; }
+  .mode-tab:hover { border-color: #48dbfb; color: #48dbfb; }
+  .mode-tab.active { background: #48dbfb22; border-color: #48dbfb; color: #48dbfb; }
+  .mode-tab .tab-emoji { display: block; font-size: 1.4rem; margin-bottom: 3px; }
+  .card { background: #1a1830; border: 1px solid #2e2b4a; border-radius: 20px; padding: 26px;
+    margin-bottom: 16px; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .card-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .card-badge { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 3px 10px;
+    border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .badge-lecture { background: #ff6b6b33; color: #ff6b6b; }
+  .badge-grammaire { background: #feca5733; color: #feca57; }
+  .badge-conjugaison { background: #48dbfb33; color: #48dbfb; }
+  .theme-label { display: inline-block; font-size: 0.76rem; font-weight: 700; padding: 3px 10px;
+    border-radius: 20px; background: #ffffff12; color: #a8a4c8; }
+  .q-counter { margin-left: auto; font-size: 0.76rem; color: #6a6890; font-weight: 700; }
+  /* passage */
+  .passage { font-size: 0.98rem; line-height: 1.85; color: #d4d0f0; background: #12112a;
+    border-radius: 12px; padding: 18px 20px; margin-bottom: 18px; border-left: 3px solid #ff9ff3;
+    user-select: text; }
+  .passage p { margin-bottom: 11px; }
+  .passage p:last-child { margin-bottom: 0; }
+  /* clickable word spans */
+  .passage .w { cursor: pointer; border-radius: 3px; transition: background 0.15s; }
+  .passage .w:hover { background: #48dbfb22; color: #48dbfb; }
+  .passage .w.active { background: #48dbfb33; color: #48dbfb; }
+  /* dictionary tip banner */
+  .dict-tip-banner {
+    background: #48dbfb12; border: 1px solid #48dbfb33;
+    border-radius: 10px; padding: 9px 14px;
+    font-size: 0.84rem; color: #a8c8d8; margin-bottom: 12px;
+    line-height: 1.4;
+  }
+  .dict-tip-banner strong { color: #48dbfb; }
+  /* dictionary tooltip */
+  #dictTooltip {
+    position: fixed; z-index: 9999;
+    background: #1a1830; border: 1px solid #48dbfb55;
+    border-radius: 14px; padding: 12px 16px;
+    box-shadow: 0 8px 32px #00000088;
+    min-width: 200px; max-width: 280px;
+    animation: fadeIn 0.15s ease;
+    pointer-events: auto;
+  }
+  #dictTooltip .dict-word {
+    font-family: 'Baloo 2', cursive; font-size: 1.1rem; font-weight: 800;
+    color: #fffffe; margin-bottom: 6px;
+  }
+  #dictTooltip .dict-link {
+    display: flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #48dbfb22, #ff9ff322);
+    border: 1px solid #48dbfb44; border-radius: 10px;
+    padding: 8px 12px; text-decoration: none;
+    color: #48dbfb; font-weight: 700; font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+  #dictTooltip .dict-link:hover { background: #48dbfb22; border-color: #48dbfb; }
+  #dictTooltip .dict-close {
+    position: absolute; top: 8px; right: 10px;
+    background: none; border: none; color: #4a4870;
+    cursor: pointer; font-size: 1rem; line-height: 1;
+    font-family: 'Nunito', sans-serif;
+  }
+  #dictTooltip .dict-close:hover { color: #a8a4c8; }
+  /* question within passage card */
+  .q-divider { border: none; border-top: 1px solid #2e2b4a; margin: 18px 0; }
+  .q-label { font-size: 0.76rem; font-weight: 700; color: #48dbfb; text-transform: uppercase;
+    letter-spacing: 0.08em; margin-bottom: 8px; }
+  .q-dot-row { display: flex; gap: 6px; margin-bottom: 14px; }
+  .q-dot { width: 10px; height: 10px; border-radius: 50%; background: #2e2b4a; transition: background 0.3s; }
+  .q-dot.done-correct { background: #1dd1a1; }
+  .q-dot.done-wrong { background: #ff6b6b; }
+  .q-dot.active { background: #48dbfb; }
+  .question-text { font-size: 1.08rem; font-weight: 700; color: #fffffe; margin-bottom: 14px; line-height: 1.4; }
+  .options { display: flex; flex-direction: column; gap: 9px; }
+  .option-btn { background: #12112a; border: 2px solid #2e2b4a; color: #d4d0f0; padding: 12px 16px;
+    border-radius: 12px; cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 0.97rem;
+    font-weight: 600; text-align: left; transition: all 0.2s; display: flex; align-items: center; gap: 11px; }
+  .option-btn:hover:not(:disabled) { border-color: #48dbfb; color: #48dbfb; background: #48dbfb11; }
+  .option-btn.correct { border-color: #1dd1a1; background: #1dd1a122; color: #1dd1a1; }
+  .option-btn.wrong { border-color: #ff6b6b; background: #ff6b6b22; color: #ff6b6b; }
+  .option-btn:disabled { cursor: default; }
+  .option-letter { width: 26px; height: 26px; border-radius: 50%; background: #2e2b4a;
+    display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 800; flex-shrink: 0; }
+  .option-btn.correct .option-letter { background: #1dd1a1; color: #0f0e17; }
+  .option-btn.wrong .option-letter { background: #ff6b6b; color: #0f0e17; }
+  /* blank */
+  .blank-input { background: #12112a; border: 2px solid #48dbfb; color: #fffffe; padding: 10px 14px;
+    border-radius: 10px; font-family: 'Nunito', sans-serif; font-size: 1.08rem; font-weight: 700;
+    outline: none; width: 210px; text-align: center; transition: border-color 0.2s; }
+  .blank-input:focus { border-color: #ff9ff3; }
+  .blank-input.correct { border-color: #1dd1a1; background: #1dd1a122; }
+  .blank-input.wrong { border-color: #ff6b6b; background: #ff6b6b22; }
+  .blank-wrap { display: flex; align-items: center; gap: 11px; flex-wrap: wrap; margin: 14px 0; }
+  /* feedback */
+  .feedback { margin-top: 14px; padding: 13px 16px; border-radius: 12px; font-weight: 600;
+    font-size: 0.93rem; line-height: 1.6; animation: fadeIn 0.2s ease; }
+  .feedback.success { background: #1dd1a122; border: 1px solid #1dd1a1; color: #1dd1a1; }
+  .feedback.fail { background: #ff6b6b22; border: 1px solid #ff6b6b; color: #ff9ff3; }
+  .feedback .expl { color: #d4d0f0; font-weight: 400; margin-top: 5px; }
+  .feedback .tip { color: #feca57; margin-top: 7px; }
+  /* buttons */
+  .btn { padding: 12px 26px; border-radius: 14px; border: none; font-family: 'Nunito', sans-serif;
+    font-weight: 800; font-size: 0.97rem; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: linear-gradient(135deg, #48dbfb, #ff9ff3); color: #0f0e17; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 18px #48dbfb44; }
+  .btn-ghost { background: #2e2b4a; color: #a8a4c8; font-size: 0.82rem; padding: 8px 14px; border-radius: 10px; }
+  .btn-ghost:hover { background: #3d3a5c; color: #fffffe; }
+  .actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; align-items: center; }
+  /* streak */
+  .streak { text-align: center; padding: 6px; font-size: 0.92rem; color: #feca57; font-weight: 700; margin-bottom: 6px; }
+  /* pills */
+  .pill { background: #48dbfb22; color: #48dbfb; padding: 3px 11px; border-radius: 20px;
+    font-size: 0.82rem; font-weight: 700; display: inline-block; margin: 2px; }
+  .pill.pink { background: #ff9ff333; color: #ff9ff3; }
+  .pill.yellow { background: #feca5722; color: #feca57; }
+  /* level badges */
+  .niveau-badge { display:inline-flex; align-items:center; padding:4px 12px; border-radius:20px;
+    font-size:0.72rem; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; }
+  .niveau-1 { background:#1dd1a118; color:#1dd1a1; border:1px solid #1dd1a140; }
+  .niveau-2 { background:#ffb34720; color:#ffb347; border:1px solid #ffb34750; }
+  .niveau-3 { background:#ff6b6b20; color:#ff6b6b; border:1px solid #ff6b6b50; }
+  /* level filter */
+  .level-filter { display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; align-items:center; }
+  .level-filter-label { font-size:0.78rem; font-weight:700; color:#a8a4c8; margin-right:2px; }
+  .lvl-btn { background:#12112a; border:2px solid #2e2b4a; color:#a8a4c8;
+    padding:5px 13px; border-radius:20px; cursor:pointer; font-family:'Nunito',sans-serif;
+    font-size:0.8rem; font-weight:700; transition:all 0.2s; }
+  .lvl-btn:hover { border-color:#48dbfb; color:#48dbfb; }
+  .lvl-btn.active { border-color:#48dbfb; background:#48dbfb22; color:#48dbfb; }
+  /* accordion */
+  .plus-loin-wrap { margin-top:14px; }
+  .plus-loin-toggle { background:#1a1830; border:1px solid #2e2b4a; color:#a8a4c8;
+    padding:9px 16px; border-radius:10px; cursor:pointer; font-family:'Nunito',sans-serif;
+    font-size:0.85rem; font-weight:700; width:100%; text-align:left; transition:all 0.2s;
+    display:flex; align-items:center; gap:8px; }
+  .plus-loin-toggle:hover { border-color:#48dbfb; color:#48dbfb; }
+  .plus-loin-toggle .arrow { transition:transform 0.2s; display:inline-block; }
+  .plus-loin-toggle.open .arrow { transform:rotate(90deg); }
+  .plus-loin-body { background:#0d0c1f; border:1px solid #2e2b4a; border-radius:10px;
+    padding:16px 18px; margin-top:6px; font-size:0.88rem; line-height:1.75; color:#d4d0f0;
+    display:none; }
+  .plus-loin-body.open { display:block; animation:fadeIn 0.2s ease; }
+  /* progress view */
+  .prog-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:10px; }
+  .prog-title { font-family:'Baloo 2',cursive; font-size:1.5rem; font-weight:800; color:#fffffe; }
+  .stat-row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:22px; }
+  .stat-box { flex:1; min-width:100px; background:#12112a; border:1px solid #2e2b4a; border-radius:14px; padding:14px 12px; text-align:center; }
+  .stat-num { font-family:'Baloo 2',cursive; font-size:1.8rem; font-weight:800; line-height:1; }
+  .stat-num.green { color:#1dd1a1; } .stat-num.red { color:#ff6b6b; } .stat-num.blue { color:#48dbfb; } .stat-num.yellow { color:#feca57; }
+  .stat-lbl { font-size:0.74rem; color:#a8a4c8; font-weight:700; margin-top:4px; text-transform:uppercase; letter-spacing:0.05em; }
+  .log-section { margin-bottom:18px; }
+  .log-section-title { font-size:0.78rem; font-weight:800; text-transform:uppercase; letter-spacing:0.08em;
+    color:#a8a4c8; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #2e2b4a; }
+  .log-entry { background:#12112a; border-radius:10px; padding:10px 14px; margin-bottom:6px;
+    display:flex; gap:12px; align-items:flex-start; border-left:3px solid #2e2b4a; }
+  .log-entry.ok { border-left-color:#1dd1a1; }
+  .log-entry.ko { border-left-color:#ff6b6b; }
+  .log-icon { font-size:1rem; flex-shrink:0; margin-top:1px; }
+  .log-body { flex:1; min-width:0; }
+  .log-q { font-size:0.88rem; font-weight:700; color:#fffffe; margin-bottom:3px; line-height:1.3; }
+  .log-ans { font-size:0.8rem; color:#a8a4c8; line-height:1.4; }
+  .log-ans .given { color:#ff9ff3; font-weight:700; }
+  .log-ans .correct-ans { color:#1dd1a1; font-weight:700; }
+  .log-time { font-size:0.72rem; color:#4a4870; margin-top:3px; }
+  .log-theme { font-size:0.7rem; background:#ffffff10; color:#a8a4c8; padding:2px 7px; border-radius:10px;
+    display:inline-block; margin-bottom:3px; }
+  .empty-log { text-align:center; padding:40px 20px; color:#4a4870; font-size:0.95rem; }
+  .export-btn { background:#2e2b4a; color:#a8a4c8; border:none; padding:8px 16px; border-radius:10px;
+    font-family:'Nunito',sans-serif; font-weight:700; font-size:0.82rem; cursor:pointer; }
+  .export-btn:hover { background:#3d3a5c; color:#fffffe; }
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="container">
+  <div class="header">
+    <h1>&#127467;&#127479; Fran&#231;ais Aventure!</h1>
+    <p>Lis, apprends et deviens un champion du fran&#231;ais &#127942;</p>
+  </div>
+
+  <div class="xp-bar-wrap">
+    <span class="xp-label">&#9889; XP</span>
+    <div class="xp-track"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+    <div class="score-badge" id="scoreBadge">0 pts</div>
+  </div>
+  <div class="save-note">&#128190; Progression sauvegard&#233;e automatiquement &mdash; <span id="saveStatus">chargement...</span></div>
+
+  <div id="streakDiv" class="streak" style="display:none"></div>
+
+  <div class="mode-tabs">
+    <button class="mode-tab active" onclick="switchMode('lecture',this)">
+      <span class="tab-emoji">&#128218;</span>Compr&#233;hension
+    </button>
+    <button class="mode-tab" onclick="switchMode('grammaire',this)">
+      <span class="tab-emoji">&#128292;</span>Grammaire
+    </button>
+    <button class="mode-tab" onclick="switchMode('conjugaison',this)">
+      <span class="tab-emoji">&#9881;&#65039;</span>Conjugaison
+    </button>
+    <button class="mode-tab" id="tabProgress" onclick="showProgress()">
+      <span class="tab-emoji">&#128202;</span>Progr&#232;s
+    </button>
+  </div>
+
+  <div id="levelFilterBar" class="level-filter" style="display:none">
+    <span class="level-filter-label">&#127919; Niveau :</span>
+    <button class="lvl-btn active" onclick="setLevel(0,this)">Tous</button>
+    <button class="lvl-btn" onclick="setLevel(1,this)">FACILE</button>
+    <button class="lvl-btn" onclick="setLevel(2,this)">MOYEN</button>
+    <button class="lvl-btn" onclick="setLevel(3,this)">DIFFICILE</button>
+  </div>
+
+  <div id="mainCard" class="card"></div>
+  <div id="dictTooltip" style="display:none">
+    <button class="dict-close" onclick="closeDict()">&#10005;</button>
+    <div class="dict-word" id="dictWord"></div>
+    <a class="dict-link" id="dictLink" href="#" target="_blank" rel="noopener">
+      &#128218; Voir dans le Wiktionnaire
+    </a>
+  </div>
+  <div class="reset-bar"><button class="btn-ghost btn" onclick="confirmReset()">&#128256; Recommencer &#224; z&#233;ro</button></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+//  BANKS
+// ═══════════════════════════════════════════════════════════════════
+const LECTURE = [
+  {
+    theme:"&#127912; Art",
+    passage:"<p>La Joconde, peinte par Léonard de Vinci entre 1503 et 1519, est sans doute le tableau le plus célèbre du monde. Pourtant, au moment de sa création, elle n'était qu'un portrait commandé par un marchand florentin pour représenter sa femme, Lisa Gherardini. Léonard a travaillé dessus pendant seize ans, perfectionnant sans cesse les détails, notamment le fameux sourire énigmatique.</p><p>Ce sourire a fasciné les scientifiques et les historiens de l'art pendant des siècles. Des études récentes ont montré que Léonard utilisait une technique appelée <em>sfumato</em> : il appliquait de fines couches de peinture semi-transparente pour créer des contours flous, ce qui donne l'impression que le sourire change selon l'angle depuis lequel on regarde le tableau.</p><p>Aujourd'hui exposée au Musée du Louvre à Paris, la Joconde est protégée derrière une vitre blindée et attire chaque année près de dix millions de visiteurs. Elle a été volée en 1911 par un employé du musée et retrouvée deux ans plus tard en Italie, ce qui a considérablement augmenté sa célébrité mondiale.</p>",
+    questions:[
+      { q:"Quelle technique Léonard de Vinci utilisait-il pour créer le sourire mystérieux de la Joconde ?", opts:["Le pointillisme","Le sfumato","L'aquarelle","Le clair-obscur"], correct:1, expl:"Le texte explique que Léonard utilisait le 'sfumato' : de fines couches semi-transparentes créant des contours flous.", fun:"La Joconde mesure seulement 77 × 53 cm — beaucoup plus petite que ce que la plupart des visiteurs imaginent !" },
+      { q:"Pourquoi la Joconde est-elle devenue encore plus célèbre au XXe siècle ?", opts:["Elle a été restaurée avec de nouvelles couleurs","Elle a été volée puis retrouvée, ce qui a fait le tour du monde","Elle a été copiée par un artiste célèbre","Elle a été exposée aux États-Unis"], correct:1, expl:"Le texte précise qu'elle 'a été volée en 1911 [...] et retrouvée deux ans plus tard en Italie, ce qui a considérablement augmenté sa célébrité mondiale'.", fun:"Le voleur, Vincenzo Peruggia, a caché la Joconde sous son lit pendant deux ans !" },
+      { q:"Combien de temps Léonard de Vinci a-t-il travaillé sur la Joconde ?", opts:["Deux ans","Cinq ans","Seize ans","Toute sa vie"], correct:2, expl:"Le texte indique que Léonard 'a travaillé dessus pendant seize ans'.", fun:"Léonard de Vinci était aussi ingénieur, scientifique et inventeur — il avait conçu des plans pour un ancêtre de l'hélicoptère au XVe siècle !" }
+    ]
+  },
+  {
+    theme:"&#127912; Art",
+    passage:"<p>Frida Kahlo est l'une des artistes les plus emblématiques du XXe siècle. Née au Mexique en 1907, elle a commencé à peindre après un grave accident de bus à l'âge de dix-huit ans, qui l'a laissée alitée pendant des mois. Immobilisée, elle a demandé à ses parents d'installer un miroir au-dessus de son lit, et c'est ainsi qu'elle a commencé à peindre des autoportraits.</p><p>Son œuvre est profondément personnelle et souvent douloureuse. Elle a réalisé 55 autoportraits au total, affirmant qu'elle se peignait elle-même parce qu'elle était le sujet qu'elle connaissait le mieux. Ses tableaux mêlent réalisme et symbolisme, incorporant des éléments de la culture mexicaine traditionnelle, comme les costumes colorés et les animaux symboliques.</p><p>Frida Kahlo n'a été reconnue internationalement qu'après sa mort, survenue en 1954. Aujourd'hui, ses œuvres se vendent à des prix records — l'une d'elles a atteint 34,9 millions de dollars en 2021, un record pour une artiste latino-américaine. Son image est devenue un symbole de résistance et d'indépendance dans le monde entier.</p>",
+    questions:[
+      { q:"Pourquoi Frida Kahlo a-t-elle commencé à peindre des autoportraits ?", opts:["Elle était payée pour le faire","Elle voulait devenir célèbre","Elle était alitée avec un miroir au-dessus d'elle","Son professeur lui avait donné cet exercice"], correct:2, expl:"Immobilisée après son accident, elle avait un miroir au-dessus de son lit et a commencé à se peindre elle-même.", fun:"Frida Kahlo avait des singes araignées, des cerfs et même un aigle comme animaux de compagnie !" },
+      { q:"Pourquoi Frida se peignait-elle principalement elle-même, selon ses propres mots ?", opts:["Parce que personne d'autre ne voulait poser pour elle","Parce qu'elle était le sujet qu'elle connaissait le mieux","Parce que les autoportraits se vendaient mieux","Parce que son médecin le lui conseillait"], correct:1, expl:"Le texte cite son explication : elle se peignait 'parce qu'elle était le sujet qu'elle connaissait le mieux'.", fun:"Kahlo a rencontré son mari, le grand peintre Diego Rivera, après lui avoir montré ses œuvres pour avoir son avis — il a été immédiatement impressionné !" },
+      { q:"Quand Frida Kahlo a-t-elle été reconnue à l'échelle internationale ?", opts:["De son vivant, dès les années 1930","Immédiatement après son accident","Seulement après sa mort en 1954","Grâce aux réseaux sociaux dans les années 2010"], correct:0, expl:"Le texte précise qu'elle 'n'a été reconnue internationalement qu'après sa mort, survenue en 1954' — donc seulement après 1954.", fun:"En 2021, son tableau 'Diego y yo' s'est vendu 34,9 millions de dollars, un record mondial pour une artiste latino-américaine !" }
+    ]
+  },
+  {
+    theme:"&#127758; G&#233;ographie",
+    passage:"<p>L'Amazonie est la plus grande forêt tropicale du monde, couvrant environ 5,5 millions de kilomètres carrés, soit la superficie de l'Europe occidentale. Elle s'étend sur neuf pays, dont le Brésil qui en possède 60 %. On l'appelle souvent le « poumon de la Terre » car elle produit environ 20 % de l'oxygène terrestre et absorbe d'énormes quantités de CO₂.</p><p>La biodiversité de l'Amazonie est absolument exceptionnelle. On y recense plus de 40 000 espèces de plantes, 1 300 espèces d'oiseaux, 3 000 espèces de poissons et des millions d'espèces d'insectes. Certaines régions de la forêt n'ont jamais été explorées par les scientifiques, et de nouvelles espèces sont découvertes chaque année.</p><p>Malheureusement, la déforestation menace sérieusement cet écosystème. Chaque année, des millions d'hectares sont détruits pour l'agriculture et l'élevage. Les scientifiques avertissent que si la déforestation continue à ce rythme, l'Amazonie pourrait atteindre un « point de basculement » à partir duquel elle se transformerait progressivement en savane.</p>",
+    questions:[
+      { q:"Pourquoi appelle-t-on l'Amazonie le « poumon de la Terre » ?", opts:["Parce qu'elle est très grande","Parce qu'elle produit de l'oxygène et absorbe le CO₂","Parce qu'elle contient beaucoup d'eau","Parce que les humains y vivent depuis longtemps"], correct:1, expl:"Elle 'produit environ 20 % de l'oxygène terrestre et absorbe d'énormes quantités de CO₂', comme le font les poumons.", fun:"Le fleuve Amazone déverse tellement d'eau dans l'Atlantique qu'on peut encore boire de l'eau douce à 160 km en mer !" },
+      { q:"Quelle est la principale menace qui pèse sur l'Amazonie aujourd'hui ?", opts:["Les incendies volcaniques","La montée des eaux","La déforestation pour l'agriculture et l'élevage","Le tourisme de masse"], correct:2, expl:"Le texte indique que 'des millions d'hectares sont détruits pour l'agriculture et l'élevage' chaque année.", fun:"Une nouvelle espèce animale ou végétale est découverte en Amazonie en moyenne toutes les deux à trois semaines !" },
+      { q:"Quel phénomène redoutent les scientifiques si la déforestation continue ?", opts:["Une inondation géante","L'Amazonie se transformerait progressivement en savane","La disparition de tous les poissons du fleuve","Une augmentation des tremblements de terre"], correct:1, expl:"Le texte parle d'un 'point de basculement à partir duquel elle se transformerait progressivement en savane'.", fun:"L'Amazonie abrite environ 400 peuples autochtones, dont certains n'ont jamais eu de contact avec le monde extérieur !" }
+    ]
+  },
+  {
+    theme:"&#127758; G&#233;ographie",
+    passage:"<p>Le Japon est un archipel composé de 6 852 îles, dont quatre principales : Honshu, Hokkaido, Kyushu et Shikoku. Situé sur la « Ceinture de feu » du Pacifique, c'est l'un des pays les plus sismiques du monde : il subit environ 1 500 tremblements de terre par an, dont la plupart sont si faibles qu'on ne les ressent pas. Pour faire face à ce risque, les Japonais ont développé des techniques de construction antisismiques parmi les plus avancées au monde.</p><p>Le Japon est aussi célèbre pour le mont Fuji, son plus haut sommet avec 3 776 mètres. Ce volcan endormi, considéré comme sacré dans la religion shinto, est l'un des sites les plus photographiés du monde. Chaque année, environ 200 000 personnes tentent de l'escalader, principalement entre juillet et septembre lorsque la neige a fondu.</p><p>Malgré sa petite superficie — le Japon est 18 fois plus petit que les États-Unis — c'est la troisième économie mondiale. Tokyo, sa capitale, est la métropole la plus peuplée du monde avec plus de 37 millions d'habitants dans son aire urbaine. Les Japonais sont également réputés pour leur espérance de vie élevée, l'une des plus longues de la planète.</p>",
+    questions:[
+      { q:"Pourquoi le Japon a-t-il développé des techniques de construction très avancées ?", opts:["Pour construire des immeubles plus beaux","Pour résister aux typhons tropicaux","Pour faire face aux fréquents tremblements de terre","Pour économiser de l'énergie"], correct:2, expl:"Le Japon subit environ 1 500 tremblements de terre par an et a donc développé des techniques antisismiques.", fun:"Au Japon, les distributeurs automatiques sont si courants qu'il y en a un pour 23 personnes !" },
+      { q:"Quelle est la particularité du mont Fuji au-delà de sa hauteur ?", opts:["C'est le volcan le plus actif d'Asie","Il est considéré comme sacré dans la religion shinto","Il est plus haut que l'Everest","Il est impossible à escalader en hiver"], correct:1, expl:"Le texte précise que le mont Fuji est 'considéré comme sacré dans la religion shinto'.", fun:"Le mont Fuji a été escaladé pour la première fois par un moine bouddhiste en 663 après J.-C. !" },
+      { q:"Quel record Tokyo détient-elle selon le texte ?", opts:["La ville la plus ancienne du monde","La ville avec le plus de gratte-ciels","La métropole la plus peuplée du monde","La capitale la plus riche du monde"], correct:2, expl:"Le texte indique que 'Tokyo est la métropole la plus peuplée du monde avec plus de 37 millions d'habitants'.", fun:"Le réseau de métro de Tokyo est tellement complexe qu'il possède des agents en gants blancs pour aider les passagers à trouver leur chemin !" }
+    ]
+  },
+  {
+    theme:"&#128220; Histoire",
+    passage:"<p>La Révolution française, qui éclate en 1789, est l'un des événements les plus importants de l'histoire mondiale. Elle met fin à des siècles de monarchie absolue et change profondément la société française. Son déclencheur immédiat est une crise financière grave : le royaume de France est au bord de la faillite après avoir participé à la guerre d'indépendance américaine, et le peuple souffre de la faim à cause de mauvaises récoltes successives.</p><p>Le 14 juillet 1789, les Parisiens prennent d'assaut la forteresse de la Bastille, symbole de l'oppression royale. Cet événement, célébré encore aujourd'hui comme fête nationale française, marque le début d'une période de bouleversements radicaux. L'Assemblée nationale adopte la Déclaration des droits de l'homme et du citoyen, proclamant les principes de liberté, d'égalité et de fraternité.</p><p>La Révolution a des conséquences mondiales considérables. Elle inspire d'autres révolutions en Europe et en Amérique latine, et ses idéaux influencent encore nos sociétés modernes. Cependant, elle traverse aussi des périodes très sombres, comme la Terreur en 1793-1794, durant laquelle des milliers de personnes sont guillotinées, y compris le roi Louis XVI et la reine Marie-Antoinette.</p>",
+    questions:[
+      { q:"Quelles étaient les deux causes principales de la Révolution française ?", opts:["Une guerre avec l'Angleterre et une sécheresse","Une crise financière et des mauvaises récoltes qui affamaient le peuple","La mort du roi et une révolte de l'armée","Des problèmes religieux et une invasion étrangère"], correct:1, expl:"Le texte mentionne une 'crise financière grave' et des 'mauvaises récoltes successives' qui faisaient souffrir le peuple.", fun:"La guillotine a été inventée pour rendre les exécutions moins douloureuses — son inventeur était contre la peine de mort !" },
+      { q:"Que symbolisait la prise de la Bastille le 14 juillet 1789 ?", opts:["La fin de la guerre avec l'Angleterre","La chute de l'oppression royale","La proclamation de la République","L'élection d'un nouveau roi"], correct:1, expl:"La Bastille est décrite dans le texte comme 'symbole de l'oppression royale', sa prise marquait donc la révolte contre cette oppression.", fun:"Au moment de sa prise d'assaut, la Bastille ne contenait que sept prisonniers — dont un fou et quatre faussaires !" },
+      { q:"Comment appelle-t-on la période sombre entre 1793 et 1794 pendant la Révolution ?", opts:["La Grande Peur","La Terreur","Le Directoire","La Commune"], correct:1, expl:"Le texte nomme explicitement 'la Terreur en 1793-1794, durant laquelle des milliers de personnes sont guillotinées'.", fun:"Durant la Terreur, même des révolutionnaires célèbres comme Robespierre ont fini par être guillotinés !" }
+    ]
+  },
+  {
+    theme:"&#128220; Histoire",
+    passage:"<p>Nelson Mandela est l'une des figures les plus admirées de l'histoire contemporaine. Né en 1918 en Afrique du Sud, il a consacré sa vie à lutter contre l'apartheid, un système légal de ségrégation raciale qui séparait les Noirs et les Blancs dans tous les aspects de la vie quotidienne : écoles, transports, restaurants, plages, et même bancs publics.</p><p>En raison de son combat pour l'égalité, Mandela a été arrêté en 1964 et condamné à la prison à vie. Il a passé 27 ans incarcéré, dont 18 dans la célèbre prison de Robben Island. Pendant ces longues années, il est devenu le symbole de la résistance mondiale contre l'injustice. Des milliers de personnes à travers le monde réclamaient sa libération.</p><p>Libéré en 1990 sous la pression internationale, Mandela a choisi la voie du dialogue plutôt que de la vengeance. En 1993, il reçoit le prix Nobel de la Paix avec le président Frederik de Klerk. L'année suivante, il devient le premier président noir d'Afrique du Sud, élu lors des premières élections libres et multiraciales du pays.</p>",
+    questions:[
+      { q:"Qu'était l'apartheid ?", opts:["Un parti politique sud-africain","Un système légal de ségrégation raciale","Une guerre civile en Afrique du Sud","Un mouvement artistique africain"], correct:1, expl:"Le texte définit l'apartheid comme 'un système légal de ségrégation raciale qui séparait les Noirs et les Blancs'.", fun:"Le mot 'apartheid' vient de l'afrikaans et signifie simplement 'séparation' ou 'mise à part'." },
+      { q:"Quelle attitude Mandela a-t-il choisie après sa libération de prison ?", opts:["Il a demandé l'emprisonnement de ses ennemis","Il a quitté l'Afrique du Sud","Il a choisi le dialogue plutôt que la vengeance","Il a organisé une révolution armée"], correct:2, expl:"Le texte indique qu'après sa libération, Mandela 'a choisi la voie du dialogue plutôt que de la vengeance'.", fun:"Mandela a appris la langue de ses gardiens de prison (l'afrikaans) pour mieux les comprendre et dialoguer avec eux." },
+      { q:"Quelle distinction Mandela a-t-il reçue en 1993 ?", opts:["La Légion d'honneur française","Le prix Nobel de la Paix","Le titre de roi d'Afrique du Sud","Le prix Pulitzer"], correct:1, expl:"Le texte précise qu'en 1993, 'il reçoit le prix Nobel de la Paix avec le président Frederik de Klerk'.", fun:"Mandela apparaît dans le Guinness des records comme le président le plus âgé à prendre ses fonctions : il avait 75 ans !" }
+    ]
+  },
+  {
+    theme:"&#127807; Nature",
+    passage:"<p>Les abeilles sont parmi les animaux les plus essentiels à la vie sur Terre. Elles pollinisent environ un tiers de toute la nourriture que nous consommons, en transportant le pollen d'une fleur à l'autre lorsqu'elles récoltent le nectar. Sans elles, des cultures entières comme les amandes, les fraises, les pommes et le café disparaîtraient ou deviendraient extrêmement rares.</p><p>Une ruche typique contient entre 50 000 et 80 000 abeilles, toutes organisées de façon remarquable. Il n'y a qu'une seule reine, dont le rôle est de pondre des œufs — jusqu'à 2 000 par jour ! Les ouvrières, toutes femelles, accomplissent toutes les autres tâches : construire les alvéoles en cire, nourrir les larves, surveiller l'entrée et récolter le nectar. Les mâles, appelés faux-bourdons, ont un seul but : s'accoupler avec la reine.</p><p>Malheureusement, les populations d'abeilles sont en déclin sérieux depuis plusieurs décennies. Les principales causes sont l'utilisation intensive de pesticides, la destruction de leur habitat naturel, les maladies et les parasites comme le varroa. Des scientifiques et des apiculteurs du monde entier cherchent des solutions pour protéger ces pollinisateurs indispensables.</p>",
+    questions:[
+      { q:"Quel est le rôle principal de la reine dans une ruche ?", opts:["Diriger les ouvrières dans leur travail","Surveiller l'entrée de la ruche","Pondre des œufs pour assurer la reproduction","Récolter le nectar des fleurs"], correct:2, expl:"Le texte précise que le rôle de la reine est de 'pondre des œufs — jusqu'à 2 000 par jour'.", fun:"Une abeille ouvrière produit environ un douzième de cuillère à café de miel dans toute sa vie !" },
+      { q:"Pourquoi les abeilles sont-elles si importantes pour notre alimentation ?", opts:["Elles produisent du miel nutritif","Elles pollinisent environ un tiers de notre nourriture","Elles nettoient les plantes des insectes nuisibles","Elles fertilisent directement la terre"], correct:1, expl:"Le texte explique qu'elles 'pollinisent environ un tiers de toute la nourriture que nous consommons'.", fun:"Il faut deux millions de fleurs visitées pour faire 500 grammes de miel !" },
+      { q:"Quelles sont les principales causes du déclin des abeilles ?", opts:["La sécheresse et le froid","Les pesticides, la destruction de l'habitat et les parasites","La concurrence avec d'autres insectes","Le changement des habitudes alimentaires des humains"], correct:1, expl:"Le texte liste 'l'utilisation intensive de pesticides, la destruction de leur habitat naturel, les maladies et les parasites comme le varroa'.", fun:"Pour aider les abeilles, tu peux planter des fleurs sauvages dans ton jardin ou sur ton balcon — même un pot de lavande fait la différence !" }
+    ]
+  },
+  {
+    theme:"&#127807; Nature",
+    passage:"<p>Les aurores boréales, aussi appelées « Northern Lights » en anglais, sont l'un des spectacles naturels les plus époustouflants de notre planète. Ces rideaux lumineux de couleurs vives — vert, rose, violet, bleu — dansent dans le ciel des régions polaires et attirent des milliers de touristes chaque année en Norvège, en Finlande, en Islande et au Canada.</p><p>Ce phénomène est causé par l'interaction entre les particules chargées émises par le Soleil — appelées vent solaire — et le champ magnétique terrestre. Lorsque ces particules entrent dans l'atmosphère aux pôles, elles entrent en collision avec les gaz atmosphériques comme l'oxygène et l'azote, les faisant briller. La couleur dépend du type de gaz et de l'altitude.</p><p>Les aurores boréales suivent un cycle d'environ onze ans lié à l'activité du Soleil. Durant les périodes d'activité solaire maximale, les aurores sont plus fréquentes et plus intenses, et peuvent même être visibles depuis des régions tempérées comme le nord de la France. Les aurores australes existent aussi dans l'hémisphère sud, mais elles sont bien moins observées car il y a moins de terres habitées dans ces régions.</p>",
+    questions:[
+      { q:"Qu'est-ce qui cause les aurores boréales ?", opts:["Le reflet de la glace sur les nuages","La collision de particules solaires avec les gaz de l'atmosphère","Les éruptions de volcans arctiques","La lumière de la lune réfractée par le froid"], correct:1, expl:"Les particules du vent solaire 'entrent en collision avec les gaz atmosphériques comme l'oxygène et l'azote, les faisant briller'.", fun:"Les peuples Inuits croyaient que les aurores étaient les esprits de leurs ancêtres qui jouaient au foot avec un crâne de morse !" },
+      { q:"De quoi dépend la couleur des aurores boréales ?", opts:["De la saison et de la température","Du type de gaz et de l'altitude","De la force du vent solaire uniquement","De la distance par rapport au pôle"], correct:1, expl:"Le texte précise que 'la couleur dépend du type de gaz et de l'altitude'.", fun:"L'oxygène à haute altitude produit des aurores rouges très rares ; à basse altitude il produit du vert, le plus courant. L'azote donne du bleu et du violet !" },
+      { q:"Quand les aurores boréales sont-elles les plus intenses ?", opts:["En hiver, à chaque année","Lors des périodes d'activité solaire maximale","Uniquement lors des équinoxes","Lors des éclipses de lune"], correct:1, expl:"Le texte explique que 'durant les périodes d'activité solaire maximale, les aurores sont plus fréquentes et plus intenses'.", fun:"En mai 2024, une tempête solaire exceptionnelle a rendu les aurores visibles jusqu'en Espagne, au Maroc et même à Bali !" }
+    ]
+  },
+  {
+    theme:"&#128640; Science &amp; Espace",
+    passage:"<p>En juillet 1969, les astronautes Neil Armstrong et Buzz Aldrin sont devenus les premiers êtres humains à marcher sur la Lune, lors de la mission Apollo 11. Neil Armstrong a prononcé ces mots célèbres en posant le pied sur le sol lunaire : « C'est un petit pas pour l'homme, un bond de géant pour l'humanité. » La mission a nécessité huit ans de travail, 400 000 ingénieurs et scientifiques, et a coûté l'équivalent de 150 milliards de dollars actuels.</p><p>La surface de la Lune est très différente de la Terre : il n'y a ni atmosphère, ni vent, ni eau. Les températures varient de -170°C la nuit à +130°C le jour. Les astronautes devaient porter des combinaisons spéciales pressurisées pour survivre. L'absence d'atmosphère signifie aussi qu'il n'y a aucun son — la Lune est totalement silencieuse.</p><p>Un détail fascinant : les traces de pas laissées par Armstrong et Aldrin sont encore visibles aujourd'hui sur la Lune, et le resteront pendant des millions d'années. Sans vent ni eau pour les effacer, elles sont parfaitement conservées. Les six missions Apollo ont rapporté 382 kg de roches lunaires qui sont encore étudiées par les scientifiques du monde entier.</p>",
+    questions:[
+      { q:"Pourquoi les traces de pas des astronautes sur la Lune sont-elles encore visibles ?", opts:["Parce qu'elles ont été sculptées profondément","Parce que la Lune est protégée par une vitre","Parce qu'il n'y a ni vent ni eau pour les effacer","Parce que les astronautes ont utilisé un matériau spécial"], correct:2, expl:"Il n'y a 'ni vent ni eau pour les effacer', donc elles sont 'parfaitement conservées'.", fun:"Michael Collins, le 3ème astronaute d'Apollo 11, est resté en orbite — il est la personne la plus isolée de l'histoire humaine, seul de l'autre côté de la Lune !" },
+      { q:"Combien de personnes ont travaillé sur le projet Apollo 11 ?", opts:["4 000 personnes","40 000 personnes","400 000 personnes","4 millions de personnes"], correct:2, expl:"Le texte mentionne que la mission 'a nécessité [...] 400 000 ingénieurs et scientifiques'.", fun:"Les calculs de navigation de la mission Apollo ont été effectués à la main par des mathématiciennes, dont la célèbre Katherine Johnson !" },
+      { q:"Quelle est la température extrême maximale à la surface de la Lune ?", opts:["-170°C","0°C","+130°C","+300°C"], correct:2, expl:"Le texte indique que 'les températures varient de -170°C la nuit à +130°C le jour'.", fun:"La combinaison spatiale des astronautes Apollo pesait 81 kg sur Terre, mais sur la Lune — avec sa gravité 6 fois plus faible — elle ne pesait que 13,5 kg !" }
+    ]
+  },
+  {
+    theme:"&#128640; Science &amp; Espace",
+    passage:"<p>Les trous noirs sont parmi les objets les plus mystérieux de l'univers. Ce sont des régions de l'espace où la gravité est si intense que rien ne peut en échapper, pas même la lumière. C'est pour cela qu'on ne peut pas les voir directement — ils sont, par définition, invisibles. Ils se forment généralement quand une étoile très massive meurt en explosant lors d'une supernova, et que son noyau s'effondre sur lui-même.</p><p>En avril 2019, les scientifiques ont réussi pour la première fois de l'histoire à photographier un trou noir. Cette image, obtenue grâce à un réseau de radiotélescopes répartis sur toute la Terre — appelé Event Horizon Telescope — montre le trou noir au centre de la galaxie M87, situé à 55 millions d'années-lumière de nous. L'image a révélé un anneau lumineux de gaz chauffé entourant une zone sombre centrale.</p><p>Au centre de notre propre galaxie, la Voie Lactée, se trouve également un trou noir supermassif nommé Sagittarius A*, dont la masse équivaut à quatre millions de fois celle du Soleil. Mais ne t'inquiète pas : il est situé à 26 000 années-lumière de la Terre, bien trop loin pour représenter le moindre danger pour nous !</p>",
+    questions:[
+      { q:"Pourquoi est-il impossible de voir un trou noir directement ?", opts:["Parce qu'ils sont trop petits","Parce qu'ils se déplacent trop vite","Parce que même la lumière ne peut pas en échapper","Parce qu'ils sont derrière d'autres étoiles"], correct:2, expl:"'La gravité est si intense que rien ne peut en échapper, pas même la lumière', les rendant invisibles.", fun:"Si tu tombais dans un trou noir, les observateurs extérieurs te verraient ralentir et ne jamais vraiment franchir le bord — un effet prévu par Einstein !" },
+      { q:"Comment les scientifiques ont-ils réussi à photographier un trou noir en 2019 ?", opts:["Avec un seul très grand télescope spatial","Grâce à un réseau de radiotélescopes répartis sur toute la Terre","En envoyant une sonde spatiale près d'un trou noir","En utilisant des rayons X spéciaux"], correct:1, expl:"L'image a été obtenue grâce à 'un réseau de radiotélescopes répartis sur toute la Terre — appelé Event Horizon Telescope'.", fun:"Les données de cette photo pesaient si lourd que les disques durs ne pouvaient pas être envoyés par internet — ils ont été expédiés par avion !" },
+      { q:"Quel trou noir se trouve au centre de notre galaxie, la Voie Lactée ?", opts:["M87","Sagittarius A*","Alpha Centauri","Andromède"], correct:1, expl:"Le texte nomme explicitement 'un trou noir supermassif nommé Sagittarius A*' au centre de la Voie Lactée.", fun:"Sagittarius A* a une masse de 4 millions de fois celle du Soleil, mais sa taille est à peine plus grande que le système solaire !" }
+    ]
+  },
+  {
+    theme:"&#127981; Civilisations anciennes",
+    passage:"<p>L'Égypte ancienne est l'une des civilisations les plus fascinantes de l'histoire humaine. Pendant plus de 3 000 ans, elle a prospéré le long du Nil, dont les crues annuelles fertilisaient les terres agricoles. Les Égyptiens croyaient en une vie après la mort et consacraient une part considérable de leurs ressources à préparer ce voyage, notamment en momifiant les corps des défunts pour les préserver.</p><p>Les pyramides, construites comme tombeaux des pharaons, sont l'une des merveilles les plus impressionnantes de l'Antiquité. La Grande Pyramide de Gizeh, construite vers 2560 avant J.-C. pour le pharaon Khéops, a nécessité environ 2,3 millions de blocs de pierre. Pendant 3 800 ans, elle a été la construction la plus haute du monde. Des milliers d'ouvriers — et non des esclaves — ont travaillé à sa construction.</p><p>L'écriture égyptienne, les hiéroglyphes, a longtemps été un mystère pour les savants modernes. C'est grâce à la Pierre de Rosette, découverte en 1799 lors de la campagne de Napoléon en Égypte, que le Français Jean-François Champollion a pu déchiffrer ce système d'écriture en 1822. La pierre portait le même texte en trois langues, dont le grec que les savants comprenaient déjà.</p>",
+    questions:[
+      { q:"Qui a construit les pyramides égyptiennes selon les connaissances actuelles ?", opts:["Des esclaves venus d'autres pays","Des extraterrestres selon des théories scientifiques","Des ouvriers égyptiens (non des esclaves)","Des soldats de l'armée du pharaon"], correct:2, expl:"Le texte précise 'des milliers d'ouvriers — et non des esclaves — ont travaillé à sa construction'.", fun:"Les ouvriers qui construisaient les pyramides recevaient de la bière comme partie de leur salaire — environ 4 litres par jour !" },
+      { q:"Quel était le rôle des momifications dans la culture égyptienne ?", opts:["Un rituel pour honorer les dieux du soleil","Préserver le corps pour le voyage vers la vie après la mort","Une pratique médicale pour soigner les malades","Une façon de punir les criminels"], correct:1, expl:"Les Égyptiens 'croyaient en une vie après la mort' et momifiaient les corps 'pour les préserver' pour ce voyage.", fun:"Le processus de momification durait 70 jours et impliquait l'extraction du cerveau par les narines à l'aide de crochets en métal !" },
+      { q:"Grâce à quoi Champollion a-t-il pu déchiffrer les hiéroglyphes ?", opts:["Un dictionnaire ancien trouvé à Alexandrie","La Pierre de Rosette qui portait le même texte en trois langues","Des dessins explicatifs dans une tombe royale","L'aide de prêtres égyptiens qui connaissaient encore l'ancienne écriture"], correct:1, expl:"La Pierre de Rosette 'portait le même texte en trois langues, dont le grec que les savants comprenaient déjà'.", fun:"Champollion était si ému d'avoir déchiffré les hiéroglyphes qu'il s'est évanoui dans son bureau avant de pouvoir l'annoncer !" }
+    ]
+  },
+  {
+    theme:"&#127981; Civilisations anciennes",
+    passage:"<p>Les Mayas ont développé l'une des civilisations les plus avancées des Amériques, entre 2000 avant J.-C. et 1500 après J.-C. Leur territoire couvrait le Mexique du sud-est, le Guatemala, le Belize et une partie du Honduras et du Salvador. À leur apogée, des villes comme Tikal ou Chichen Itza comptaient plusieurs dizaines de milliers d'habitants et possédaient des pyramides imposantes et des systèmes d'irrigation sophistiqués.</p><p>Les Mayas étaient des astronomes et des mathématiciens remarquables. Ils avaient développé un calendrier extrêmement précis, basé sur des observations méticuleuses du Soleil, de la Lune et de Vénus. Ils utilisaient également le concept du zéro dans leurs calculs — une innovation mathématique majeure que l'Europe n'a adoptée que bien plus tard. Leur écriture, composée de glyphes complexes, permettait de noter l'histoire, les mythes et les calculs astronomiques.</p><p>L'effondrement de la civilisation maya classique, vers 900 après J.-C., reste en partie mystérieux. Les historiens évoquent plusieurs causes possibles : des sécheresses prolongées, des guerres entre cités-États rivales et la surexploitation des ressources naturelles. Mais les Mayas n'ont pas disparu — leurs descendants, environ six millions de personnes, vivent encore aujourd'hui au Mexique et en Amérique centrale.</p>",
+    questions:[
+      { q:"Quelle innovation mathématique importante les Mayas avaient-ils développée ?", opts:["Le système décimal","La géométrie avancée","Le concept du zéro","Les fractions"], correct:2, expl:"Le texte mentionne qu'ils 'utilisaient le concept du zéro dans leurs calculs — une innovation mathématique majeure que l'Europe n'a adoptée que bien plus tard'.", fun:"Le calendrier maya était si précis qu'il ne déphasait d'une seconde par rapport au calendrier solaire qu'au bout de 6 000 ans !" },
+      { q:"Qu'est-il arrivé à la civilisation maya vers l'an 900 après J.-C. ?", opts:["Elle a été conquise par les Aztèques","Elle s'est effondrée, possiblement à cause de sécheresses et de guerres","Elle a migré vers l'Amérique du Nord","Elle a été détruite par des éruptions volcaniques"], correct:1, expl:"Le texte parle de 'l'effondrement de la civilisation maya classique' et cite 'sécheresses prolongées, guerres et surexploitation des ressources'.", fun:"Le fameux 'calendrier maya de 2012 annonçant la fin du monde' était juste la fin d'un cycle de 5 125 ans — les Mayas ne prévoyaient aucune apocalypse !" },
+      { q:"Les Mayas ont-ils complètement disparu ?", opts:["Oui, ils ont tous péri lors de l'effondrement","Oui, les Espagnols les ont entièrement éliminés","Non, environ six millions de descendants vivent encore aujourd'hui","Non, mais ils n'ont gardé aucune de leurs traditions"], correct:2, expl:"Le texte précise que 'leurs descendants, environ six millions de personnes, vivent encore aujourd'hui au Mexique et en Amérique centrale'.", fun:"Vingt-et-une langues mayas différentes sont encore parlées aujourd'hui au Mexique et en Amérique centrale !" }
+    ]
+  },
+  {
+    theme:"&#129504; Psychologie",
+    passage:"<p>Le sommeil est bien plus qu'un simple repos pour le corps. C'est un état actif durant lequel le cerveau accomplit des tâches essentielles. Pendant la nuit, il trie et consolide les souvenirs de la journée, élimine les déchets toxiques accumulés entre les neurones, et libère des hormones de croissance indispensables au développement physique — c'est pour cela que les adolescents, qui grandissent vite, ont particulièrement besoin de dormir.</p><p>Le cerveau traverse plusieurs cycles de sommeil au cours d'une nuit. Le sommeil paradoxal, aussi appelé phase REM (Rapid Eye Movement), est le moment où l'on rêve le plus intensément. Durant cette phase, les yeux bougent rapidement sous les paupières, le cerveau est aussi actif qu'en état de veille, mais les muscles sont paralysés — probablement pour nous empêcher d'agir physiquement nos rêves.</p><p>Les scientifiques s'accordent à dire que les adolescents ont besoin de 8 à 10 heures de sommeil par nuit. Un manque chronique de sommeil affecte la concentration, la mémoire, les émotions et même le système immunitaire. Des études ont montré que les élèves qui dorment suffisamment obtiennent de meilleures notes et gèrent mieux le stress. Pourtant, les écrans et les réseaux sociaux poussent beaucoup de jeunes à dormir bien moins que nécessaire.</p>",
+    questions:[
+      { q:"Que se passe-t-il dans le cerveau pendant la phase de sommeil paradoxal (REM) ?", opts:["Le cerveau est totalement au repos","On ne rêve pas du tout","Le cerveau est très actif et l'on rêve intensément","Le corps grandit le plus vite"], correct:2, expl:"Le texte décrit la phase REM comme le moment où 'le cerveau est aussi actif qu'en état de veille' et où 'l'on rêve le plus intensément'.", fun:"Les dauphins dorment avec la moitié de leur cerveau à la fois pour continuer à nager et surveiller les prédateurs !" },
+      { q:"Pourquoi les adolescents ont-ils particulièrement besoin de sommeil ?", opts:["Parce qu'ils font beaucoup de sport","Parce que leur cerveau libère des hormones de croissance pendant le sommeil","Parce qu'ils apprennent plus de choses que les adultes","Parce qu'ils ont un rythme cardiaque plus rapide"], correct:1, expl:"Le texte explique que le sommeil 'libère des hormones de croissance indispensables au développement physique' — crucial pour les ados qui grandissent vite.", fun:"La lumière bleue des écrans de téléphone imite la lumière du jour et trompe le cerveau, lui faisant croire qu'il fait encore jour — d'où la difficulté à s'endormir !" },
+      { q:"Selon les études citées dans le texte, quel est l'effet d'un bon sommeil sur les élèves ?", opts:["Ils deviennent plus créatifs","Ils obtiennent de meilleures notes et gèrent mieux le stress","Ils ont besoin de moins de temps pour réviser","Ils mémorisent mieux en dormant moins longtemps"], correct:1, expl:"Le texte indique que 'les élèves qui dorment suffisamment obtiennent de meilleures notes et gèrent mieux le stress'.", fun:"Des chercheurs de Harvard ont découvert que dormir juste après avoir appris quelque chose améliore la mémorisation de 20 à 40% !" }
+    ]
+  },
+  {
+    theme:"&#129504; Psychologie",
+    passage:"<p>Les émotions jouent un rôle fondamental dans nos décisions, bien plus que nous ne le pensons. Le neuroscientifique Antonio Damasio a étudié des patients ayant subi des lésions dans la zone du cerveau qui traite les émotions. Paradoxalement, ces personnes, pourtant parfaitement intelligentes et rationnelles, étaient incapables de prendre des décisions simples comme choisir entre deux restaurants. Sans émotions pour guider leur choix, elles pouvaient analyser indéfiniment sans jamais décider.</p><p>Nos émotions communiquent également à travers notre corps. La peur déclenche une montée d'adrénaline qui accélère le cœur et tend les muscles — une réaction héritée de nos ancêtres qui devaient fuir les prédateurs. La joie libère de la dopamine, un neurotransmetteur qui nous donne envie de répéter ce qui nous a rendus heureux. La tristesse, elle, ralentit notre corps et nous pousse à réfléchir.</p><p>Les psychologues ont identifié six émotions dites « universelles » que tous les êtres humains expriment de la même façon sur leur visage, quelle que soit leur culture : la joie, la tristesse, la peur, la colère, le dégoût et la surprise. Cette universalité suggère que ces émotions ont une origine biologique, gravée dans nos gènes. Reconnaître et accepter ses émotions est aujourd'hui considéré comme une compétence essentielle pour le bien-être mental.</p>",
+    questions:[
+      { q:"Quelle découverte Damasio a-t-il faite sur les émotions et les décisions ?", opts:["Les émotions nuisent à la prise de décision rationnelle","Des personnes intelligentes sans émotions ne parvenaient plus à décider","Les émotions sont uniquement culturelles","Les décisions sont toujours irrationnelles"], correct:1, expl:"Des patients sans émotions 'étaient incapables de prendre des décisions simples' malgré une intelligence préservée.", fun:"On peut légèrement 'se rendre heureux' en souriant même faussement : le cerveau perçoit les signaux des muscles et libère de la dopamine !" },
+      { q:"Pourquoi la peur provoque-t-elle une montée d'adrénaline dans notre corps ?", opts:["C'est un mécanisme récent lié au stress moderne","C'est une réaction héritée de nos ancêtres qui devaient fuir les prédateurs","C'est une réponse au manque de sommeil","C'est causé par l'excès de sucre dans le sang"], correct:1, expl:"Le texte explique que c'est 'une réaction héritée de nos ancêtres qui devaient fuir les prédateurs'.", fun:"En situation de peur extrême, certains humains développent une force physique temporairement décuplée — des gens ont soulevé des voitures pour sauver des proches !" },
+      { q:"Combien d'émotions universelles les psychologues ont-ils identifiées ?", opts:["Quatre","Six","Huit","Douze"], correct:1, expl:"Le texte mentionne 'six émotions dites universelles' : la joie, la tristesse, la peur, la colère, le dégoût et la surprise.", fun:"Paul Ekman, le chercheur qui a identifié ces 6 émotions universelles, a inspiré la série TV 'Lie to Me' sur la détection du mensonge !" }
+    ]
+  },
+  {
+    theme:"&#127754; Oc&#233;ans",
+    passage:"<p>Les océans couvrent 71 % de la surface de la Terre et contiennent 97 % de toute l'eau de la planète. Pourtant, nous en avons exploré moins de 20 % : le fond des océans reste plus mystérieux que la surface de la Lune. La zone la plus profonde connue est la fosse des Mariannes dans le Pacifique, qui atteint 11 034 mètres de profondeur — si on y plaçait l'Everest, il serait encore submergé de plus de 2 kilomètres.</p><p>La vie dans les grandes profondeurs est étonnamment riche. Des centaines d'espèces vivent dans une obscurité totale, sous des pressions écrasantes et à des températures proches de zéro. Beaucoup de ces créatures produisent leur propre lumière grâce à un phénomène appelé bioluminescence. Le poisson-lanterne, le calamar géant et certaines méduses font partie de cette faune fascinante et encore largement inconnue.</p><p>Les océans jouent un rôle crucial dans la régulation du climat terrestre. Ils absorbent environ 30 % du CO₂ produit par les activités humaines et 90 % de l'excès de chaleur lié au réchauffement climatique. Cependant, cette absorption a des conséquences graves : l'acidification des océans menace les coraux et les coquillages, et la montée des températures provoque le blanchissement des récifs coralliens.</p>",
+    questions:[
+      { q:"Qu'est-ce que la bioluminescence ?", opts:["Une technique pour explorer les fonds marins","La capacité de certains animaux à produire leur propre lumière","Un type de plante qui pousse dans l'obscurité","La lumière du soleil qui pénètre dans les profondeurs"], correct:1, expl:"Le texte explique que 'beaucoup de ces créatures produisent leur propre lumière grâce à un phénomène appelé bioluminescence'.", fun:"75 % des animaux des grandes profondeurs sont bioluminescents — dans l'obscurité totale des abysses, la lumière est une arme pour chasser !" },
+      { q:"Quelle est la zone la plus profonde connue des océans ?", opts:["La fosse de Puerto Rico","La fosse des Mariannes","La fosse de Tonga","La fosse de l'Atlantique nord"], correct:1, expl:"Le texte cite 'la fosse des Mariannes dans le Pacifique, qui atteint 11 034 mètres de profondeur'.", fun:"En 2012, le réalisateur James Cameron (Titanic, Avatar) est descendu seul dans un sous-marin jusqu'au fond de la fosse des Mariannes !" },
+      { q:"Quel problème l'absorption de CO₂ par les océans crée-t-elle ?", opts:["Elle réchauffe l'eau de surface","Elle réduit la quantité d'oxygène dans l'eau","Elle provoque l'acidification des océans, menaçant les coraux","Elle ralentit les courants marins"], correct:2, expl:"Le texte indique que 'l'acidification des océans menace les coraux et les coquillages'.", fun:"L'acidité des océans a augmenté de 26 % depuis le début de l'ère industrielle, au XVIIIe siècle !" }
+    ]
+  },
+  {
+    theme:"&#127754; Oc&#233;ans",
+    passage:"<p>Les récifs coralliens couvrent moins de 1 % du fond des océans, mais ils abritent environ 25 % de toutes les espèces marines connues. On les appelle parfois les « forêts tropicales de la mer ». La Grande Barrière de Corail, au large de l'Australie, est le plus grand organisme vivant du monde : elle s'étend sur 2 300 kilomètres et est visible depuis l'espace.</p><p>Contrairement à ce qu'on pourrait penser, les coraux ne sont pas des plantes mais des animaux. Chaque polype de corail est un petit animal qui sécrète un squelette calcaire. Ces milliards de squelettes s'accumulent sur des milliers d'années pour former les récifs. Les coraux vivent en symbiose avec de minuscules algues appelées zooxanthelles, qui leur fournissent leur énergie et leur donnent leurs couleurs vives.</p><p>Aujourd'hui, les récifs coralliens sont gravement menacés. Le réchauffement des océans provoque le blanchissement des coraux : quand la température monte trop, les coraux expulsent les algues et deviennent blancs. Sans leurs algues, ils meurent lentement. On estime que 50 % des coraux du monde ont disparu depuis les années 1950, et les scientifiques craignent que la majorité disparaisse d'ici la fin du siècle.</p>",
+    questions:[
+      { q:"Pourquoi les coraux blanchissent-ils quand la température de l'eau monte ?", opts:["Ils produisent plus de squelette calcaire blanc","Ils perdent leur couleur à cause de la pollution","Ils expulsent les algues qui leur donnaient leur couleur","Ils se protègent du soleil en changeant de couleur"], correct:2, expl:"Le texte explique que 'les coraux expulsent les algues et deviennent blancs' quand la température monte trop.", fun:"Le poisson-clown (comme Nemo !) est immunisé contre le venin des anémones grâce à un mucus protecteur — une symbiose parfaite !" },
+      { q:"Quelle est la nature biologique des coraux ?", opts:["Des plantes marines","Des champignons marins","Des minéraux naturels","Des animaux"], correct:3, expl:"Le texte précise clairement que 'les coraux ne sont pas des plantes mais des animaux'. Chaque polype est un animal.", fun:"Un récif corallien peut mettre 10 000 ans à se former — ce qui rend leur destruction en quelques décennies encore plus alarmante !" },
+      { q:"Quel pourcentage des espèces marines vivent dans les récifs coralliens ?", opts:["5 %","25 %","50 %","75 %"], correct:1, expl:"Le texte indique que les récifs 'abritent environ 25 % de toutes les espèces marines connues'.", fun:"La Grande Barrière de Corail est si grande qu'elle peut être vue depuis la Station spatiale internationale à 400 km d'altitude !" }
+    ]
+  },
+  {
+    theme:"&#127916; Cin&#233;ma &amp; Musique",
+    passage:"<p>Le cinéma est né officiellement le 28 décembre 1895, lorsque les frères Lumière ont organisé la première projection publique payante à Paris. Leurs premières « vues » — de courtes scènes de la vie quotidienne — ont stupéfié le public. La légende raconte que des spectateurs ont fui la salle en pensant qu'un train allait les écraser, bien que les historiens doutent aujourd'hui que cette réaction ait vraiment eu lieu.</p><p>En moins d'un siècle, le cinéma est devenu l'art le plus populaire du monde. Les premières œuvres étaient muettes et en noir et blanc. Le premier film parlant, « Le Chanteur de jazz », est sorti aux États-Unis en 1927, révolutionnant l'industrie. La couleur est devenue courante dans les années 1950, et les effets spéciaux numériques ont transformé le cinéma à partir des années 1990 avec des films comme « Jurassic Park ».</p><p>Aujourd'hui, l'industrie du cinéma mondial représente des dizaines de milliards de dollars par an. Hollywood reste la capitale du cinéma mondial, mais Bollywood, à Mumbai en Inde, produit en réalité plus de films chaque année. La façon dont on consomme le cinéma change radicalement : les plateformes de streaming comme Netflix ont bouleversé les habitudes, et des films de qualité sont désormais produits pour être vus directement chez soi.</p>",
+    questions:[
+      { q:"Quelle innovation le film 'Le Chanteur de jazz' (1927) a-t-il introduite ?", opts:["La couleur","Les effets spéciaux","Le son et la parole","Les sous-titres"], correct:2, expl:"Le texte indique que 'Le Chanteur de jazz' est 'le premier film parlant', révolutionnant l'industrie grâce au son.", fun:"Le film le plus cher jamais réalisé est 'Pirates des Caraïbes : Jusqu'au bout du monde' avec un budget de 300 millions de dollars !" },
+      { q:"Quel pays produit plus de films chaque année qu'Hollywood ?", opts:["La France","La Chine","Le Royaume-Uni","L'Inde (Bollywood)"], correct:3, expl:"Le texte précise que 'Bollywood, à Mumbai en Inde, produit en réalité plus de films chaque année' qu'Hollywood.", fun:"Bollywood produit environ 2 000 films par an — contre 700 pour Hollywood. Les films indiens sont regardés dans plus de 90 pays !" },
+      { q:"Quelle réaction légendaire (mais probablement fausse) les premiers spectateurs du cinéma auraient-ils eue ?", opts:["Ils auraient essayé de toucher les images","Ils auraient fui la salle en croyant qu'un train arrivait sur eux","Ils auraient applaudi pendant toute la projection","Ils auraient refusé de payer"], correct:1, expl:"Le texte mentionne la légende selon laquelle 'des spectateurs ont fui la salle en pensant qu'un train allait les écraser', bien que les historiens en doutent.", fun:"La première séance des frères Lumière comptait 33 spectateurs payants. Aujourd'hui, le cinéma accueille 7 milliards de spectateurs par an dans le monde !" }
+    ]
+  },
+  {
+    theme:"&#127916; Cin&#233;ma &amp; Musique",
+    passage:"<p>Ludwig van Beethoven est considéré comme l'un des plus grands compositeurs de l'histoire de la musique occidentale. Né à Bonn en Allemagne en 1770, il a montré un talent musical exceptionnel dès son plus jeune âge. À l'âge de 22 ans, il s'installe à Vienne, la capitale musicale de l'époque, où il devient rapidement célèbre comme pianiste virtuose et compositeur innovant.</p><p>Ce qui rend son histoire particulièrement extraordinaire, c'est qu'à partir de 27 ans, Beethoven a commencé à perdre l'ouïe progressivement. Vers 44 ans, il était complètement sourd. Pourtant, c'est pendant cette période qu'il a composé certaines de ses œuvres les plus grandioses, dont la célèbre Neuvième Symphonie. Il composait en « entendant » la musique dans sa tête et en ressentant les vibrations du piano.</p><p>La Neuvième Symphonie, créée en 1824, est particulièrement remarquable car c'est la première grande symphonie à intégrer des voix humaines et un chœur. Lors de la première représentation, Beethoven dirigeait l'orchestre de dos au public. À la fin, sourd, il ne s'est pas retourné pour saluer. C'est la soliste qui l'a doucement tourné vers la salle, et il a découvert le public debout, en délire.</p>",
+    questions:[
+      { q:"Pourquoi la scène finale de la première de la Neuvième Symphonie était-elle si émouvante ?", opts:["Beethoven a pleuré sur scène","Beethoven ne pouvait pas entendre les applaudissements et ignorait l'ovation","L'orchestre avait fait de nombreuses erreurs","C'était le dernier concert de Beethoven"], correct:1, expl:"Sourd, Beethoven 'ne s'est pas retourné' car il 'ne les entendait pas' — quelqu'un a dû le tourner vers la salle pour qu'il voie les ovations.", fun:"L'hymne européen est tiré du dernier mouvement de la Neuvième Symphonie de Beethoven, l'Ode à la Joie !" },
+      { q:"Comment Beethoven continuait-il à composer malgré sa surdité totale ?", opts:["Il utilisait un appareil auditif révolutionnaire","Il dictait ses idées à un assistant","Il 'entendait' la musique dans sa tête et ressentait les vibrations du piano","Il copiait des mélodies de compositeurs plus jeunes"], correct:2, expl:"Le texte explique qu'il composait 'en entendant la musique dans sa tête et en ressentant les vibrations du piano'.", fun:"Beethoven sciait les pieds de son piano pour poser son oreille directement sur le plancher et ressentir les vibrations en composant !" },
+      { q:"Quelle innovation musicale la Neuvième Symphonie a-t-elle introduite ?", opts:["L'utilisation d'instruments électriques","L'intégration de voix humaines et d'un chœur dans une grande symphonie","La composition à partir d'une seule note","L'absence totale de violons"], correct:1, expl:"Le texte précise que c'est 'la première grande symphonie à intégrer des voix humaines et un chœur'.", fun:"La Neuvième Symphonie dure environ 65 minutes — et la durée standard des CD (74 min) a été choisie pour qu'elle tienne entièrement sur un seul disque !" }
+    ]
+  },
+  {
+    theme:"&#127941; Sports &amp; Records",
+    passage:"<p>Usain Bolt, le sprinter jamaïcain, est universellement reconnu comme l'homme le plus rapide de l'histoire. En 2009, lors des Championnats du monde de Berlin, il a établi le record du monde du 100 mètres en 9 secondes 58, une performance qui semble presque inhumaine. À cette vitesse, il parcourt environ 10,44 mètres par seconde, soit plus de 37 km/h.</p><p>Ce qui est remarquable, c'est que Bolt mesure 1,96 mètre — une taille inhabituellement grande pour un sprinteur. Les spécialistes pensaient que les grands athlètes étaient désavantagés en sprint car ils mettent plus de temps à accélérer. Bolt a prouvé le contraire : sa foulée exceptionnellement longue compense largement ce désavantage. Il lui faut environ 41 foulées pour parcourir 100 mètres, contre 45 à 48 pour ses adversaires.</p><p>Bolt a dominé le sprint mondial pendant plus d'une décennie, remportant huit médailles d'or olympiques aux Jeux de Pékin (2008), Londres (2012) et Rio (2016). Il a pris sa retraite sportive en 2017, laissant des records qui semblent destinés à durer longtemps. Depuis lors, personne n'est passé sous les 9 secondes 60 au 100 mètres.</p>",
+    questions:[
+      { q:"Quel avantage Bolt tirait-il de sa grande taille ?", opts:["Il pesait plus lourd et avait plus de puissance","Sa foulée longue lui permettait de couvrir plus de distance","Il pouvait mieux voir la ligne d'arrivée","Il résistait mieux à la fatigue"], correct:1, expl:"Le texte explique que 'sa foulée exceptionnellement longue compense largement ce désavantage' — il fait moins de foulées que ses adversaires.", fun:"Lors de sa course record à Berlin, Bolt a regardé à droite et célébré avant la ligne — il aurait pu courir encore plus vite !" },
+      { q:"Combien de médailles d'or olympiques Usain Bolt a-t-il remportées ?", opts:["Quatre","Six","Huit","Dix"], correct:2, expl:"Le texte mentionne 'huit médailles d'or olympiques aux Jeux de Pékin (2008), Londres (2012) et Rio (2016)'.", fun:"Bolt a déclaré que son repas préféré avant une course était... le poulet nuggets ! Il en aurait mangé 1 000 lors des JO de Pékin !" },
+      { q:"À quelle vitesse maximale Bolt courait-il lors de son record du monde ?", opts:["Environ 25 km/h","Environ 30 km/h","Environ 37 km/h","Environ 45 km/h"], correct:2, expl:"Le texte indique qu'à cette vitesse, 'il parcourt environ 10,44 mètres par seconde, soit plus de 37 km/h'.", fun:"Un guépard court à 110 km/h — mais ne peut maintenir cette vitesse que 30 secondes. Bolt maintient sa vitesse de pointe bien plus longtemps !" }
+    ]
+  },
+  {
+    theme:"&#127941; Sports &amp; Records",
+    passage:"<p>L'escalade est l'un des sports qui connaît la croissance la plus rapide au monde. Après son apparition aux Jeux Olympiques de Tokyo en 2021, elle a attiré des millions de nouveaux pratiquants. La discipline olympique combine trois spécialités : la vitesse, le bloc et la difficulté. Chacune exige des qualités physiques et mentales très différentes.</p><p>En falaise naturelle, certains grimpeurs atteignent des sommets à peine croyables. En 2017, Alex Honnold a réalisé l'un des exploits sportifs les plus extraordinaires de l'histoire : il a gravi en solitaire et sans corde le mur d'El Capitan dans le parc de Yosemite, en Californie. Cette paroi verticale de 900 mètres, que les meilleurs grimpeurs avec corde mettent plusieurs jours à franchir, il l'a escaladée en 3 heures 56 minutes. La moindre erreur aurait été fatale.</p><p>Ce qui est fascinant dans l'escalade, c'est l'importance de la réflexion et de la résolution de problèmes, presque autant que la force physique. Les grimpeurs parlent de « lire » le rocher : analyser les prises disponibles, planifier chaque mouvement, trouver les positions où le corps peut se reposer. C'est pour cette combinaison unique d'intelligence et d'athlétisme que beaucoup considèrent l'escalade comme l'un des sports les plus complets qui soit.</p>",
+    questions:[
+      { q:"Qu'est-ce qui rend l'exploit d'Alex Honnold particulièrement exceptionnel ?", opts:["Il a grimpé El Capitan en moins d'une heure","Il a grimpé une paroi de 900 m seul et sans corde, où toute erreur était mortelle","Il était le premier à gravir El Capitan avec une équipe","Il a battu un record de vitesse avec corde"], correct:1, expl:"Honnold a gravi 900 mètres 'en solitaire et sans corde' — 'la moindre erreur aurait été fatale', rendant l'exploit unique.", fun:"Des chercheurs ont scanné le cerveau d'Alex Honnold et découvert que son amygdale — la zone de la peur — réagit bien moins que chez une personne ordinaire !" },
+      { q:"Que signifie 'lire' le rocher pour un grimpeur ?", opts:["Étudier les noms des voies d'escalade dans un guide","Analyser les prises, planifier les mouvements et repérer les positions de repos","Compter le nombre de mètres qu'il reste à grimper","Lire les indications laissées par d'autres grimpeurs"], correct:1, expl:"Le texte explique que 'lire' le rocher c'est 'analyser les prises disponibles, planifier chaque mouvement, trouver les positions de repos'.", fun:"Le bloc, l'une des disciplines olympiques, se pratique sur des murs de 4 mètres seulement — mais les mouvements sont si difficiles que certains prennent des mois à réussir !" },
+      { q:"Quand l'escalade est-elle devenue un sport olympique ?", opts:["Aux Jeux de Rio en 2016","Aux Jeux de Tokyo en 2021","Aux Jeux de Paris en 2024","Aux Jeux de Londres en 2012"], correct:1, expl:"Le texte précise que l'escalade a fait 'son apparition aux Jeux Olympiques de Tokyo en 2021'.", fun:"Lors de sa première apparition olympique, l'escalade a séduit tant de téléspectateurs qu'elle est déjà considérée comme l'une des épreuves les plus populaires !" }
+    ]
+  }
+];
+
+const GRAMMAIRE = [
+  {
+    niveau: 1,
+    consigne: "Choisis la bonne forme.",
+    phrase: "Mon frère [___] oublié son sac à l'école.",
+    question: "Quel mot complète correctement cette phrase ?",
+    options: ["a", "à", "as", "est"],
+    correct: 0,
+    explication: "'A' est ici le verbe 'avoir' conjugué à la 3ème personne du singulier (il a oublié).",
+    astuce: "Si tu peux remplacer par 'avait', c'est le verbe → écris 'a'. Sinon c'est la préposition → écris 'à'.",
+    plus_loin: "<strong>La règle complète : a / à</strong><br><br>'<strong>a</strong>' (sans accent) = le verbe <em>avoir</em> conjugué au présent, 3ème personne du singulier.<br>→ On peut toujours le remplacer par <em>avait</em> : « Mon frère <u>avait</u> oublié son sac. » ✓<br><br>'<strong>à</strong>' (avec accent) = une préposition qui indique un lieu, un moment, une manière.<br>→ On <em>ne peut pas</em> le remplacer par <em>avait</em> : « Il va <u>à</u> l'école. » (avait l'école ✗)<br><br><strong>Exemples :</strong><br>• Elle <u>a</u> mangé une pomme. (verbe avoir → avait ✓)<br>• Il habite <u>à</u> Paris. (préposition → avait Paris ✗)<br>• Tu <u>as</u> raison — attention ! 'as' est aussi le verbe avoir (2ème personne), mais ne se confond pas avec 'à'."
+  },
+  {
+    niveau: 1,
+    consigne: "Choisis le bon homophone.",
+    phrase: "Tu veux du gâteau [___] de la glace ?",
+    question: "Quel mot complète correctement cette phrase ?",
+    options: ["ou", "où", "au", "et"],
+    correct: 0,
+    explication: "'Ou' sans accent exprime un choix entre deux options (= ou bien).",
+    astuce: "Remplace par 'ou bien' : si la phrase reste correcte, c'est 'ou'. Sinon (lieu/situation) c'est 'où'.",
+    plus_loin: "<strong>La règle complète : ou / où</strong><br><br>'<strong>ou</strong>' (sans accent) = conjonction de coordination qui exprime un choix, une alternative.<br>→ Remplaçable par <em>ou bien</em>.<br>→ « Tu veux du gâteau <u>ou bien</u> de la glace ? » ✓<br><br>'<strong>où</strong>' (avec accent) = pronom ou adverbe qui indique un lieu ou une situation.<br>→ <em>Non</em> remplaçable par <em>ou bien</em>.<br>→ « La ville <u>où</u> j'habite est belle. » (ou bien j'habite ✗)<br><br><strong>Exemples :</strong><br>• On va au cinéma <u>ou</u> au bowling ? (choix → ou bien ✓)<br>• Je ne sais pas <u>où</u> il est. (lieu → ou bien ✗)<br>• <u>Où</u> vas-tu ? (question de lieu → ou bien ✗)"
+  },
+  {
+    niveau: 1,
+    consigne: "Choisis le bon homophone.",
+    phrase: "[___] chien aboie très fort la nuit.",
+    question: "Quel mot complète correctement cette phrase ?",
+    options: ["Son", "Sont", "S'on", "Ont"],
+    correct: 0,
+    explication: "'Son' est ici un adjectif possessif accompagnant 'chien'. 'Sont' est le verbe être au pluriel.",
+    astuce: "Si tu peux remplacer par 'ils sont', écris 'sont'. Sinon, écris 'son' (= mon/ton/son).",
+    plus_loin: "<strong>La règle complète : son / sont</strong><br><br>'<strong>son</strong>' = adjectif possessif (= mon, ton, son). Il accompagne toujours un nom.<br>→ « <u>Son</u> chien » = le chien qui lui appartient. Remplaçable par <em>mon</em> ou <em>ton</em>.<br><br>'<strong>sont</strong>' = verbe <em>être</em> au présent, 3ème personne du pluriel.<br>→ Remplaçable par <em>ils sont</em> ou <em>elles sont</em>.<br>→ « Ils <u>sont</u> fatigués. » = « <u>ils sont</u> fatigués. » ✓<br><br><strong>Exemples :</strong><br>• <u>Son</u> sac est rouge. (→ mon sac ✓ = possessif)<br>• Elles <u>sont</u> parties. (→ ils sont parties ✓ = verbe être)<br>• <u>Sont</u>-ils là ? (→ ils sont là ? ✓ = verbe être)"
+  },
+  {
+    niveau: 1,
+    consigne: "Accorde correctement l'adjectif.",
+    phrase: "Ces chaussures sont vraiment [___].",
+    question: "Quelle est la bonne forme de l'adjectif 'beau' ?",
+    options: ["beau", "belle", "belles", "beaux"],
+    correct: 2,
+    explication: "'Chaussures' est féminin pluriel. L'adjectif s'accorde : beau → belle → belles.",
+    astuce: "Pour accorder un adjectif : 1) Trouve le nom qu'il décrit. 2) Regarde son genre (M/F) et son nombre (S/P).",
+    plus_loin: "<strong>L'accord de l'adjectif</strong><br><br>Un adjectif qualificatif s'accorde toujours en <strong>genre</strong> (masculin/féminin) et en <strong>nombre</strong> (singulier/pluriel) avec le nom qu'il décrit.<br><br><strong>Tableau de 'beau' :</strong><br>• Masculin singulier → <em>beau</em> (un beau garçon)<br>• Masculin pluriel → <em>beaux</em> (de beaux garçons)<br>• Féminin singulier → <em>belle</em> (une belle fille)<br>• Féminin pluriel → <em>belles</em> (de belles filles)<br><br><strong>Piège !</strong> 'Beau' devient 'bel' devant un nom masculin commençant par une voyelle : un <em>bel</em> homme, un <em>bel</em> arbre.<br><br><strong>Méthode :</strong> remplace le nom par un pronom pour identifier le genre : 'chaussures' → 'elles' → féminin pluriel → belles ✓"
+  },
+  {
+    niveau: 2,
+    consigne: "Choisis le bon homophone.",
+    phrase: "Je ne sais pas [___] tu viens ce soir.",
+    question: "Quel mot complète correctement cette phrase ?",
+    options: ["ou", "où", "et", "si"],
+    correct: 1,
+    explication: "'Où' avec accent introduit une interrogation indirecte sur une situation.",
+    astuce: "'Où' avec accent = lieu ou situation. 'Ou' sans accent = ou bien (choix).",
+    plus_loin: "<strong>'Où' dans les interrogations indirectes</strong><br><br>'Où' ne sert pas seulement à indiquer un lieu physique. Il peut aussi introduire une <strong>proposition subordonnée interrogative indirecte</strong> portant sur une situation.<br><br>→ « Je ne sais pas <u>où</u> tu en es. » (= dans quelle situation)<br>→ « Je me demande <u>où</u> cela va mener. » (= vers quelle situation)<br><br>Dans la phrase de l'exercice, 'où tu viens ce soir' = 'si tu viens ce soir / dans quelle situation tu es par rapport à ce soir'.<br><br><strong>Comment distinguer :</strong><br>• Essaie de remplacer par <em>ou bien</em> → ça ne marche pas ici (ou bien tu viens ? → sens différent)<br>• Le 'où' avec accent introduit une idée de situation, de condition, de lieu au sens large.<br><br><strong>Autre exemple :</strong> « Dis-moi <u>où</u> tu habites. » (lieu) vs « Choisis <u>ou</u> tu viens <u>ou</u> tu restes. » (choix)"
+  },
+  {
+    niveau: 2,
+    consigne: "Identifie la nature du mot.",
+    phrase: "Les enfants courent rapidement dans le jardin.",
+    question: "Quelle est la nature du mot 'rapidement' ?",
+    options: ["Un adjectif", "Un nom commun", "Un adverbe", "Un verbe"],
+    correct: 2,
+    explication: "'Rapidement' est un adverbe : il modifie le verbe 'courent' et indique comment les enfants courent.",
+    astuce: "Les adverbes répondent aux questions : comment ? quand ? où ? combien ? Et ils sont invariables !",
+    plus_loin: "<strong>Les adverbes de manière</strong><br><br>Un <strong>adverbe</strong> est un mot invariable (il ne change jamais) qui modifie un verbe, un adjectif ou un autre adverbe.<br><br><strong>Formation des adverbes en -ment :</strong><br>• Adjectif féminin + <em>-ment</em> → lente → <em>lentement</em>, douce → <em>doucement</em><br>• Si l'adjectif masculin finit par une voyelle : poli → <em>poliment</em>, vrai → <em>vraiment</em><br>• Exceptions : gentiment (gentil), brièvement (bref), etc.<br><br><strong>Types d'adverbes :</strong><br>• Manière : vite, bien, mal, rapidement<br>• Temps : hier, demain, souvent, toujours<br>• Lieu : ici, là, partout, dedans<br>• Quantité : très, trop, peu, beaucoup<br><br><strong>Attention !</strong> L'adverbe ne s'accorde pas : « Elles courent <u>rapidement</u> » (pas 'rapidements')"
+  },
+  {
+    niveau: 2,
+    consigne: "Identifie la fonction du groupe de mots.",
+    phrase: "Le chat de ma voisine dort sur le canapé.",
+    question: "Quelle est la fonction de 'Le chat de ma voisine' ?",
+    options: ["Complément d'objet direct", "Sujet", "Complément circonstanciel", "Attribut du sujet"],
+    correct: 1,
+    explication: "C'est le sujet de la phrase. Pour le trouver, on pose la question 'Qui est-ce qui dort ?'",
+    astuce: "Pour trouver le sujet : pose la question 'Qui est-ce qui + verbe ?' ou 'Qu'est-ce qui + verbe ?'",
+    plus_loin: "<strong>Les fonctions dans la phrase</strong><br><br>Le <strong>sujet</strong> est le mot ou groupe de mots qui fait l'action ou dont on parle.<br>→ Question : <em>Qui est-ce qui / Qu'est-ce qui + verbe ?</em><br>→ « <u>Le chat de ma voisine</u> dort. » — Qui est-ce qui dort ? Le chat de ma voisine. ✓<br><br>Le <strong>COD</strong> (Complément d'Objet Direct) répond à la question <em>quoi ? qui ?</em> après le verbe, sans préposition.<br>→ « Elle mange <u>une pomme</u>. » — Elle mange quoi ? Une pomme.<br><br>Le <strong>complément circonstanciel</strong> indique les circonstances (lieu, temps, manière).<br>→ <em>où ? quand ? comment ?</em> → « Il dort <u>sur le canapé</u>. »<br><br>L'<strong>attribut du sujet</strong> est relié au sujet par un verbe d'état (être, paraître, sembler...).<br>→ « Il <em>est</em> <u>fatigué</u>. » — 'fatigué' est attribut du sujet 'il'."
+  },
+  {
+    niveau: 2,
+    consigne: "Choisis la bonne forme.",
+    phrase: "Les filles [___] parties en vacances hier.",
+    question: "Quel auxiliaire complète correctement cette phrase ?",
+    options: ["ont", "sont", "seront", "avons"],
+    correct: 1,
+    explication: "'Partir' se conjugue avec 'être' au passé composé. Le participe passé s'accorde avec le sujet : parties.",
+    astuce: "Les verbes de mouvement (aller, venir, partir, arriver, entrer, sortir...) utilisent souvent 'être' comme auxiliaire.",
+    plus_loin: "<strong>Être ou Avoir ? — Les auxiliaires au passé composé</strong><br><br>La majorité des verbes se conjuguent avec <strong>avoir</strong> : « Il a mangé, elle a fini, ils ont joué. »<br><br>Environ 17 verbes se conjuguent avec <strong>être</strong>. Moyen mnémotechnique : la <em>maison d'être</em> ou l'acronyme <strong>DR MRS VANDERTRAMP</strong> :<br>Devenir, Revenir · Mourir, Retourner · Sortir · Venir, Aller, Naître · Descendre, Entrer, Rentrer · Tomber, Rester, Arriver, Monter, Partir<br><br><strong>Règle d'accord avec ÊTRE :</strong> le participe passé s'accorde avec le sujet.<br>→ « Les filles sont parti<u>es</u>. » (féminin pluriel → +es)<br>→ « Le garçon est parti. » (masculin singulier → rien)<br><br><strong>Tous les verbes pronominaux</strong> (se lever, se laver...) utilisent aussi être :<br>→ « Elles se sont levées tôt. »"
+  },
+  {
+    niveau: 3,
+    consigne: "Choisis la bonne expression.",
+    phrase: "[___] le monde était présent à la fête.",
+    question: "Quel mot complète correctement cette phrase ?",
+    options: ["Tout", "Tous", "Toute", "Toutes"],
+    correct: 0,
+    explication: "'Tout le monde' est une expression figée, toujours au singulier masculin.",
+    astuce: "'Tout le monde' → toujours singulier. Le verbe et les participes qui suivent sont au singulier.",
+    plus_loin: "<strong>Les formes de 'tout'</strong><br><br>'Tout' peut être adjectif, pronom, adverbe ou faire partie d'expressions figées.<br><br><strong>Adjectif (s'accorde) :</strong><br>• <em>Tout</em> le gâteau (M.S.) · <em>Toute</em> la classe (F.S.)<br>• <em>Tous</em> les élèves (M.P.) · <em>Toutes</em> les filles (F.P.)<br><br><strong>Pronom (remplace un nom) :</strong><br>• « <em>Tous</em> sont arrivés. » (masculin pluriel)<br>• « <em>Toutes</em> étaient là. » (féminin pluriel)<br><br><strong>Expression figée :</strong><br>• '<em>Tout le monde</em>' = chaque personne → <strong>toujours singulier</strong><br>→ « Tout le monde <u>est</u> parti. » (pas 'sont partis')<br>→ « Tout le monde <u>était</u> content. » (pas 'étaient')<br><br><strong>Piège fréquent :</strong> on entend souvent 'Tout le monde sont...' à l'oral — c'est une erreur. Le verbe reste au singulier."
+  },
+  {
+    niveau: 3,
+    consigne: "Repère la phrase correctement écrite.",
+    phrase: "",
+    question: "Laquelle de ces phrases est correcte ?",
+    options: ["Ces livres sont très intéressants.", "Ces livres est très intéressant.", "Ce livres sont très intéressants.", "Ces livre sont très intéressants."],
+    correct: 0,
+    explication: "'Ces livres' → pluriel → verbe 'sont' + adjectif 'intéressants' au masculin pluriel.",
+    astuce: "Vérifie toujours la chaîne complète : déterminant + nom + verbe + adjectif doivent tous s'accorder.",
+    plus_loin: "<strong>La chaîne d'accord dans la phrase nominale</strong><br><br>En français, plusieurs éléments de la phrase doivent s'accorder entre eux. On appelle ça la <strong>chaîne d'accord</strong> :<br><br><strong>Déterminant → Nom → Verbe → Adjectif attribut</strong><br><br>Exemple : « <u>Ces</u> (déterminant pluriel) <u>livres</u> (nom M.P.) <u>sont</u> (verbe 3ème P.P.) très <u>intéressants</u> (adj. M.P.) »<br><br><strong>Analyse des erreurs :</strong><br>• ❌ « Ces livres <u>est</u> très intéressant. » → verbe singulier avec sujet pluriel + adj. singulier<br>• ❌ « <u>Ce</u> livres... » → déterminant singulier avec nom pluriel ('ce' → 'ces')<br>• ❌ « Ces <u>livre</u> sont... » → nom singulier avec déterminant/verbe pluriels<br><br><strong>Méthode :</strong> identifie d'abord le nom principal (ici : livres, masculin pluriel), puis vérifie que tout s'accorde avec lui."
+  }
+];
+
+const CONJUGAISON = [
+  {
+    niveau: 1,
+    temps: "Présent de l'indicatif", sujet: "nous", verbe_infinitif: "aller",
+    contexte: "Demain, ___ au cinéma voir le nouveau film Marvel.", hint: "nous ___",
+    reponse: "nous allons", reponses_acceptees: ["nous allons","allons"],
+    explication: "'Aller' est irrégulier. Au présent : je vais, tu vas, il va, nous allons, vous allez, ils vont.",
+    groupe: "3ème groupe (irrégulier)",
+    plus_loin: "<strong>Le verbe ALLER au présent</strong><br><br>'Aller' est l'un des verbes les plus irréguliers du français. Il faut absolument le connaître par cœur car il est utilisé constamment.<br><br><strong>Conjugaison complète :</strong><br>Je <em>vais</em> · Tu <em>vas</em> · Il/Elle <em>va</em><br>Nous <em>allons</em> · Vous <em>allez</em> · Ils/Elles <em>vont</em><br><br><strong>Usages importants :</strong><br>• Se déplacer : « Je <em>vais</em> à l'école. »<br>• Futur proche (aller + infinitif) : « Il <em>va</em> pleuvoir. » / « Nous <em>allons</em> partir. »<br>• Salutation : « Comment <em>vas</em>-tu ? — Je <em>vais</em> bien ! »<br><br><strong>Piège !</strong> On dit 'ils <em>vont</em>' et non 'ils allent' (qui n'existe pas). La racine change complètement entre certaines personnes : va-/all-/vont."
+  },
+  {
+    niveau: 1,
+    temps: "Présent de l'indicatif", sujet: "je", verbe_infinitif: "être",
+    contexte: "___ tellement content(e) d'avoir eu 20/20 en maths !", hint: "je ___",
+    reponse: "je suis", reponses_acceptees: ["je suis","suis"],
+    explication: "'Être' est très irrégulier. Au présent : je suis, tu es, il est, nous sommes, vous êtes, ils sont.",
+    groupe: "Auxiliaire (irrégulier)",
+    plus_loin: "<strong>Le verbe ÊTRE au présent</strong><br><br>'Être' est le verbe le plus fondamental du français. Il sert de verbe principal ET d'auxiliaire (pour former le passé composé de certains verbes).<br><br><strong>Conjugaison complète :</strong><br>Je <em>suis</em> · Tu <em>es</em> · Il/Elle <em>est</em><br>Nous <em>sommes</em> · Vous <em>êtes</em> · Ils/Elles <em>sont</em><br><br><strong>Usages :</strong><br>• Verbe principal : « Je <em>suis</em> fatigué. » / « Nous <em>sommes</em> en France. »<br>• Auxiliaire du passé composé : « Elle <em>est</em> arrivée. » / « Ils <em>sont</em> partis. »<br><br><strong>Ne pas confondre :</strong><br>• 'son' (possessif) ≠ 'sont' (verbe être, pluriel)<br>• 'est' (verbe être) ≠ 'et' (conjonction) ≠ 'ai' (verbe avoir)"
+  },
+  {
+    niveau: 1,
+    temps: "Imparfait", sujet: "ils", verbe_infinitif: "jouer",
+    contexte: "Quand ils étaient petits, ___ aux Lego tous les weekends.", hint: "ils ___",
+    reponse: "ils jouaient", reponses_acceptees: ["ils jouaient","jouaient"],
+    explication: "À l'imparfait, les verbes du 1er groupe (-er) prennent : -ais, -ais, -ait, -ions, -iez, -aient.",
+    groupe: "1er groupe",
+    plus_loin: "<strong>L'imparfait des verbes du 1er groupe (-er)</strong><br><br>L'imparfait exprime une action passée <strong>habituelle, répétée ou en cours</strong>. On l'utilise souvent avec des expressions comme 'quand j'étais petit', 'tous les jours', 'chaque été'.<br><br><strong>Formation :</strong> radical (nous au présent, sans -ons) + terminaisons :<br>-ais · -ais · -ait · -ions · -iez · -aient<br><br><strong>Exemple avec JOUER :</strong><br>Je <em>jouais</em> · Tu <em>jouais</em> · Il <em>jouait</em><br>Nous <em>jouions</em> · Vous <em>jouiez</em> · Ils <em>jouaient</em><br><br><strong>Attention :</strong> les terminaisons -ais, -ait, -aient se prononcent pareil [ɛ] mais s'écrivent différemment.<br><br><strong>Imparfait vs Passé composé :</strong><br>• Imparfait = action habituelle/continue : « Il <em>jouait</em> souvent. »<br>• Passé composé = action ponctuelle/terminée : « Il <em>a joué</em> hier. »"
+  },
+  {
+    niveau: 1,
+    temps: "Passé composé", sujet: "elle", verbe_infinitif: "finir",
+    contexte: "Hier soir, ___ tous ses devoirs avant le dîner.", hint: "elle ___",
+    reponse: "elle a fini", reponses_acceptees: ["elle a fini","a fini"],
+    explication: "'Finir' → auxiliaire 'avoir' + participe passé 'fini'. Pas d'accord car pas de COD avant le verbe.",
+    groupe: "2ème groupe",
+    plus_loin: "<strong>Le passé composé des verbes du 2ème groupe (-ir)</strong><br><br>Le passé composé = auxiliaire (avoir ou être au présent) + participe passé.<br><br><strong>Verbes du 2ème groupe :</strong> ils finissent par -ir et font -issons à la 1ère personne du pluriel.<br>Exemples : finir, choisir, grandir, réussir, rougir, obéir...<br><br><strong>Participe passé des verbes en -ir (2ème groupe) :</strong><br>→ Enlève le -r de l'infinitif : finir → <em>fini</em>, choisir → <em>choisi</em>, grandir → <em>grandi</em><br><br><strong>Conjugaison complète (finir) :</strong><br>J'<em>ai fini</em> · Tu <em>as fini</em> · Il <em>a fini</em><br>Nous <em>avons fini</em> · Vous <em>avez fini</em> · Ils <em>ont fini</em><br><br><strong>Accord :</strong> avec l'auxiliaire 'avoir', le participe passé ne s'accorde pas (sauf si le COD est placé avant le verbe)."
+  },
+  {
+    niveau: 2,
+    temps: "Futur simple", sujet: "tu", verbe_infinitif: "venir",
+    contexte: "___ à ma fête d'anniversaire samedi prochain ?", hint: "tu ___",
+    reponse: "tu viendras", reponses_acceptees: ["tu viendras","viendras"],
+    explication: "'Venir' est irrégulier au futur. Son radical change : viendr-. Tu viendras.",
+    groupe: "3ème groupe (irrégulier)",
+    plus_loin: "<strong>Le futur simple — verbes irréguliers</strong><br><br>Au futur simple, la plupart des verbes gardent leur infinitif comme radical et ajoutent les terminaisons : -ai, -as, -a, -ons, -ez, -ont.<br><br>Mais certains verbes ont un <strong>radical irrégulier</strong> au futur qu'il faut mémoriser :<br><br>• être → <em>ser-</em> : je <em>serai</em><br>• avoir → <em>aur-</em> : j'<em>aurai</em><br>• aller → <em>ir-</em> : j'<em>irai</em><br>• faire → <em>fer-</em> : je <em>ferai</em><br>• venir → <em>viendr-</em> : je <em>viendrai</em><br>• voir → <em>verr-</em> : je <em>verrai</em><br>• pouvoir → <em>pourr-</em> : je <em>pourrai</em><br>• vouloir → <em>voudr-</em> : je <em>voudrai</em><br>• savoir → <em>saur-</em> : je <em>saurai</em><br><br><strong>Conjugaison de VENIR au futur :</strong><br>Je <em>viendrai</em> · Tu <em>viendras</em> · Il <em>viendra</em><br>Nous <em>viendrons</em> · Vous <em>viendrez</em> · Ils <em>viendront</em>"
+  },
+  {
+    niveau: 2,
+    temps: "Passé composé", sujet: "nous", verbe_infinitif: "partir",
+    contexte: "___ en vacances au Portugal cet été, c'était génial !", hint: "nous ___",
+    reponse: "nous sommes partis", reponses_acceptees: ["nous sommes partis","sommes partis","nous sommes parties","sommes parties"],
+    explication: "'Partir' → auxiliaire 'être' + participe passé 'parti'. Accord avec le sujet : partis/parties.",
+    groupe: "3ème groupe — auxiliaire ÊTRE",
+    plus_loin: "<strong>Le passé composé avec ÊTRE — accord du participe passé</strong><br><br>Environ 17 verbes (+ tous les pronominaux) se conjuguent avec <strong>être</strong> au passé composé.<br><br><strong>Règle d'accord :</strong> avec être, le participe passé s'accorde en genre et en nombre avec le <strong>sujet</strong>.<br><br><strong>Exemple avec PARTIR :</strong><br>• Je (m.) <em>suis parti</em> · Je (f.) <em>suis partie</em><br>• Tu (m.) <em>es parti</em> · Tu (f.) <em>es partie</em><br>• Il <em>est parti</em> · Elle <em>est partie</em><br>• Nous (m.) <em>sommes partis</em> · Nous (f.) <em>sommes parties</em><br>• Vous (m.) <em>êtes partis</em> · Vous (f.) <em>êtes parties</em><br>• Ils <em>sont partis</em> · Elles <em>sont parties</em><br><br><strong>Astuce :</strong> 'nous' peut être masculin ou féminin selon le groupe qui parle. Si on ne sait pas, on met le masculin par défaut (règle traditionnelle)."
+  },
+  {
+    niveau: 2,
+    temps: "Imparfait", sujet: "elle", verbe_infinitif: "avoir",
+    contexte: "Quand ma grand-mère était jeune, ___ les cheveux très longs.", hint: "elle ___",
+    reponse: "elle avait", reponses_acceptees: ["elle avait","avait"],
+    explication: "'Avoir' à l'imparfait : j'avais, tu avais, il/elle avait, nous avions, vous aviez, ils avaient.",
+    groupe: "Auxiliaire (irrégulier)",
+    plus_loin: "<strong>Le verbe AVOIR à l'imparfait</strong><br><br>'Avoir' est un auxiliaire essentiel, utilisé pour former le passé composé de la majorité des verbes.<br><br><strong>Conjugaison complète à l'imparfait :</strong><br>J'<em>avais</em> · Tu <em>avais</em> · Il/Elle <em>avait</em><br>Nous <em>avions</em> · Vous <em>aviez</em> · Ils/Elles <em>avaient</em><br><br><strong>Usages de l'imparfait d'AVOIR :</strong><br>• Description dans le passé : « Elle <em>avait</em> les yeux bleus. »<br>• Habitude passée : « Ils <em>avaient</em> toujours faim après le sport. »<br>• Action en cours interrompue : « Il <em>avait</em> froid quand elle est arrivée. »<br><br><strong>À ne pas confondre :</strong><br>• 'avait' (imparfait) ≠ 'a eu' (passé composé)<br>• « Elle <em>avait</em> faim. » (état continu) vs « Elle <em>a eu</em> faim. » (moment précis)"
+  },
+  {
+    niveau: 2,
+    temps: "Futur simple", sujet: "vous", verbe_infinitif: "manger",
+    contexte: "Ce soir, ___ des pâtes à la carbonara, c'est promis !", hint: "vous ___",
+    reponse: "vous mangerez", reponses_acceptees: ["vous mangerez","mangerez"],
+    explication: "Au futur, les verbes en -ger gardent le 'e' pour conserver le son doux : manger → mangerez.",
+    groupe: "1er groupe",
+    plus_loin: "<strong>Le futur simple — verbes en -ger et -cer</strong><br><br>Au futur simple, les verbes réguliers du 1er groupe prennent l'infinitif complet comme radical :<br>manger → manger + <em>ez</em> = <em>mangerez</em><br><br><strong>Particularité des verbes en -ger :</strong><br>On garde le 'e' avant toutes les terminaisons (pour que le 'g' reste prononcé [ʒ] et non [g]) :<br>• Nager : je <em>nagerai</em>, tu <em>nageras</em>, il <em>nagera</em>...<br>• Manger : je <em>mangerai</em>, tu <em>mangeras</em>...<br><br><strong>Terminaisons complètes du futur simple :</strong><br>-ai · -as · -a · -ons · -ez · -ont<br><br><strong>Exemples :</strong><br>• « Demain, tu <em>mangeras</em> chez moi. »<br>• « L'été prochain, nous <em>nagerons</em> dans la mer. »<br>• « Ils <em>protégeront</em> la forêt. » (protéger)"
+  },
+  {
+    niveau: 3,
+    temps: "Conditionnel présent", sujet: "je", verbe_infinitif: "vouloir",
+    contexte: "___ bien une part de pizza supplémentaire, s'il vous plaît !", hint: "je ___",
+    reponse: "je voudrais", reponses_acceptees: ["je voudrais","voudrais"],
+    explication: "Au conditionnel, 'vouloir' a le radical 'voudr-' + terminaison -ais. C'est la forme polie de 'je veux'.",
+    groupe: "3ème groupe (irrégulier)",
+    plus_loin: "<strong>Le conditionnel présent</strong><br><br>Le conditionnel présent exprime une action <strong>hypothétique, polie ou soumise à une condition</strong>.<br><br><strong>Formation :</strong> radical du futur + terminaisons de l'imparfait (-ais, -ais, -ait, -ions, -iez, -aient)<br><br><strong>Exemple avec VOULOIR :</strong><br>Je <em>voudrais</em> · Tu <em>voudrais</em> · Il <em>voudrait</em><br>Nous <em>voudrions</em> · Vous <em>voudriez</em> · Ils <em>voudraient</em><br><br><strong>Usages :</strong><br>• Politesse : « Je <em>voudrais</em> un café. » (plus poli que 'je veux')<br>• Hypothèse : « Si j'avais de l'argent, je <em>voyagerais</em>. »<br>• Conseil : « Tu <em>devrais</em> dormir plus tôt. »<br>• Souhait : « J'<em>aimerais</em> visiter le Japon. »<br><br><strong>Verbes irréguliers au conditionnel</strong> (même radical qu'au futur) :<br>être → <em>serais</em> · avoir → <em>aurais</em> · aller → <em>irais</em> · faire → <em>ferais</em>"
+  },
+  {
+    niveau: 3,
+    temps: "Présent de l'indicatif", sujet: "ils", verbe_infinitif: "faire",
+    contexte: "Chaque matin, ___ du sport avant d'aller à l'école.", hint: "ils ___",
+    reponse: "ils font", reponses_acceptees: ["ils font","font"],
+    explication: "'Faire' est très irrégulier. Au présent : je fais, tu fais, il fait, nous faisons, vous faites, ils font.",
+    groupe: "3ème groupe (irrégulier)",
+    plus_loin: "<strong>Le verbe FAIRE — un verbe exceptionnel</strong><br><br>'Faire' est l'un des verbes les plus irréguliers et les plus utilisés du français. Sa conjugaison a plusieurs particularités uniques.<br><br><strong>Conjugaison complète au présent :</strong><br>Je <em>fais</em> · Tu <em>fais</em> · Il <em>fait</em><br>Nous <em>faisons</em> · Vous <em>faites</em> · Ils <em>font</em><br><br><strong>Particularités :</strong><br>• 'Vous <em>faites</em>' — seule forme en -tes avec 'être' (vous êtes) et 'dire' (vous dites)<br>• 'Ils <em>font</em>' — radical complètement différent (pas 'ils faisent' qui n'existe pas)<br>• 'Nous <em>faisons</em>' — le 'ai' se prononce [ə] comme dans 'je' (et non [ɛ] comme dans 'faire')<br><br><strong>Expressions courantes avec FAIRE :</strong><br>• Faire du sport / de la musique / des maths<br>• Il fait beau / froid / chaud (météo)<br>• Faire attention · Faire semblant · Faire confiance<br>• Ça fait combien ? / Qu'est-ce que tu fais ?"
+  }
+];
+
+// ═══════════════════════════════════════════════════════════════════
+//  LOCALSTORAGE SAVE/LOAD
+// ═══════════════════════════════════════════════════════════════════
+const SAVE_KEY = 'francais_aventure_v1';
+
+function saveState() {
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify({
+      score, xp, streak,
+      usedTexts, textQIdx,
+      usedGrammaire, usedConjugaison,
+      currentMode, answerLog, selectedLevel
+    }));
+    document.getElementById('saveStatus').textContent = 'sauvegardé ✓';
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) { document.getElementById('saveStatus').textContent = 'nouvelle session'; return; }
+    const s = JSON.parse(raw);
+    score = s.score || 0;
+    xp = s.xp || 0;
+    streak = s.streak || 0;
+    usedTexts = s.usedTexts || [];
+    textQIdx = s.textQIdx !== undefined ? s.textQIdx : -1;
+    usedGrammaire = s.usedGrammaire || [];
+    usedConjugaison = s.usedConjugaison || [];
+    currentMode = s.currentMode || 'lecture';
+    answerLog = s.answerLog || [];
+    selectedLevel = s.selectedLevel || 0;
+    document.getElementById('saveStatus').textContent = 'reprise de ta session ✓';
+    updateScore(); updateStreak();
+  } catch(e) {
+    document.getElementById('saveStatus').textContent = 'nouvelle session';
+  }
+}
+
+function confirmReset() {
+  if (confirm('Remettre le score à zéro et recommencer depuis le début ?')) {
+    localStorage.removeItem(SAVE_KEY);
+    score = 0; xp = 0; streak = 0;
+    usedTexts = []; textQIdx = -1;
+    usedGrammaire = []; usedConjugaison = [];
+    answerLog = [];
+    currentMode = 'lecture';
+    document.querySelectorAll('.mode-tab').forEach((t,i) => { t.classList.toggle('active', i===0); });
+    updateScore(); updateStreak();
+    document.getElementById('saveStatus').textContent = 'remise à zéro ✓';
+    loadQuestion();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════════
+let score = 0, xp = 0, streak = 0;
+let currentMode = 'lecture';
+let answered = false;
+// lecture: track which text we're on, and which question index within it
+let usedTexts = [];       // indexes of texts already shown
+let textQIdx = -1;        // question index within current text (-1 = pick new text)
+let currentTextIdx = -1;
+let currentQ = null;
+// grammaire / conjugaison
+let usedGrammaire = [];
+let usedConjugaison = [];
+// level filter (0 = all, 1/2/3 = specific level)
+let selectedLevel = 0;
+// dot state per text
+let dotResults = [];
+// full answer history — every answer ever given
+// each entry: { ts, mode, theme, question, given, correct, ok }
+let answerLog = [];
+
+// ═══════════════════════════════════════════════════════════════════
+//  QUESTION LOGIC
+// ═══════════════════════════════════════════════════════════════════
+function switchMode(mode, btn) {
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  currentMode = mode;
+  streak = 0; updateStreak();
+  // show level filter only for grammaire and conjugaison
+  document.getElementById('levelFilterBar').style.display =
+    (mode === 'grammaire' || mode === 'conjugaison') ? 'flex' : 'none';
+  saveState();
+  loadQuestion();
+}
+
+function setLevel(lvl, btn) {
+  selectedLevel = lvl;
+  document.querySelectorAll('.lvl-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // reset used index so we draw from the filtered pool
+  if (currentMode === 'grammaire') usedGrammaire = [];
+  else if (currentMode === 'conjugaison') usedConjugaison = [];
+  loadQuestion();
+}
+
+function loadQuestion() {
+  answered = false;
+  if (currentMode === 'lecture') {
+    loadLecture();
+  } else if (currentMode === 'grammaire') {
+    loadSimple(GRAMMAIRE, usedGrammaire, 'grammaire');
+  } else {
+    loadSimple(CONJUGAISON, usedConjugaison, 'conjugaison');
+  }
+}
+
+function loadLecture() {
+  // if we have a current text and more questions in it, advance
+  if (currentTextIdx >= 0 && textQIdx + 1 < LECTURE[currentTextIdx].questions.length) {
+    textQIdx++;
+  } else {
+    // pick a new text
+    if (usedTexts.length >= LECTURE.length) usedTexts = [];
+    let idx;
+    do { idx = Math.floor(Math.random() * LECTURE.length); }
+    while (usedTexts.includes(idx));
+    usedTexts.push(idx);
+    currentTextIdx = idx;
+    textQIdx = 0;
+    dotResults = [];
+  }
+  const text = LECTURE[currentTextIdx];
+  currentQ = text.questions[textQIdx];
+  currentQ._mode = 'lecture';
+  currentQ._theme = text.theme.replace(/<[^>]+>/g,'').trim();
+  renderLecture(text, textQIdx);
+  saveState();
+}
+
+function loadSimple(bank, usedArr, modeName) {
+  // filter by selected level
+  const pool = selectedLevel === 0 ? bank : bank.filter(q => q.niveau === selectedLevel);
+  if (pool.length === 0) {
+    document.getElementById('mainCard').innerHTML =
+      '<div style="text-align:center;padding:40px;color:#a8a4c8;">Aucune question pour ce niveau. Choisis un autre niveau !</div>';
+    return;
+  }
+  // filter usedArr to only pool indexes
+  const poolIdxs = bank.map((q,i) => pool.includes(q) ? i : -1).filter(i => i >= 0);
+  const usedFromPool = usedArr.filter(i => poolIdxs.includes(i));
+  if (usedFromPool.length >= poolIdxs.length) {
+    // reset only the used pool entries
+    poolIdxs.forEach(i => { const pos = usedArr.indexOf(i); if (pos > -1) usedArr.splice(pos,1); });
+  }
+  let idx;
+  do { idx = poolIdxs[Math.floor(Math.random() * poolIdxs.length)]; }
+  while (usedArr.includes(idx));
+  usedArr.push(idx);
+  currentQ = bank[idx];
+  currentQ._mode = modeName;
+  currentQ._theme = modeName;
+  const doneInPool = usedArr.filter(i => poolIdxs.includes(i)).length;
+  renderSimple(currentQ, doneInPool, poolIdxs.length, modeName);
+  saveState();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════════════════════════
+function renderLecture(text, qIdx) {
+  const qs = text.questions;
+  const q = qs[qIdx];
+  const L = ['A','B','C','D'];
+
+  // dots
+  let dots = '<div class="q-dot-row">';
+  for (let i = 0; i < qs.length; i++) {
+    let cls = 'q-dot';
+    if (i < dotResults.length) cls += dotResults[i] ? ' done-correct' : ' done-wrong';
+    else if (i === qIdx) cls += ' active';
+    dots += '<div class="' + cls + '"></div>';
+  }
+  dots += '</div>';
+
+  let html = '<div class="card-top">'
+    + '<span class="card-badge badge-lecture">&#128218; Compr&#233;hension</span>'
+    + '<span class="theme-label">' + text.theme + '</span>'
+    + '<span class="q-counter">Q' + (qIdx+1) + '/' + qs.length + '</span>'
+    + '</div>';
+
+  html += '<div class="dict-tip-banner">&#128161; <strong>Astuce :</strong> clique sur n\'importe quel mot du texte pour voir sa d\u00e9finition dans le Wiktionnaire !</div>';
+  html += '<div class="passage" id="passageText">' + linkifyPassage(text.passage) + '</div>';
+  html += '<hr class="q-divider">';
+  html += '<div class="q-label">Question ' + (qIdx+1) + ' sur ' + qs.length + '</div>';
+  html += dots;
+  html += '<div class="question-text">' + q.q + '</div>';
+  html += '<div class="options" id="opts">';
+  q.opts.forEach((opt, i) => {
+    html += '<button class="option-btn" onclick="checkQCM(this,' + i + ',' + q.correct + ')">'
+      + '<span class="option-letter">' + L[i] + '</span>' + opt + '</button>';
+  });
+  html += '</div>';
+  html += '<div id="feedback"></div>';
+  html += '<div class="actions" id="actions" style="display:none">';
+  const isLast = (qIdx === qs.length - 1);
+  html += '<button class="btn btn-primary" onclick="loadQuestion()">'
+    + (isLast ? '&#127381; Nouveau texte' : '&#10145;&#65039; Question suivante') + '</button>';
+  html += '</div>';
+
+  document.getElementById('mainCard').innerHTML = html;
+  initPassageClicks();
+}
+
+function renderSimple(q, num, total, mode) {
+  const badges = { grammaire:'badge-grammaire', conjugaison:'badge-conjugaison' };
+  const labels = { grammaire:'&#128292; Grammaire', conjugaison:'&#9881;&#65039; Conjugaison' };
+  const niveauLabel = ['','FACILE','MOYEN','DIFFICILE'];
+  const niveauClass = ['','niveau-1','niveau-2','niveau-3'];
+  const niv = q.niveau || 1;
+  const L = ['A','B','C','D'];
+
+  let html = '<div class="card-top">'
+    + '<span class="card-badge ' + badges[mode] + '">' + labels[mode] + '</span>'
+    + '<span class="niveau-badge ' + niveauClass[niv] + '">' + niveauLabel[niv] + '</span>'
+    + '<span class="q-counter">' + num + ' / ' + total + '</span>'
+    + '</div>';
+
+  if (q.temps) {
+    html += '<div style="margin-bottom:12px;">'
+      + '<span class="pill">&#128197; ' + q.temps + '</span>'
+      + '<span class="pill pink">&#128292; ' + q.verbe_infinitif + '</span>'
+      + '<span class="pill yellow">&#128100; ' + q.sujet + '</span>'
+      + '</div>';
+  }
+  if (q.consigne) html += '<div style="color:#a8a4c8;font-size:0.88rem;margin-bottom:9px;">&#128204; ' + q.consigne + '</div>';
+
+  if (q.options) {
+    if (q.phrase && q.phrase.trim()) html += '<div class="passage" style="border-left-color:#feca57"><p>' + q.phrase + '</p></div>';
+    html += '<div class="question-text">' + q.question + '</div>';
+    html += '<div class="options" id="opts">';
+    q.options.forEach((opt, i) => {
+      html += '<button class="option-btn" onclick="checkQCM(this,' + i + ',' + q.correct + ')">'
+        + '<span class="option-letter">' + L[i] + '</span>' + opt + '</button>';
+    });
+    html += '</div>';
+  } else {
+    const ctx = (q.contexte||'').replace('___','<strong style="color:#feca57;letter-spacing:2px">_ _ _</strong>');
+    html += '<div class="question-text">Conjugue <strong style="color:#48dbfb">' + q.verbe_infinitif
+      + '</strong> au <strong style="color:#ff9ff3">' + q.temps
+      + '</strong> avec <strong style="color:#feca57">' + q.sujet + '</strong> :</div>';
+    html += '<div class="passage" style="border-left-color:#48dbfb"><p>' + ctx + '</p></div>';
+    html += '<div class="blank-wrap">'
+      + '<input class="blank-input" id="blankInput" type="text" placeholder="' + q.hint + '" '
+      + 'onkeydown="if(event.key===\'Enter\')checkBlank()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">'
+      + '<button class="btn btn-primary" onclick="checkBlank()">&#10003; V&#233;rifier</button></div>';
+  }
+
+  html += '<div id="feedback"></div>';
+  // "En savoir plus" accordion — hidden until answered
+  if (q.plus_loin) {
+    html += '<div class="plus-loin-wrap" id="plusLoinWrap" style="display:none">'
+      + '<button class="plus-loin-toggle" onclick="togglePlusLoin(this)" id="plusLoinBtn">'
+      + '<span class="arrow">&#9654;</span> &#128218; En savoir plus sur cette règle</button>'
+      + '<div class="plus-loin-body" id="plusLoinBody">' + q.plus_loin + '</div>'
+      + '</div>';
+  }
+  html += '<div class="actions" id="actions" style="display:none">'
+    + '<button class="btn btn-primary" onclick="loadQuestion()">&#10145;&#65039; Question suivante</button></div>';
+
+  document.getElementById('mainCard').innerHTML = html;
+  if (!q.options) setTimeout(() => { const i=document.getElementById('blankInput'); if(i) i.focus(); }, 80);
+}
+
+function togglePlusLoin(btn) {
+  btn.classList.toggle('open');
+  document.getElementById('plusLoinBody').classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  CHECK
+// ═══════════════════════════════════════════════════════════════════
+function checkQCM(btn, chosen, correct) {
+  if (answered) return;
+  answered = true;
+  document.querySelectorAll('.option-btn').forEach((b,i) => {
+    b.disabled = true;
+    if (i===correct) b.classList.add('correct');
+    if (i===chosen && chosen!==correct) b.classList.add('wrong');
+  });
+  const ok = chosen === correct;
+  if (currentQ._mode === 'lecture') dotResults.push(ok);
+  // build log entry
+  const opts = currentQ.opts || currentQ.options || [];
+  logAnswer({
+    mode: currentQ._mode,
+    theme: currentQ._theme || '',
+    question: currentQ.q || currentQ.question || '',
+    given: opts[chosen] || String(chosen),
+    correctAns: opts[correct] || String(correct),
+    ok
+  });
+  showFeedback(ok);
+}
+
+function checkBlank() {
+  if (answered) return;
+  const inp = document.getElementById('blankInput');
+  if (!inp) return;
+  const val = inp.value.trim().toLowerCase();
+  const accepted = (currentQ.reponses_acceptees||[currentQ.reponse]).map(a=>(a||'').toLowerCase());
+  const ok = accepted.includes(val);
+  inp.disabled = true;
+  inp.classList.add(ok ? 'correct' : 'wrong');
+  if (!ok) {
+    const hint = document.createElement('span');
+    hint.style.cssText = 'color:#1dd1a1;font-weight:800;font-size:1rem;';
+    hint.textContent = '→ ' + (currentQ.reponse||'');
+    inp.parentElement.appendChild(hint);
+  }
+  answered = true;
+  logAnswer({
+    mode: currentQ._mode,
+    theme: currentQ._theme || '',
+    question: (currentQ.verbe_infinitif||'') + ' — ' + (currentQ.sujet||'') + ' (' + (currentQ.temps||'') + ')',
+    given: inp.value.trim() || '(vide)',
+    correctAns: currentQ.reponse || '',
+    ok
+  });
+  showFeedback(ok);
+}
+
+function showFeedback(ok) {
+  const q = currentQ;
+  const fb = document.getElementById('feedback');
+  const acts = document.getElementById('actions');
+  if (ok) {
+    streak++;
+    const pts = 10 + (streak > 2 ? 5 : 0);
+    score += pts; xp += pts;
+    updateScore(); updateStreak();
+    const expl = q.expl || q.explication || '';
+    const fun = q.fun_fact || q.fun || '';
+    const tip = q.astuce || '';
+    let msg = '<strong>&#9989; Bravo' + (streak > 2 ? ' &#128293; S&#233;rie x' + streak + '!' : ' !') + ' +' + pts + ' pts</strong>';
+    msg += '<div class="expl">' + expl + '</div>';
+    if (fun) msg += '<div class="tip">&#127881; <strong>Le savais-tu ?</strong> ' + fun + '</div>';
+    if (tip) msg += '<div class="tip">&#128161; <strong>Astuce :</strong> ' + tip + '</div>';
+    if (q.groupe) msg += '<div style="color:#a8a4c8;font-size:0.8rem;margin-top:5px;">(' + q.groupe + ')</div>';
+    fb.className = 'feedback success'; fb.innerHTML = msg;
+  } else {
+    streak = 0; updateStreak();
+    const expl = q.expl || q.explication || '';
+    const tip = q.astuce || '';
+    let msg = '<strong>&#10060; Pas tout &#224; fait !</strong>';
+    msg += '<div class="expl">' + expl + '</div>';
+    if (tip) msg += '<div class="tip">&#128161; <strong>Astuce :</strong> ' + tip + '</div>';
+    if (q.groupe) msg += '<div style="color:#a8a4c8;font-size:0.8rem;margin-top:5px;">(' + q.groupe + ')</div>';
+    fb.className = 'feedback fail'; fb.innerHTML = msg;
+  }
+  acts.style.display = 'flex';
+  // reveal "En savoir plus" for grammaire/conjugaison
+  const plw = document.getElementById('plusLoinWrap');
+  if (plw) plw.style.display = 'block';
+  saveState();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  ANSWER LOG
+// ═══════════════════════════════════════════════════════════════════
+function logAnswer({ mode, theme, question, given, correctAns, ok }) {
+  answerLog.push({ ts: Date.now(), mode, theme, question, given, correctAns, ok });
+}
+
+function fmtDate(ts) {
+  const d = new Date(ts);
+  return d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' })
+    + ' ' + d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+}
+
+function showProgress() {
+  // switch active tab
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tabProgress').classList.add('active');
+
+  const total = answerLog.length;
+  const correct = answerLog.filter(e => e.ok).length;
+  const wrong = total - correct;
+  const pct = total ? Math.round(correct / total * 100) : 0;
+
+  const byMode = { lecture:[], grammaire:[], conjugaison:[] };
+  answerLog.forEach(e => { if (byMode[e.mode]) byMode[e.mode].push(e); });
+
+  const modeLabels = { lecture:'📖 Compréhension', grammaire:'🔤 Grammaire', conjugaison:'⚙️ Conjugaison' };
+
+  let html = '<div class="prog-header">'
+    + '<span class="prog-title">&#128202; Mon Progrès</span>'
+    + '<button class="export-btn" onclick="exportCSV()">&#128229; Exporter CSV</button>'
+    + '</div>';
+
+  // stats
+  html += '<div class="stat-row">'
+    + '<div class="stat-box"><div class="stat-num blue">' + total + '</div><div class="stat-lbl">Questions</div></div>'
+    + '<div class="stat-box"><div class="stat-num green">' + correct + '</div><div class="stat-lbl">Correctes</div></div>'
+    + '<div class="stat-box"><div class="stat-num red">' + wrong + '</div><div class="stat-lbl">Erreurs</div></div>'
+    + '<div class="stat-box"><div class="stat-num yellow">' + pct + '%</div><div class="stat-lbl">Réussite</div></div>'
+    + '</div>';
+
+  if (total === 0) {
+    html += '<div class="empty-log">Aucune réponse enregistrée pour l\'instant.<br>Commence par répondre à quelques questions !</div>';
+  } else {
+    // per-mode sections, most recent first within each
+    ['lecture','grammaire','conjugaison'].forEach(mode => {
+      const entries = [...byMode[mode]].reverse();
+      if (entries.length === 0) return;
+      const mOk = entries.filter(e=>e.ok).length;
+      html += '<div class="log-section"><div class="log-section-title">'
+        + modeLabels[mode] + ' &mdash; ' + mOk + '/' + entries.length + ' correctes</div>';
+      entries.forEach(e => {
+        html += '<div class="log-entry ' + (e.ok ? 'ok' : 'ko') + '">'
+          + '<div class="log-icon">' + (e.ok ? '✅' : '❌') + '</div>'
+          + '<div class="log-body">';
+        if (e.theme && e.theme !== e.mode) html += '<span class="log-theme">' + e.theme + '</span><br>';
+        html += '<div class="log-q">' + e.question + '</div>';
+        if (e.ok) {
+          html += '<div class="log-ans">Réponse : <span class="given">' + e.given + '</span></div>';
+        } else {
+          html += '<div class="log-ans">'
+            + 'Donné : <span class="given">' + e.given + '</span> &nbsp;|&nbsp; '
+            + 'Correct : <span class="correct-ans">' + e.correctAns + '</span></div>';
+        }
+        html += '<div class="log-time">' + fmtDate(e.ts) + '</div>';
+        html += '</div></div>';
+      });
+      html += '</div>';
+    });
+  }
+
+  html += '<div class="actions" style="margin-top:10px;">'
+    + '<button class="btn btn-primary" onclick="backToGame()">&#8592; Retour au jeu</button></div>';
+
+  document.getElementById('mainCard').innerHTML = '<div>' + html + '</div>';
+}
+
+function backToGame() {
+  document.querySelectorAll('.mode-tab').forEach((t,i) => {
+    const modes = ['lecture','grammaire','conjugaison'];
+    t.classList.toggle('active', modes[i] === currentMode);
+  });
+  loadQuestion();
+}
+
+function exportCSV() {
+  const header = 'Date,Mode,Thème,Question,Réponse donnée,Bonne réponse,Résultat\n';
+  const rows = answerLog.map(e => {
+    const esc = s => '"' + (s||'').replace(/"/g,'""') + '"';
+    return [fmtDate(e.ts), e.mode, e.theme, e.question, e.given, e.correctAns, e.ok ? 'Correct' : 'Faux']
+      .map(esc).join(',');
+  }).join('\n');
+  const blob = new Blob(['\uFEFF' + header + rows], { type:'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'francais_aventure_progres.csv';
+  a.click(); URL.revokeObjectURL(url);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  DICTIONARY — click on any word in the passage
+// ═══════════════════════════════════════════════════════════════════
+
+// Pre-process passage HTML: wrap every word in a clickable span.
+// Strategy: split on ALL tags first, then process only the text chunks.
+function linkifyPassage(html) {
+  // Split into alternating [text, tag, text, tag, ...] chunks
+  const parts = html.split(/(<[^>]+>)/);
+  return parts.map(function(part) {
+    // If it looks like a tag, leave it alone
+    if (part.charAt(0) === '<') return part;
+    // Otherwise wrap each non-whitespace token
+    return part.replace(/\S+/g, function(word) {
+      const clean = word.replace(/^[«»"'()\[\].,!?;:\-–—]+|[«»"'()\[\].,!?;:\-–—]+$/g, '');
+      if (clean.length < 2) return word;
+      return '<span class="w" data-word="' + clean.replace(/"/g, '&quot;') + '">' + word + '</span>';
+    });
+  }).join('');
+}
+
+// Attach a single delegated click listener on the passage
+function initPassageClicks() {
+  const passage = document.getElementById('passageText');
+  if (!passage) return;
+  passage.addEventListener('click', function(e) {
+    const span = e.target.closest('.w');
+    if (!span) { closeDict(); return; }
+    const word = span.dataset.word || span.textContent.trim();
+    if (!word || word.length < 2) return;
+    passage.querySelectorAll('.w.active').forEach(s => s.classList.remove('active'));
+    span.classList.add('active');
+    showDictTooltip(word, span.getBoundingClientRect());
+    e.stopPropagation();
+  });
+}
+
+// Noun singular map — covers plural nouns found in our passages.
+// Verbs, adjectives, adverbs are deliberately excluded.
+const NOUN_SINGULAR = {
+  // -aux / -eaux (already handled by rule, but included for completeness)
+  'animaux':'animal','chevaux':'cheval','journaux':'journal','tableaux':'tableau',
+  'oiseaux':'oiseau','coraux':'corail','travaux':'travail','vitraux':'vitrail',
+  'idéaux':'idéal','cristaux':'cristal','métaux':'métal','minéraux':'minéral',
+  'tombeaux':'tombeau','rideaux':'rideau','nouveaux':'nouveau',
+  // common nouns from our passages
+  'abeilles':'abeille','activités':'activité','adolescents':'adolescent',
+  'algues':'algue','alvéoles':'alvéole','amandes':'amande','ancêtres':'ancêtre',
+  'années':'année','apiculteurs':'apiculteur','artistes':'artiste',
+  'astronautes':'astronaute','astronomes':'astronome','aurores':'aurore',
+  'autoportraits':'autoportrait','bancs':'banc','blocs':'bloc',
+  'bouleversements':'bouleversement','calculs':'calcul','causes':'cause',
+  'championnats':'championnat','chargées':'chargée',
+  'civilisations':'civilisation','combinaisons':'combinaison',
+  'compositeurs':'compositeur','conséquences':'conséquence','contours':'contour',
+  'coquillages':'coquillage','costumes':'costume','couches':'couche',
+  'couleurs':'couleur','créatures':'créature','crues':'crue','cultures':'culture',
+  'cycles':'cycle','décennies':'décennie','déchets':'déchet',
+  'découvertes':'découverte','défunts':'défunt','descendants':'descendant',
+  'décisions':'décision','détails':'détail','dollars':'dollar',
+  'droits':'droit','effets':'effet','esclaves':'esclave','espèces':'espèce',
+  'exploits':'exploit','figures':'figure','films':'film',
+  'forêts':'forêt','foulées':'foulée','fraises':'fraise','frères':'frère',
+  'glyphes':'glyphe','grimpeurs':'grimpeur','guerres':'guerre',
+  'gènes':'gène','habitudes':'habitude','heures':'heure',
+  'hiéroglyphes':'hiéroglyphe','hormones':'hormone','humains':'humain',
+  'ingénieurs':'ingénieur','jeux':'jeu','jours':'jour',
+  'kilomètres':'kilomètre','langues':'langue','larves':'larve',
+  'lésions':'lésion','maladies':'maladie','mathématiciens':'mathématicien',
+  'mayas':'maya','médailles':'médaille','méduses':'méduse',
+  'merveilles':'merveille','milliards':'milliard','milliers':'millier',
+  'millions':'million','minutes':'minute','missions':'mission','mots':'mot',
+  'muscles':'muscle','mythes':'mythe','mètres':'mètre','neurones':'neurone',
+  'notes':'note','objets':'objet','observations':'observation','océans':'océan',
+  'ouvrières':'ouvrière','parasites':'parasite','parents':'parent',
+  'parisiens':'parisien','particules':'particule','patients':'patient',
+  'pesticides':'pesticide','pharaons':'pharaon','plages':'plage',
+  'plantes':'plante','plateformes':'plateforme','poissons':'poisson',
+  'pollinisateurs':'pollinisateur','pommes':'pomme','populations':'population',
+  'positions':'position','pratiquants':'pratiquant','pressions':'pression',
+  'principes':'principe','prises':'prise','problèmes':'problème',
+  'produits':'produit','profondeurs':'profondeur','psychologues':'psychologue',
+  'pyramides':'pyramide','périodes':'période','qualités':'qualité',
+  'quantités':'quantité','radiotélescopes':'radiotélescope','records':'record',
+  'ressources':'ressource','restaurants':'restaurant','rivales':'rivale',
+  'roches':'roche','récifs':'récif','récoltes':'récolte','régions':'région',
+  'réseaux':'réseau','révolutions':'révolution','rêves':'rêve',
+  'savants':'savant','scientifiques':'scientifique','scènes':'scène',
+  'secondes':'seconde','siècles':'siècle','sites':'site','sociétés':'société',
+  'solutions':'solution','sommets':'sommet','souvenirs':'souvenir',
+  'spectateurs':'spectateur','spectacles':'spectacle','sports':'sport',
+  'squelettes':'squelette','systèmes':'système','sécheresses':'sécheresse',
+  'tableaux':'tableau','techniques':'technique','températures':'température',
+  'terres':'terre','tombeaux':'tombeau','touristes':'touriste','traces':'trace',
+  'transports':'transport','tremblements':'tremblement',
+  'tropicales':'tropicale','trous':'trou','tâches':'tâche','villes':'ville',
+  'visiteurs':'visiteur','zooxanthelles':'zooxanthelle','écoles':'école',
+  'écrans':'écran','égyptiens':'égyptien','élections':'élection',
+  'élèves':'élève','éléments':'élément','émotions':'émotion',
+  'études':'étude','événements':'événement','êtres':'être','îles':'île',
+  'étoiles':'étoile','galaxies':'galaxie','planètes':'planète',
+  'volcans':'volcan','récents':'récent',
+};
+
+function singularize(word) {
+  const w = word.toLowerCase();
+  if (w.length < 3) return w;
+  // Hyphenated compound words — leave as-is
+  if (w.includes('-')) return w;
+  // Noun map lookup first
+  if (NOUN_SINGULAR[w]) return NOUN_SINGULAR[w];
+  // -eaux → -eau  (tableaux→tableau, oiseaux→oiseau)
+  if (w.endsWith('eaux')) return w.slice(0, -1);
+  // -aux → -al   (animaux→animal, chevaux→cheval)
+  if (w.endsWith('aux')) return w.slice(0, -3) + 'al';
+  // Everything else goes as-is (verbs, adjectives, unknown words)
+  return w;
+}
+
+function showDictTooltip(word, rect) {
+  const tooltip = document.getElementById('dictTooltip');
+  document.getElementById('dictWord').textContent = word;
+  const lookup = singularize(word);
+  document.getElementById('dictLink').href =
+    'https://fr.wiktionary.org/wiki/' + encodeURIComponent(lookup);
+
+  tooltip.style.display = 'block';
+  const ttW = tooltip.offsetWidth  || 280;
+  const ttH = tooltip.offsetHeight || 90;
+  const vw  = window.innerWidth;
+  const vh  = window.innerHeight;
+  const gap = 8;
+
+  // Prefer below the word; flip above if not enough room
+  let top  = rect.bottom + gap;
+  if (top + ttH > vh - gap) top = rect.top - ttH - gap;
+  if (top < gap) top = gap;
+
+  // Align left with the word; shift left if it would overflow right edge
+  let left = rect.left;
+  if (left + ttW > vw - gap) left = vw - ttW - gap;
+  if (left < gap) left = gap;
+
+  tooltip.style.top  = top  + 'px';
+  tooltip.style.left = left + 'px';
+}
+
+document.addEventListener('click', function(e) {
+  const tt = document.getElementById('dictTooltip');
+  if (tt && !tt.contains(e.target)) closeDict();
+});
+
+function closeDict() {
+  document.getElementById('dictTooltip').style.display = 'none';
+  document.querySelectorAll('.passage .w.active').forEach(s => s.classList.remove('active'));
+}
+// ═══════════════════════════════════════════════════════════════════
+function updateScore() {
+  document.getElementById('scoreBadge').textContent = score + ' pts';
+  document.getElementById('xpFill').style.width = Math.min((xp % 100), 100) + '%';
+}
+
+function updateStreak() {
+  const d = document.getElementById('streakDiv');
+  if (streak >= 2) { d.style.display='block'; d.textContent='&#128293; S&#233;rie de '+streak+' bonnes r&#233;ponses !'; }
+  else d.style.display='none';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  INIT — restore active tab then load
+// ═══════════════════════════════════════════════════════════════════
+loadState();
+const modeOrder = ['lecture','grammaire','conjugaison'];
+document.querySelectorAll('.mode-tab').forEach((btn, i) => {
+  if (i < 3) {
+    btn.classList.toggle('active', modeOrder[i] === currentMode);
+    btn.setAttribute('onclick', "switchMode('" + modeOrder[i] + "',this)");
+  }
+});
+// restore filter bar visibility
+if (currentMode === 'grammaire' || currentMode === 'conjugaison') {
+  document.getElementById('levelFilterBar').style.display = 'flex';
+  // restore active level button
+  document.querySelectorAll('.lvl-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i === selectedLevel);
+  });
+}
+loadQuestion();
+</script>
+</body>
+</html>
