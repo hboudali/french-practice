@@ -63,29 +63,23 @@
     line-height: 1.4;
   }
   .dict-tip-banner strong { color: #48dbfb; }
-  /* dictionary tooltip */
+  /* translation tooltip */
   #dictTooltip {
     position: fixed; z-index: 9999;
     background: #1a1830; border: 1px solid #48dbfb55;
-    border-radius: 14px; padding: 12px 16px;
+    border-radius: 14px; padding: 13px 16px 12px;
     box-shadow: 0 8px 32px #00000088;
-    min-width: 200px; max-width: 280px;
+    min-width: 180px; max-width: 260px;
     animation: fadeIn 0.15s ease;
     pointer-events: auto;
   }
   #dictTooltip .dict-word {
-    font-family: 'Baloo 2', cursive; font-size: 1.1rem; font-weight: 800;
-    color: #fffffe; margin-bottom: 6px;
+    font-family: 'Baloo 2', cursive; font-size: 1rem; font-weight: 800;
+    color: #a8a4c8; margin-bottom: 4px;
   }
-  #dictTooltip .dict-link {
-    display: flex; align-items: center; gap: 8px;
-    background: linear-gradient(135deg, #48dbfb22, #ff9ff322);
-    border: 1px solid #48dbfb44; border-radius: 10px;
-    padding: 8px 12px; text-decoration: none;
-    color: #48dbfb; font-weight: 700; font-size: 0.85rem;
-    transition: all 0.2s;
+  #dictTooltip .dict-translation {
+    font-size: 1.1rem; font-weight: 800; color: #48dbfb; line-height: 1.3;
   }
-  #dictTooltip .dict-link:hover { background: #48dbfb22; border-color: #48dbfb; }
   #dictTooltip .dict-close {
     position: absolute; top: 8px; right: 10px;
     background: none; border: none; color: #4a4870;
@@ -93,6 +87,9 @@
     font-family: 'Nunito', sans-serif;
   }
   #dictTooltip .dict-close:hover { color: #a8a4c8; }
+  #dictTooltip .dict-unknown {
+    font-size: 0.82rem; color: #4a4870; font-style: italic; margin-top: 2px;
+  }
   /* question within passage card */
   .q-divider { border: none; border-top: 1px solid #2e2b4a; margin: 18px 0; }
   .q-label { font-size: 0.76rem; font-weight: 700; color: #48dbfb; text-transform: uppercase;
@@ -246,9 +243,8 @@
   <div id="dictTooltip" style="display:none">
     <button class="dict-close" onclick="closeDict()">&#10005;</button>
     <div class="dict-word" id="dictWord"></div>
-    <a class="dict-link" id="dictLink" href="#" target="_blank" rel="noopener">
-      &#128218; Voir dans le Wiktionnaire
-    </a>
+    <div class="dict-translation" id="dictTranslation"></div>
+    <div class="dict-unknown" id="dictUnknown" style="display:none">pas de traduction disponible</div>
   </div>
   <div class="reset-bar"><button class="btn-ghost btn" onclick="confirmReset()">&#128256; Recommencer &#224; z&#233;ro</button></div>
 </div>
@@ -832,16 +828,16 @@ function renderLecture(text, qIdx) {
     + '<span class="q-counter">Q' + (qIdx+1) + '/' + qs.length + '</span>'
     + '</div>';
 
-  html += '<div class="dict-tip-banner">&#128161; <strong>Astuce :</strong> clique sur n\'importe quel mot du texte pour voir sa d\u00e9finition dans le Wiktionnaire !</div>';
+  html += '<div class="dict-tip-banner">&#127468;&#127463; <strong>Astuce :</strong> clique sur n\'importe quel mot pour voir sa traduction en anglais !</div>';
   html += '<div class="passage" id="passageText">' + linkifyPassage(text.passage) + '</div>';
   html += '<hr class="q-divider">';
   html += '<div class="q-label">Question ' + (qIdx+1) + ' sur ' + qs.length + '</div>';
   html += dots;
-  html += '<div class="question-text">' + q.q + '</div>';
+  html += '<div class="question-text">' + linkifyPassage(q.q) + '</div>';
   html += '<div class="options" id="opts">';
   q.opts.forEach((opt, i) => {
     html += '<button class="option-btn" onclick="checkQCM(this,' + i + ',' + q.correct + ')">'
-      + '<span class="option-letter">' + L[i] + '</span>' + opt + '</button>';
+      + '<span class="option-letter">' + L[i] + '</span>' + linkifyPassage(opt) + '</button>';
   });
   html += '</div>';
   html += '<div id="feedback"></div>';
@@ -1108,148 +1104,833 @@ function exportCSV() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-//  DICTIONARY — click on any word in the passage
+//  TRANSLATION — exact 1:1 map of every word used in the passages
+//  Keys are exact lowercase forms as they appear in the text.
+//  No normalization, no stemming — pure lookup.
 // ═══════════════════════════════════════════════════════════════════
 
-// Pre-process passage HTML: wrap every word in a clickable span.
-// Strategy: split on ALL tags first, then process only the text chunks.
+const TRANSLATIONS = {
+  // A
+  'abeille':'bee','abeilles':'bees','abrite':'houses','abritent':'house',
+  'absence':'absence','absolue':'absolute','absolument':'absolutely',
+  'absorbe':'absorbs','absorbent':'absorb','absorption':'absorption',
+  'abysses':'abyss','accident':'accident','accomplissent':'accomplish',
+  'accomplit':'accomplishes','accordent':'agree','accoupler':'to mate',
+  'accueille':'welcomes','accumulent':'accumulate','accumulés':'accumulated',
+  'accélère':'accelerates','accélérer':'to accelerate','acidification':'acidification',
+  'acidité':'acidity','actif':'active','activité':'activity','activités':'activities',
+  'actuelles':'current','actuels':'current','admirées':'admired',
+  'adolescents':'teenagers','adopte':'adopts','adoptée':'adopted',
+  'ados':'teens','adrénaline':'adrenaline','adultes':'adults',
+  'adversaires':'opponents','affamaient':'were starving','affecte':'affects',
+  'affirmant':'claiming','africain':'African','afrikaans':'Afrikaans',
+  'afrique':'Africa','agents':'agents','agir':'to act','agricoles':'agricultural',
+  'agriculture':'agriculture','aide':'helps','aider':'to help','aigle':'eagle',
+  'aire':'area','alarmante':'alarming','aldrin':'Aldrin','alex':'Alex',
+  'alexandrie':'Alexandria','algues':'seaweed/algae','alimentaires':'food (adj.)',
+  'alimentation':'diet/food','alitée':'bedridden','allait':'was going',
+  'allemagne':'Germany','alpha':'alpha','altitude':'altitude','alvéoles':'cells',
+  'amandes':'almonds','amazone':'Amazon river','amazonie':'Amazon rainforest',
+  'amygdale':'amygdala','améliore':'improves','américaine':'American',
+  'amérique':'America','analyser':'to analyse','ancien':'old/ancient',
+  'ancienne':'old/ancient','anciennes':'old/ancient','ancêtre':'ancestor',
+  'ancêtres':'ancestors','andromède':'Andromeda','anglais':'English',
+  'angle':'angle','angleterre':'England','animal':'animal','animale':'animal',
+  'animaux':'animals','anneau':'ring','annoncer':'to announce','annonçant':'announcing',
+  'annuelles':'annual','année':'year','années':'years','antiquité':'Antiquity',
+  'antisismiques':'earthquake-resistant','antoinette':'Antoinette',
+  'antonio':'Antonio','anémones':'anemones','apartheid':'apartheid',
+  'apiculteurs':'beekeepers','apocalypse':'apocalypse','apogée':'peak/height',
+  'apollo':'Apollo','apparaît':'appears','appareil':'device','apparition':'appearance',
+  'appelle':'calls','appelé':'called','appelée':'called','applaudissements':'applause',
+  'appliquait':'applied','apprennent':'learn','appris':'learned',
+  'araignées':'spiders','archipel':'archipelago','arctiques':'Arctic',
+  'arme':'weapon','armstrong':'Armstrong','armée':'army','arrivait':'was arriving',
+  'arrivé':'arrived','arrêté':'arrested','artiste':'artist','artistes':'artists',
+  'artistique':'artistic','aspects':'aspects','assistant':'assistant',
+  'assurer':'to ensure','astronaute':'astronaut','astronautes':'astronauts',
+  'astronomes':'astronomers','astronomiques':'astronomical','athlètes':'athletes',
+  'atmosphère':'atmosphere','atmosphériques':'atmospheric','atteignent':'reach',
+  'atteindre':'to reach','atteint':'reached','attire':'attracts','attirent':'attract',
+  'attiré':'attracted','attitude':'attitude','augmentation':'increase',
+  'augmenté':'increased','aurores':'auroras','australes':'southern (polar)',
+  'autochtones':'indigenous peoples','automatiques':'automatic',
+  'autoportraits':'self-portraits','aviez':'were flying','avion':'plane',
+  'avis':'opinion','avoir':'to have','avril':'April','aztèques':'Aztecs',
+  // B
+  'balcon':'balcony','bali':'Bali','bancs':'benches','barrière':'barrier',
+  'basculement':'tipping point','bastille':'Bastille','basé':'based',
+  'battu':'beaten','beaucoup':'a lot','beethoven':'Beethoven','belize':'Belize',
+  'berlin':'Berlin','besoin':'need','bien-être':'well-being',
+  'biodiversité':'biodiversity','biologique':'biological',
+  'bioluminescence':'bioluminescence','bioluminescents':'bioluminescent',
+  'bière':'beer','blanc':'white','blanchissement':'bleaching',
+  'blanchissent':'bleach','blancs':'white','bleu':'blue','bleue':'blue',
+  'blindée':'bulletproof','bloc':'block','blocs':'blocks','boire':'to drink',
+  'bollywood':'Bollywood','bolt':'Bolt','bond':'leap','bonn':'Bonn',
+  'bord':'edge','boréales':'boreal/northern (polar lights)','bouddhiste':'Buddhist',
+  'bougent':'move','bouleversements':'upheavals','bouleversé':'shaken',
+  'bout':'end','briller':'to shine','brésil':'Brazil','budget':'budget',
+  'bureau':'office','bus':'bus',
+  // C
+  'cafés':'coffees','calamar':'squid','calcaire':'limestone','calculs':'calculations',
+  'calendrier':'calendar','californie':'California','cameron':'Cameron',
+  'campagne':'campaign','canada':'Canada','capacité':'ability','capitale':'capital',
+  'capitan':'Captain','caraïbes':'Caribbean','carrés':'square (unit)',
+  'cause':'cause','causes':'causes','causé':'caused',
+  'ceinture':'belt','cellule':'cell','centaines':'hundreds','centrale':'central',
+  'centre':'centre','cerfs':'deer','cerveau':'brain','chaleur':'heat',
+  'champ':'field','champignons':'mushrooms','championnats':'championships',
+  'champollion':'Champollion','change':'changes','changeant':'changing',
+  'changement':'change','chanteur':'singer','chargées':'charged',
+  'chasser':'to hunt','chauffé':'heated','chemin':'path','cherchent':'look for',
+  'chercheur':'researcher','chercheurs':'researchers','chichen':'Chichen',
+  'choisie':'chosen','choisir':'to choose','choix':'choice','chose':'thing',
+  'choses':'things','chronique':'chronic','ciel':'sky','cinéma':'cinema',
+  'cire':'wax','cités':'cities','cité':'city','cités-états':'city-states',
+  'civilisation':'civilisation','civilisations':'civilisations',
+  'clair':'clear/light','clown':'clown','code':'code','coeur':'heart',
+  'collaboration':'collaboration','collins':'Collins','colonnes':'columns',
+  'colorés':'colourful','combinaisons':'spacesuits','combines':'combines',
+  'commerce':'trade','commun':'common','communauté':'community',
+  'comparaison':'comparison','complet':'full/complete','complexe':'complex',
+  'complexes':'complex','compositeur':'composer','compositeurs':'composers',
+  'comprend':'includes','compris':'included','comptait':'counted',
+  'condamné':'sentenced','connaissances':'knowledge','connaître':'to know',
+  'conservation':'conservation','considérable':'considerable',
+  'considérables':'considerable','constamment':'constantly','consommons':'consume',
+  'construire':'to build','construite':'built','consécutives':'consecutive',
+  'contact':'contact','contours':'outlines','corallien':'coral','coralliens':'coral',
+  'coraux':'corals','corps':'body','costumes':'costumes','couche':'layer',
+  'couches':'layers','couleur':'colour','couleurs':'colours','courant':'current',
+  'cours':'course','course':'race','courtes':'short','couvertes':'covered',
+  'couvrent':'cover','croyaient':'believed','crues':'floods','culture':'culture',
+  'cultures':'cultures','cycle':'cycle','cycles':'cycles','célèbre':'famous',
+  'célèbres':'famous','cités':'cities',
+  // D
+  'damasio':'Damasio','dans':'in','dauphin':'dolphin','décennie':'decade',
+  'décennies':'decades','déchets':'waste','décision':'decision',
+  'décisions':'decisions','découverte':'discovery','découvertes':'discoveries',
+  'découvrir':'to discover','défaite':'defeat','défunts':'deceased',
+  'déforestation':'deforestation','délire':'frenzy','descendant':'descendant',
+  'descendants':'descendants','description':'description','dialogue':'dialogue',
+  'disque':'disc','distance':'distance','dopamine':'dopamine','douleur':'pain',
+  'douloureuse':'painful','droits':'rights','danger':'danger','décrit':'describes',
+  'déchiffré':'deciphered','déclencheur':'trigger','déclenche':'triggers',
+  'dépassé':'exceeded','dépasse':'exceeds','dépose':'deposits','détruit':'destroys',
+  'difficile':'difficult','difficulté':'difficulty','direction':'direction',
+  'disparaître':'to disappear','disparition':'disappearance','distant':'distant',
+  'dizaines':'tens (of thousands)','dollars':'dollars','domaine':'domain',
+  // E
+  'écoles':'schools','écrans':'screens','égyptien':'Egyptian','égyptiens':'Egyptians',
+  'élection':'election','élections':'elections','élève':'student','élèves':'students',
+  'élément':'element','éléments':'elements','émission':'emission','émotion':'emotion',
+  'émotions':'emotions','empire':'empire','emploi':'job','employé':'employee',
+  'endormi':'dormant','entière':'entire','époque':'era','éruption':'eruption',
+  'escalade':'climbing','espace':'space','espèce':'species','espèces':'species',
+  'essence':'essence','essentielle':'essential','essentielles':'essential',
+  'essentiels':'essential','ethnie':'ethnicity','étoile':'star','étoiles':'stars',
+  'étude':'study','études':'studies','événement':'event','événements':'events',
+  'être':'to be','êtres':'beings','évoluer':'to evolve','exactement':'exactly',
+  'exemple':'example','exceptionnel':'exceptional','exceptionnel':'exceptional',
+  'exceptionnel':'exceptional','exceptionnel':'exceptional',
+  'excès':'excess','exploit':'feat','exploits':'feats',
+  'explorées':'explored','exposition':'exhibition','expulsent':'expel',
+  'extension':'extension','extrêmement':'extremely',
+  // F
+  'fabriquer':'to make','faillite':'bankruptcy','fascinante':'fascinating',
+  'fascinantes':'fascinating','fascinant':'fascinating','faux-bourdons':'drones (bees)',
+  'famine':'famine','femelles':'females','figure':'figure','figures':'figures',
+  'film':'film','films':'films','finlande':'Finland','fleurs':'flowers',
+  'forêt':'forest','forêts':'forests','foulée':'stride','foulées':'strides',
+  'fraises':'strawberries','frère':'brother','frères':'brothers','futur':'future',
+  'formation':'formation','fossile':'fossil','fosse':'trench','fondateur':'founder',
+  'fondamental':'fundamental','fond':'bottom','flexibilité':'flexibility',
+  // G
+  'galaxie':'galaxy','galaxies':'galaxies','gardiens':'guards','génial':'brilliant',
+  'gènes':'genes','glyphes':'glyphs','grimpeur':'climber','grimpeurs':'climbers',
+  'guitare':'guitar','guerre':'war','guerres':'wars','gouvernement':'government',
+  'grand':'big/great','grande':'big/great','grandes':'big/great','grands':'big/great',
+  'gravité':'gravity','gravement':'seriously','grâce':'thanks to','grec':'Greek',
+  'genre':'genre/type','géographie':'geography','géant':'giant',
+  // H
+  'habitant':'inhabitant','habitants':'inhabitants','habitude':'habit',
+  'habitudes':'habits','hauteur':'height','heure':'hour','heures':'hours',
+  'hiéroglyphe':'hieroglyph','hiéroglyphes':'hieroglyphs','historique':'historical',
+  'historiens':'historians','hollywood':'Hollywood','honnold':'Honnold',
+  'hormones':'hormones','humain':'human','humains':'humans','humaine':'human',
+  'humaines':'human','hypothétique':'hypothetical',
+  // I
+  'identifié':'identified','idéaux':'ideals','ignorait':'did not know',
+  'immobilisée':'immobilized','impression':'impression','incapables':'unable',
+  'incarcéré':'imprisoned','inconnu':'unknown','indépendance':'independence',
+  'inde':'India','industrie':'industry','ingénieurs':'engineers',
+  'innovation':'innovation','insecte':'insect','insectes':'insects',
+  'intense':'intense','intenses':'intense','international':'international',
+  'irrigation':'irrigation','itza':'Itza','invisible':'invisible',
+  // J
+  'jamaïque':'Jamaica','japon':'Japan','japonais':'Japanese','jazz':'jazz',
+  'jeune':'young','jeunes':'young people','jeux':'games','jour':'day',
+  'jours':'days','justice':'justice','juillet':'July',
+  // K
+  'kahlo':'Kahlo','katherine':'Katherine','kenya':'Kenya','khéops':'Khufu',
+  'kilomètre':'kilometre','kilomètres':'kilometres',
+  // L
+  'langueur':'languor','larve':'larva','larves':'larvae','légende':'legend',
+  'lésion':'lesion','lésions':'lesions','libération':'liberation','liberté':'freedom',
+  'lire':'to read','livre':'book','livres':'books','lune':'moon','lumière':'light',
+  // M
+  'maison':'house','maladies':'diseases','maladie':'disease','mâle':'male',
+  'mâles':'males','mandela':'Mandela','marchent':'walk','marchand':'merchant',
+  'mathématicien':'mathematician','mathématiciens':'mathematicians','maya':'Mayan',
+  'mayas':'Mayans','médaille':'medal','médailles':'medals','méduse':'jellyfish',
+  'méduses':'jellyfish','miel':'honey','millénaire':'millennium',
+  'milliard':'billion','milliards':'billions','million':'million','millions':'millions',
+  'millier':'thousand','milliers':'thousands','minute':'minute','minutes':'minutes',
+  'miroir':'mirror','mission':'mission','missions':'missions','monde':'world',
+  'moniteur':'monitor','momie':'mummy','monarchie':'monarchy','montagne':'mountain',
+  'mort':'death/dead','mourir':'to die','muscles':'muscles','musique':'music',
+  'mélodie':'melody','mètre':'metre','mètres':'metres','mythe':'myth','mythes':'myths',
+  'mémoire':'memory','médicaux':'medical','médecin':'doctor',
+  // N
+  'napoléon':'Napoleon','nation':'nation','nature':'nature','néctar':'nectar',
+  'nectar':'nectar','neurones':'neurons','neurone':'neuron','nord':'north',
+  'norvège':'Norway','notable':'notable','nombre':'number',
+  // O
+  'obscurité':'darkness','observation':'observation','observations':'observations',
+  'octopus':'octopus','oiseau':'bird','oiseaux':'birds','olympique':'Olympic',
+  'olympiques':'Olympic','orchestre':'orchestra','organisme':'organism',
+  'organisation':'organisation','ouvrière':'worker bee','ouvrières':'worker bees',
+  'oxygène':'oxygen',
+  // P
+  'parasite':'parasite','parasites':'parasites','paix':'peace','paroi':'rock face',
+  'particule':'particle','particules':'particles','pays':'country',
+  'peintre':'painter','peindre':'to paint','peinture':'painting',
+  'pesticide':'pesticide','pesticides':'pesticides','pharaon':'pharaoh',
+  'pharaons':'pharaohs','phénomène':'phenomenon','philosophie':'philosophy',
+  'photographié':'photographed','pieuvre':'octopus','planète':'planet',
+  'planètes':'planets','plante':'plant','plantes':'plants',
+  'pollinisateur':'pollinator','pollinisateurs':'pollinators',
+  'pollen':'pollen','pollinisation':'pollination','pomme':'apple','pommes':'apples',
+  'population':'population','populations':'populations',
+  'portrait':'portrait','pression':'pressure','pressions':'pressures',
+  'principe':'principle','principes':'principles','prédateur':'predator',
+  'prédateurs':'predators','prison':'prison','profondeur':'depth',
+  'profondeurs':'depths','proie':'prey','pyramide':'pyramid','pyramides':'pyramids',
+  'période':'period','périodes':'periods','psychologue':'psychologist',
+  'psychologues':'psychologists','publicité':'publicity',
+  // Q
+  'quantité':'quantity','quantités':'quantities',
+  // R
+  'radiotélescope':'radio telescope','radiotélescopes':'radio telescopes',
+  'reine':'queen','récif':'reef','récifs':'reefs','récolte':'harvest',
+  'récoltes':'harvests','résistance':'resistance','ressource':'resource',
+  'ressources':'resources','révolution':'revolution','révolutions':'revolutions',
+  'rêve':'dream','rêves':'dreams','robben':'Robben','roche':'rock','roches':'rocks',
+  'roi':'king','requin':'shark','requins':'sharks','religion':'religion',
+  'région':'region','régions':'regions','règle':'rule','réseau':'network',
+  'réseaux':'networks','récent':'recent',
+  // S
+  'sacrifice':'sacrifice','savane':'savanna','scientifique':'scientist/scientific',
+  'scientifiques':'scientists/scientific','sécheresse':'drought',
+  'sécheresses':'droughts','ségrégation':'segregation','séisme':'earthquake',
+  'siècle':'century','siècles':'centuries','site':'site','sites':'sites',
+  'société':'society','sociétés':'societies','solution':'solution',
+  'solutions':'solutions','sommet':'summit','sommets':'summits',
+  'souvenir':'memory','souvenirs':'memories','spectacle':'show','spectacles':'shows',
+  'spectateur':'spectator','spectateurs':'spectators','sport':'sport',
+  'sports':'sports','squelette':'skeleton','squelettes':'skeletons',
+  'système':'system','systèmes':'systems','symbiose':'symbiosis',
+  'symbole':'symbol','sujet':'subject','subjectif':'subjective',
+  'surface':'surface','surpasse':'surpasses','survie':'survival',
+  'survécu':'survived','succès':'success','supernova':'supernova',
+  'sublime':'sublime',
+  // T
+  'tableau':'painting/table','tableaux':'paintings/tables','technique':'technique',
+  'techniques':'techniques','température':'temperature','températures':'temperatures',
+  'tikal':'Tikal','tombe':'tomb','tombeau':'tomb','tombeaux':'tombs',
+  'touriste':'tourist','touristes':'tourists','trace':'trace/footprint',
+  'traces':'traces/footprints','transport':'transport','transports':'transport',
+  'tremblement':'earthquake','tremblements':'earthquakes','trou':'hole',
+  'trous':'holes','tâche':'task','tâches':'tasks',
+  // U
+  'ultrasons':'ultrasounds','universel':'universal','urbaine':'urban',
+  'utiliser':'to use',
+  // V
+  'vengeance':'vengeance','vibration':'vibration','vibrations':'vibrations',
+  'ville':'city','villes':'cities','violon':'violin','virus':'virus',
+  'visiteur':'visitor','visiteurs':'visitors','voie':'way/path','volcan':'volcano',
+  'volcans':'volcanoes','voyage':'journey','vue':'view',
+  'vaisseau':'spacecraft','varroa':'varroa mite',
+  // W-Z
+  'wiktionnaire':'Wiktionary','yeux':'eyes','zone':'zone','zones':'zones',
+  'zooxanthelles':'zooxanthellae',
+  // Additional words
+  'londre':'London','londres':'London','movement':'movement',
+  'retraite':'retirement','salaire':'salary/wage','ufs':'eggs',
+  'vitesse':'speed','élevage':'livestock farming','était':'was',
+'accepter':'to accept','ainsi':'thus/so','ait':'has (subj.)','amériques':'Americas',
+  'an':'year','ans':'years','appelées':'called','appelés':'called',
+  'applaudi':'applauded','après':'after','aquarelle':'watercolour','arrivée':'arrived',
+  'art':'art','asie':'Asia','assaut':'assault/storming','assemblée':'assembly',
+  'athlétisme':'athletics','atlantique':'Atlantic','au':'to the/at the',
+  'aucun':'none/no','aucune':'none/no','auditif':'auditory','aujourd':'today',
+  'auraient':'would have','aurait':'would have','aussi':'also/too',
+  'australie':'Australia','autant':'as much/as many','autre':'other',
+  'autres':'others','aux':'to the/at the','avaient':'had','avait':'had',
+  'avancée':'advanced','avancées':'advanced','avant':'before','avantage':'advantage',
+  'avatar':'Avatar','avec':'with','avertissent':'warn','avons':'we have',
+  'ayant':'having','azote':'nitrogen',
+  'basse':'low','beaux':'beautiful','bien':'well/good','bon':'good',
+  'bourdons':'drones (bees)','but':'goal/purpose','buzz':'buzz',
+  'caché':'hidden','café':'coffee','car':'because','cardiaque':'cardiac/heart',
+  'cd':'CD','ce':'this','cela':'that','celle':'that one','centauri':'Centauri',
+  'cependant':'however','certaines':'some/certain','certains':'some/certain',
+  'ces':'these','cesse':'stops','cet':'this','cette':'this','ch':'ch',
+  'chacune':'each one','chaque':'each','cher':'expensive/dear','chez':'at',
+  'chine':'China','choisi':'chosen','chute':'fall/drop','ciels':'skies',
+  'cin':'cin','cinq':'five','cite':'quotes','citoyen':'citizen','citées':'cited',
+  'civile':'civil','clairement':'clearly','classique':'classical/classic',
+  'climat':'climate','climatique':'climatic','cm':'cm','co':'co',
+  'collision':'collision','colère':'anger','combat':'fight/combat',
+  'combien':'how much/many','combinaison':'combination/spacesuit',
+  'combine':'combines','commandé':'commissioned','comme':'like/as',
+  'commencé':'began','comment':'how','commune':'common/town',
+  'communiquent':'communicate','compagnie':'company','compense':'compensates',
+  'complets':'complete','complètement':'completely','composait':'composed',
+  'composant':'composing','composer':'to compose','composition':'composition',
+  'composé':'composed','composée':'composed','comprenaient':'understood',
+  'comprendre':'to understand','comptaient':'counted','compter':'to count',
+  'compétence':'skill','concentration':'concentration','concept':'concept',
+  'concert':'concert','concurrence':'competition','connaissaient':'knew',
+  'connaissait':'knew','connaît':'knows','connue':'known','connues':'known',
+  'conquise':'conquered','consacraient':'devoted','consacré':'devoted',
+  'conseillait':'advised','conservées':'preserved','considèrent':'consider',
+  'considérablement':'considerably','considéré':'considered',
+  'considérée':'considered','consolide':'consolidates','consomme':'consumes',
+  'construction':'construction','construisaient':'were building',
+  'construit':'built','construites':'built','conséquences':'consequences',
+  'contemporaine':'contemporary','contenait':'contained','contiennent':'contain',
+  'contient':'contains','continuait':'continued','continue':'continues',
+  'continuer':'to continue','contraire':'contrary/opposite',
+  'contrairement':'contrary to','contre':'against','conçu':'designed',
+  'copiait':'copied','copiée':'copied','coquillages':'shellfish/shells',
+  'corail':'coral','corde':'rope','correct':'correct','courait':'was running',
+  'courante':'common/current','courants':'currents/common','courir':'to run',
+  'court':'short/runs','couvrait':'covered','couvrant':'covering',
+  'couvrir':'to cover','coûté':'cost','craignent':'fear',
+  'criminels':'criminals','crise':'crisis','crochets':'hooks',
+  'croire':'to believe','croissance':'growth','croyables':'believable',
+  'croyant':'believing','crucial':'crucial','crâne':'skull',
+  'créant':'creating','créatifs':'creative','création':'creation',
+  'créatures':'creatures','crée':'creates','créer':'to create',
+  'créée':'created','cuillère':'spoon','culturelles':'cultural',
+  'célébrité':'fame/celebrity','célébré':'celebrated','côté':'side',
+  'dansent':'dance','dauphins':'dolphins','de':'of/from','debout':'standing',
+  'delà':'beyond','demandé':'asked','depuis':'since/from','dernier':'last',
+  'derrière':'behind','des':'some/of the','descendu':'descended',
+  'dessins':'drawings','dessus':'above/on top','destinés':'destined',
+  'destruction':'destruction','deux':'two','devaient':'had to',
+  'devenir':'to become','devenu':'became','devenue':'became',
+  'devenus':'became','deviendraient':'would become','deviennent':'become',
+  'devient':'becomes','dialoguer':'to dialogue','dictait':'dictated',
+  'dictionnaire':'dictionary','diego':'Diego','dieux':'gods',
+  'difficiles':'difficult','différence':'difference','différente':'different',
+  'différentes':'different','dire':'to say','directement':'directly',
+  'directoire':'Directory (French hist.)','dirigeait':'conducted/led',
+  'diriger':'to conduct/lead','discipline':'discipline',
+  'disciplines':'disciplines','disparaisse':'disappear (subj.)',
+  'disparaîtraient':'would disappear','disparu':'disappeared',
+  'disponibles':'available','disques':'discs/records','distinction':'distinction',
+  'distributeurs':'distributors/vending machines','dites':'said',
+  'dix':'ten','dominé':'dominated','donc':'so/therefore',
+  'donnaient':'gave','donne':'gives','donnent':'give','donné':'given',
+  'données':'data','dont':'whose/of which','dormant':'sleeping',
+  'dorment':'sleep','dormir':'to sleep','dos':'back','douce':'gentle/soft',
+  'doucement':'gently/softly','douloureuses':'painful','doute':'doubt',
+  'doutent':'doubt','douze':'twelve','douzième':'twelfth','droite':'right',
+  'du':'of the/some','duquel':'of which','durait':'lasted','durant':'during',
+  'dure':'lasts','durer':'to last','durs':'hard','durée':'duration',
+  'dès':'from/as soon as','début':'beginning','décembre':'December',
+  'déchiffrer':'to decipher','décider':'to decide','décimal':'decimal',
+  'déclaration':'declaration','déclaré':'declared','déclin':'decline',
+  'découvert':'discovered','décrite':'described','décuplée':'tenfold',
+  'définit':'defines','définition':'definition','dégoût':'disgust',
+  'déjà':'already','dépend':'depends','déphasait':'drifted',
+  'déplacent':'move','désavantage':'disadvantage','désavantagés':'disadvantaged',
+  'désormais':'from now on','détail':'detail','détails':'details',
+  'détection':'detection','détient':'holds','détruite':'destroyed',
+  'détruits':'destroyed','développement':'development',
+  'développent':'develop','développé':'developed','développée':'developed',
+  'déverse':'pours','dû':'had to/owed',
+  'eau':'water','eaux':'waters','effacer':'to erase','effectués':'performed',
+  'effet':'effect','effets':'effects','effondre':'collapses',
+  'effondrement':'collapse','effondrée':'collapsed','einstein':'Einstein',
+  'ekman':'Ekman','el':'el','elle':'she','elles':'they',
+  'emblématiques':'emblematic','emprisonnement':'imprisonment',
+  'empêcher':'to prevent','en':'in/on/of','encore':'still/again',
+  'endormir':'to fall asleep','ennemis':'enemies','entendait':'heard',
+  'entendant':'hearing','entendre':'to hear','entier':'entire/whole',
+  'entièrement':'entirely','entières':'entire','entourant':'surrounding',
+  'entre':'between','entrent':'enter','entrée':'entrance/entered',
+  'envie':'desire/want','environ':'about/around','envoyant':'sending',
+  'envoyés':'sent','erreur':'error/mistake','erreurs':'errors',
+  'escalader':'to climb','escaladé':'climbed','escaladée':'climbed',
+  'esclaves':'slaves','espagne':'Spain','espagnols':'Spanish',
+  'esprits':'spirits/minds','espérance':'life expectancy',
+  'essayé':'tried','est':'is','estime':'estimates','et':'and',
+  'eu':'had (past part.)','eue':'had','europe':'Europe','européen':'European',
+  'eux':'them','event':'Event','everest':'Everest',
+  'exceptionnelle':'exceptional','exceptionnellement':'exceptionally',
+  'exercice':'exercise','exige':'requires','existent':'exist',
+  'expl':'expl.','explicatifs':'explanatory','explication':'explanation',
+  'explicitement':'explicitly','explique':'explains','explorer':'to explore',
+  'exploré':'explored','explosant':'exploding','exposée':'exhibited',
+  'expriment':'express','expédiés':'sent/shipped','extraction':'extraction',
+  'extraordinaire':'extraordinary','extraordinaires':'extraordinary',
+  'extraterrestres':'extraterrestrials','extrême':'extreme',
+  'extérieur':'exterior','extérieurs':'exterior','exécutions':'executions',
+  'eye':'eye','face':'face','faible':'weak','faibles':'weak',
+  'faim':'hunger','faire':'to do/make','faisaient':'were doing',
+  'faisant':'doing','fait':'does/did','faite':'done','falaise':'cliff',
+  'fameux':'famous','fasciné':'fascinated','fatale':'fatal',
+  'fatigue':'fatigue','faune':'fauna/wildlife','faussaires':'forgers',
+  'fausse':'false','faussement':'falsely','faut':'must/need',
+  'faux':'false/fake','façon':'way/manner','femme':'woman/wife',
+  'fertilisaient':'fertilised','fertilisent':'fertilise','feu':'fire',
+  'fin':'end','finale':'final','financière':'financial','fines':'fine/thin',
+  'fini':'finished','fleur':'flower','fleuve':'river','florentin':'Florentian',
+  'flous':'blurry','fois':'times/once','fonctions':'functions','fonds':'depths',
+  'fondu':'melted','font':'do/make','foot':'football','force':'force/strength',
+  'forment':'form','former':'to form','forteresse':'fortress','fou':'mad/crazy',
+  'fournissent':'provide','fractions':'fractions','france':'France',
+  'franchir':'to cross/clear','français':'French','française':'French',
+  'françois':'François','fraternité':'fraternity/brotherhood',
+  'frederik':'Frederik','frida':'Frida','froid':'cold',
+  'fréquentes':'frequent','fréquents':'frequent','fui':'fled',
+  'fuir':'to flee','fuji':'Fuji','fun':'fun','fête':'party/celebration',
+  'gants':'gloves','gardé':'kept/guarded','gaz':'gas','gens':'people',
+  'gherardini':'Gherardini','gizeh':'Giza','glace':'ice',
+  'grammes':'grams','grandioses':'grandiose','grandissent':'grow',
+  'grandit':'grows','gratte':'scrapes','grave':'serious','graves':'serious',
+  'gravi':'climbed','gravir':'to climb','gravée':'engraved',
+  'grimper':'to climb','grimpé':'climbed','guatemala':'Guatemala',
+  'guide':'guide','guider':'to guide','guillotine':'guillotine',
+  'guillotinées':'guillotined','guillotinés':'guillotined',
+  'guinness':'Guinness','guépard':'cheetah','gèrent':'manage',
+  'géante':'giant','généralement':'generally','géométrie':'geometry',
+  'habitat':'habitat','habitées':'inhabited','harvard':'Harvard',
+  'haut':'high/tall','haute':'high/tall','hectares':'hectares',
+  'heureux':'happy','histoire':'history/story','hiver':'winter',
+  'hokkaido':'Hokkaido','homme':'man','honduras':'Honduras',
+  'honneur':'honour','honorer':'to honour','honshu':'Honshu',
+  'horizon':'horizon','hui':'today (part of aujourd\'hui)',
+  'huit':'eight','humanité':'humanity','hymne':'anthem',
+  'hélicoptère':'helicopter','hémisphère':'hemisphere','héritée':'inherited',
+  'ici':'here','identifiées':'identified','idées':'ideas','il':'he',
+  'ils':'they','image':'image','images':'images','imaginent':'imagine',
+  'imite':'imitates','immeubles':'buildings','immunisé':'immune',
+  'immunitaire':'immune (system)','immédiat':'immediate',
+  'immédiatement':'immediately','impliquait':'involved',
+  'importance':'importance','importante':'important',
+  'importantes':'important','importants':'important',
+  'imposantes':'imposing','impossible':'impossible',
+  'impressionnantes':'impressive','impressionné':'impressed',
+  'incendies':'fires','inconnue':'unknown','incorporant':'incorporating',
+  'indications':'indications','indiens':'Indian','indique':'indicates',
+  'indispensables':'indispensable','industrielle':'industrial',
+  'indéfiniment':'indefinitely','influencent':'influence',
+  'ingénieur':'engineer','inhabituellement':'unusually',
+  'inhumaine':'inhuman','injustice':'injustice','innovant':'innovative',
+  'inondation':'flood','inquiète':'worries','inspire':'inspires',
+  'inspiré':'inspired','installe':'settles/installs',
+  'installer':'to install/settle','instruments':'instruments',
+  'intelligence':'intelligence','intelligentes':'intelligent',
+  'intensive':'intensive','intensément':'intensely',
+  'interaction':'interaction','internationale':'international',
+  'internationalement':'internationally','internet':'internet',
+  'introduite':'introduced','intégration':'integration',
+  'intégrer':'to integrate','inuits':'Inuit','invasion':'invasion',
+  'inventeur':'inventor','inventée':'invented','invisibles':'invisible',
+  'irrationnelles':'irrational','island':'Island','islande':'Iceland',
+  'isolée':'isolated','italie':'Italy',
+  'jamais':'never','jamaïcain':'Jamaican','james':'James',
+  'jardin':'garden','jean':'Jean','jo':'Jo','joconde':'Mona Lisa',
+  'johnson':'Johnson','joie':'joy','jouaient':'played','jouent':'play',
+  'journée':'day','jurassic':'Jurassic','jusqu':'until','juste':'just/fair',
+  'kg':'kg','klerk':'de Klerk','km':'km','kyushu':'Kyushu',
+  'la':'the/her','lactée':'milky','laissant':'leaving',
+  'laissée':'left','laissées':'left','langue':'language','langues':'languages',
+  'lanterne':'lantern','laquelle':'which','large':'wide','largement':'widely',
+  'latine':'Latin','latino':'Latino','lavande':'lavender','le':'the/him',
+  'lentement':'slowly','lequel':'which','les':'the','leur':'their',
+  'leurs':'their','libres':'free','libère':'frees','libéré':'freed',
+  'lie':'links/binds','lieu':'place','lights':'lights','ligne':'line',
+  'lisa':'Lisa','liste':'list','lit':'reads/bed','litres':'litres',
+  'lié':'linked','loin':'far','londre':'London','long':'long',
+  'longtemps':'a long time','longue':'long','longues':'long',
+  'lors':'at the time of','lorsqu':'when','lorsque':'when',
+  'louis':'Louis','lourd':'heavy','louvre':'Louvre','ludwig':'Ludwig',
+  'lui':'him','lumineux':'luminous','lunaire':'lunar','lunaires':'lunar',
+  'lutter':'to fight','légal':'legal','légendaire':'legendary',
+  'légion':'legion','légèrement':'slightly','léonard':'Leonardo',
+  'ma':'my','magnétique':'magnetic','mai':'May','main':'hand',
+  'maintenir':'to maintain','maintient':'maintains','mais':'but',
+  'majeure':'major','majorité':'majority','malades':'sick','malgré':'despite',
+  'malheureusement':'unfortunately','mangé':'eaten','manque':'lacks',
+  'marcher':'to walk','mari':'husband','mariannes':'Marianas',
+  'marie':'Marie','marin':'marine','marines':'marine','marins':'marine',
+  'maroc':'Morocco','marquait':'marked','marque':'marks','masse':'mass',
+  'massive':'massive','mathématiciennes':'female mathematicians',
+  'mathématique':'mathematical','matériau':'material','mauvaises':'bad',
+  'maximale':'maximum','me':'me','meilleures':'better','meilleurs':'better',
+  'menace':'threatens','menacés':'threatened','menaçant':'threatening',
+  'mensonge':'lie','mental':'mental','mentales':'mental',
+  'mentionne':'mentions','mer':'sea','merveilles':'wonders',
+  'mesure':'measures','met':'puts','mettent':'put','mettre':'to put',
+  'meurent':'die','meurt':'dies','mexicaine':'Mexican','mexique':'Mexico',
+  'michael':'Michael','mieux':'better','migré':'migrated',
+  'min':'min','minuscules':'tiny','minéraux':'minerals','mise':'placed',
+  'moderne':'modern','modernes':'modern','moindre':'least',
+  'moine':'monk','moins':'less','mois':'month','moitié':'half',
+  'moment':'moment','momifiaient':'mummified','momifiant':'mummifying',
+  'momification':'mummification','momifications':'mummifications',
+  'mondial':'worldwide','mondiale':'worldwide','mondiales':'worldwide',
+  'mont':'mount','monte':'climbs','montre':'shows','montré':'shown',
+  'montée':'rise','morse':'walrus','mortelle':'deadly',
+  'mot':'word','mots':'words','mouvement':'movement',
+  'mouvements':'movements','moyen':'average/middle','moyenne':'average',
+  'mucus':'mucus','muettes':'silent/mute','multiraciales':'multiracial',
+  'mumbai':'Mumbai','mur':'wall','murs':'walls','musical':'musical',
+  'musicale':'musical','musée':'museum','mystère':'mystery',
+  'mystérieux':'mysterious','mécanisme':'mechanism','médicale':'medical',
+  'mélodies':'melodies','mémorisation':'memorisation','mémorisent':'memorise',
+  'métal':'metal','méticuleuses':'meticulous','métro':'metro/subway',
+  'métropole':'metropolis','mêlent':'mix','même':'same/even',
+  'nager':'to swim','narines':'nostrils','national':'national',
+  'nationale':'national','naturel':'natural','naturelle':'natural',
+  'naturelles':'natural','naturels':'natural','navigation':'navigation',
+  'ne':'not','neige':'snow','neil':'Neil','nelson':'Nelson',
+  'nemo':'Nemo','netflix':'Netflix','nettoient':'clean','neuf':'nine/new',
+  'neuroscientifique':'neuroscientist','neurotransmetteur':'neurotransmitter',
+  'neuvième':'ninth','ni':'neither/nor','nil':'Nile','nobel':'Nobel',
+  'noir':'black','noirs':'black','nombreuses':'numerous',
+  'nomme':'names','nommé':'named','noms':'names','non':'no',
+  'northern':'Northern','nos':'our','notamment':'notably',
+  'note':'note','noter':'to note','notes':'notes','notre':'our',
+  'nourrir':'to feed','nourriture':'food','nous':'we',
+  'nouveau':'new','nouveaux':'new','nouvelle':'new','nouvelles':'news/new',
+  'noyau':'core/nucleus','nuages':'clouds','nuggets':'nuggets',
+  'nuisent':'harm','nuisibles':'harmful','nuit':'night','numériques':'digital',
+  'nutritif':'nutritious','né':'born','nécessaire':'necessary',
+  'nécessité':'necessity','née':'born',
+  'objets':'objects','obscur':'dark/obscure','observateurs':'observers',
+  'observées':'observed','obtenue':'obtained','obtiennent':'obtain',
+  'oc':'oc','occidentale':'western','océans':'oceans','ode':'Ode',
+  'officiellement':'officially','ographie':'ography','on':'one/we',
+  'ont':'have','onze':'eleven','oppression':'oppression','opts':'opts',
+  'or':'now/gold','orbite':'orbit','ordinaire':'ordinary','oreille':'ear',
+  'organisé':'organised','organisées':'organised','origine':'origin',
+  'ou':'or','oui':'yes','ouvriers':'workers','ouïe':'hearing',
+  'ovation':'ovation','ovations':'ovations','où':'where',
+  'pacifique':'Pacific','par':'by/through','paradoxal':'paradoxical',
+  'paradoxalement':'paradoxically','paralysés':'paralysed',
+  'parc':'park','parce':'because','parcourir':'to cover/travel',
+  'parcourt':'covers','parents':'parents','parfaite':'perfect',
+  'parfaitement':'perfectly','parfois':'sometimes','paris':'Paris',
+  'parisiens':'Parisians','park':'park','parlant':'speaking',
+  'parle':'speaks','parlent':'speak','parlées':'spoken',
+  'parmi':'among','parole':'word/speech','part':'part','parti':'left',
+  'participé':'participated','particularité':'particularity',
+  'particulièrement':'particularly','partie':'part',
+  'partir':'to leave','parvenaient':'managed to','pas':'not/step',
+  'passage':'passage','passagers':'passengers','passe':'passes',
+  'passé':'past/spent','patients':'patients','paul':'Paul',
+  'paupières':'eyelids','payante':'paid','payants':'paying',
+  'payer':'to pay','payée':'paid','peignait':'painted',
+  'peine':'barely/punishment','peinte':'painted','pendant':'during',
+  'pensaient':'thought','pensant':'thinking','penser':'to think',
+  'pensons':'we think','perdent':'lose','perdre':'to lose',
+  'perfectionnant':'perfecting','performance':'performance',
+  'permettait':'allowed','personne':'person/no one',
+  'personnelle':'personal','personnes':'people','peruggia':'Peruggia',
+  'perçoit':'perceives','pesaient':'weighed','pesait':'weighed',
+  'petit':'small','petite':'small','petits':'small','peuple':'people',
+  'peuples':'peoples','peuplée':'populated','peur':'fear',
+  'peut':'can','peuvent':'can','peux':'can (I)','phase':'phase',
+  'photo':'photo','photographier':'to photograph',
+  'photographiés':'photographed','physique':'physical',
+  'physiquement':'physically','physiques':'physical','pianiste':'pianist',
+  'piano':'piano','pied':'foot','pieds':'feet','pierre':'stone/Pierre',
+  'pirates':'Pirates','plages':'beaches','plancher':'floor',
+  'planifier':'to plan','plans':'plans','planter':'to plant',
+  'plateformes':'platforms','plaçait':'placed','pleuré':'cried',
+  'plupart':'most','plus':'more','plusieurs':'several','plutôt':'rather',
+  'point':'point','pointe':'peak/tip','pointillisme':'pointillism',
+  'poisson':'fish','poissons':'fish','polaires':'polar',
+  'politique':'political','pollinisent':'pollinate','pollution':'pollution',
+  'polype':'polyp','pondre':'to lay (eggs)','populaire':'popular',
+  'populaires':'popular','portait':'wore','porter':'to wear/carry',
+  'posant':'placing','poser':'to place','positions':'positions',
+  'possiblement':'possibly','possibles':'possible','possède':'possesses',
+  'possédaient':'possessed','pot':'pot','poulet':'chicken',
+  'poumon':'lung','poumons':'lungs','pour':'for','pourcentage':'percentage',
+  'pourquoi':'why','pourrait':'could','pourtant':'however',
+  'pousse':'pushes','poussent':'push','pouvaient':'could',
+  'pouvait':'could','pouvoir':'to be able to','pratiquants':'practitioners',
+  'pratique':'practice/practises','premier':'first',
+  'premiers':'first','première':'first','premières':'first',
+  'prendre':'to take','prennent':'take','presque':'almost',
+  'pressurisées':'pressurised','principal':'main',
+  'principale':'main','principalement':'mainly',
+  'principales':'main','pris':'taken/imprisoned','prise':'taken',
+  'prises':'taken','prisonniers':'prisoners','prix':'price/prize',
+  'probablement':'probably','problème':'problem',
+  'problèmes':'problems','processus':'process',
+  'proches':'close/near','proclamant':'proclaiming',
+  'proclamation':'proclamation','produire':'to produce',
+  'produisent':'produce','produit':'produces','produits':'products',
+  'professeur':'professor/teacher','profonde':'deep',
+  'profondément':'deeply','progressivement':'progressively',
+  'projection':'projection','projet':'project',
+  'prolongées':'prolonged','prononcé':'pronounced',
+  'propre':'own/clean','propres':'own','prospéré':'prospered',
+  'protecteur':'protective','protègent':'protect',
+  'protéger':'to protect','protégée':'protected',
+  'prouvé':'proved','provoque':'triggers','près':'near',
+  'précis':'precise','précise':'precise','préféré':'favourite',
+  'préparer':'to prepare','préserver':'to preserve',
+  'préservée':'preserved','président':'president',
+  'prévoyaient':'predicted','prévu':'planned','prêtres':'priests',
+  'psychologie':'psychology','pu':'was able to','public':'public',
+  'publics':'public','publique':'public','puerto':'Puerto','puis':'then',
+  'puissance':'power','pulitzer':'Pulitzer','punir':'to punish',
+  'pèse':'weighs','pékin':'Beijing','pénètre':'penetrates',
+  'péri':'perished','pôle':'pole','pôles':'poles',
+  'qu':'qu\'','qualité':'quality','qualités':'qualities',
+  'quand':'when','quatre':'four','que':'that/which','quel':'which',
+  'quelle':'which','quelles':'which','quelqu':'some','quelque':'some',
+  'quelques':'some','questions':'questions','qui':'who/which',
+  'quitté':'left','quoi':'what','quotidienne':'daily',
+  'raciale':'racial','raconte':'tells','radicalement':'radically',
+  'radicaux':'radicals','raison':'reason','ralentir':'to slow down',
+  'ralentit':'slows down','rapid':'rapid','rapide':'fast',
+  'rapidement':'quickly','rapport':'report/relationship',
+  'rapporté':'brought back','rares':'rare','rationnelle':'rational',
+  'rationnelles':'rational','rayons':'rays','recense':'counts',
+  'recevaient':'received','reconnaître':'to recognise',
+  'reconnu':'recognised','reconnue':'recognised','record':'record',
+  'records':'records','redoutent':'dread','reflet':'reflection',
+  'refusé':'refused','regarde':'looks at','regardé':'looked at',
+  'regardés':'looked at','religieux':'religious','rem':'REM',
+  'remarquable':'remarkable','remarquables':'remarkable',
+  'remportant':'winning','remportées':'won','rencontré':'met',
+  'rend':'makes','rendant':'making','rendre':'to make/render',
+  'rendu':'rendered','rendus':'rendered','repas':'meal',
+  'repos':'rest','reposer':'to rest','reproduction':'reproduction',
+  'représentation':'representation','représente':'represents',
+  'représenter':'to represent','repérer':'to locate',
+  'ressent':'feels','ressentait':'felt','ressentant':'feeling',
+  'ressentir':'to feel','restaurants':'restaurants',
+  'restaurée':'restored','reste':'remains','resteront':'will remain',
+  'resté':'remained','retourné':'turned around',
+  'retrouvée':'found again','reçoit':'receives','reçue':'received',
+  'riche':'rich','rico':'Rico','rideaux':'curtains','rien':'nothing',
+  'rio':'Rio','risque':'risk','rituel':'ritual','rivales':'rivals',
+  'rivera':'Rivera','robespierre':'Robespierre','rocher':'rock',
+  'rose':'pink','rosette':'Rosetta','rouges':'red','royale':'royal',
+  'royaume':'kingdom','ruche':'hive','rythme':'rhythm',
+  'réaction':'reaction','réagit':'reacts','réalisateur':'director',
+  'réalisme':'realism','réalisé':'achieved','réalité':'reality',
+  'récentes':'recent','réchauffe':'warms','réchauffement':'warming',
+  'réclamaient':'demanded','récoltent':'harvest','récolter':'to harvest',
+  'réduit':'reduces','réflexion':'reflection','réfléchir':'to reflect',
+  'réfractée':'refracted','régulation':'regulation',
+  'répartis':'spread','réponse':'answer','république':'republic',
+  'réputés':'reputed','répéter':'to repeat','résistait':'resisted',
+  'résister':'to resist','résolution':'resolution','réussi':'succeeded',
+  'réussir':'to succeed','réviser':'to revise','révolte':'revolt',
+  'révolutionnaire':'revolutionary','révolutionnaires':'revolutionaries',
+  'révolutionnant':'revolutionising','révélé':'revealed','rôle':'role',
+  'sa':'his/her','sacré':'sacred','sagittarius':'Sagittarius',
+  'saison':'season','salle':'room/hall','saluer':'to greet',
+  'salvador':'Salvador','sang':'blood','sans':'without',
+  'sauvages':'wild','sauver':'to save','savants':'scholars',
+  'scanné':'scanned','sciait':'sawed','science':'science',
+  'sculptées':'sculpted','scène':'scene','scènes':'scenes',
+  'se':'himself/herself/itself','seconde':'second',
+  'secondes':'seconds','seize':'sixteen','selon':'according to',
+  'semaines':'weeks','semble':'seems','semblent':'seem',
+  'semi':'semi','sept':'seven','septembre':'September',
+  'serait':'would be','ses':'his/her','seul':'alone/only',
+  'seule':'alone/only','seulement':'only','sfumato':'sfumato',
+  'shikoku':'Shikoku','shinto':'Shinto','si':'if/so',
+  'signaux':'signals','signifie':'means','silencieuse':'silent',
+  'simple':'simple','simplement':'simply','simples':'simple',
+  'singes':'monkeys','sismiques':'seismic','situation':'situation',
+  'situé':'situated','six':'six','sociaux':'social','soi':'oneself',
+  'soigner':'to treat/care for','soit':'be (subj.)/either',
+  'sol':'ground/floor','solaire':'solar','solaires':'solar',
+  'soldats':'soldiers','soleil':'sun','soliste':'soloist',
+  'solitaire':'solo/alone','sombre':'dark','sombres':'dark',
+  'sommeil':'sleep','son':'his/her/its','sonde':'probe',
+  'sont':'are','sophistiqués':'sophisticated','sorti':'came out',
+  'souffre':'suffers','souffrir':'to suffer','soulevé':'lifted',
+  'sourd':'deaf','souriant':'smiling','sourire':'smile','sous':'under',
+  'souvent':'often','spatial':'space (adj.)','spatiale':'space (adj.)',
+  'sportifs':'sporting','sportive':'sporting','sprint':'sprint',
+  'sprinter':'sprinter','sprinteur':'sprinter','spécial':'special',
+  'spéciales':'special','spécialistes':'specialists',
+  'spécialités':'specialities','spéciaux':'special',
+  'standard':'standard','station':'station','streaming':'streaming',
+  'stress':'stress','stupéfié':'stunned','subi':'suffered',
+  'subit':'undergoes','submergé':'submerged','successives':'successive',
+  'sucre':'sugar','sud':'south','suffisamment':'enough',
+  'suggère':'suggests','suivante':'following','suivent':'follow',
+  'superficie':'surface area','supermassif':'supermassive',
+  'sur':'on','surdité':'deafness','surexploitation':'overexploitation',
+  'surprise':'surprise','surveiller':'to watch','survenue':'occurred',
+  'survivre':'to survive','symboliques':'symbolic',
+  'symbolisait':'symbolised','symbolisme':'symbolism',
+  'symphonie':'symphony','séance':'screening/session',
+  'sécrète':'secretes','séduit':'seduced','séparait':'separated',
+  'séparation':'separation','série':'series',
+  'sérieusement':'seriously','sérieux':'serious',
+  'taille':'size/height','talent':'talent','tant':'so much',
+  'tard':'late','te':'you (obj.)','telescope':'telescope',
+  'tellement':'so much','temporairement':'temporarily',
+  'temps':'time/weather','tempérées':'temperate',
+  'tempête':'storm','tend':'tends','tentent':'attempt',
+  'terre':'earth/land','terres':'lands','terrestre':'terrestrial',
+  'terreur':'terror','territoire':'territory','texte':'text',
+  'theme':'theme','théories':'theories','tienne':'holds (subj.)',
+  'tiers':'third','tirait':'pulled','tiré':'pulled',
+  'titanic':'Titanic','titre':'title','titres':'titles',
+  'to':'to','tokyo':'Tokyo','tombais':'was falling',
+  'ton':'your','tonga':'Tonga','total':'total',
+  'totale':'total','totalement':'totally','toucher':'to touch',
+  'toujours':'always','tour':'tower/turn','tourisme':'tourism',
+  'tourner':'to turn','tourné':'turned','tous':'all',
+  'tout':'all/everything','toute':'all/every','toutes':'all',
+  'toxiques':'toxic','traditionnelle':'traditional',
+  'traditions':'traditions','train':'train','traite':'treats',
+  'transformerait':'would transform','transformé':'transformed',
+  'transparente':'transparent','transparentes':'transparent',
+  'transportant':'transporting','travail':'work',
+  'travaillé':'worked','travers':'through','traverse':'crosses',
+  'trie':'sorts','tristesse':'sadness','trois':'three',
+  'troisième':'third','trompe':'deceives','trop':'too much',
+  'tropicale':'tropical','tropicales':'tropical',
+  'tropicaux':'tropical','trouve':'finds','trouver':'to find',
+  'trouvé':'found','très':'very','tu':'you',
+  'tv':'TV','type':'type','typhons':'typhoons','typique':'typical',
+  'télescope':'telescope','téléphone':'phone',
+  'téléspectateurs':'viewers','tête':'head',
+  'un':'a/one','une':'a/one','uni':'united','unique':'unique',
+  'uniquement':'solely','unis':'united','univers':'universe',
+  'universalité':'universality','universellement':'universally',
+  'universelles':'universal','ur':'ur','usain':'Usain',
+  'utilisaient':'used','utilisait':'used','utilisant':'using',
+  'utilisation':'use','utilisé':'used','uvre':'oeuvre',
+  'uvres':'works','van':'van','varient':'vary',
+  'veille':'wakefulness/eve','vendaient':'sold','vendent':'sell',
+  'vendu':'sold','venin':'venom','vent':'wind','venus':'came',
+  'verraient':'would see','vers':'towards/verses','vert':'green',
+  'verticale':'vertical','vie':'life','vienne':'comes (subj.)',
+  'vient':'comes','vincenzo':'Vincenzo','vinci':'da Vinci',
+  'vingt':'twenty','violet':'purple','violons':'violins',
+  'virtuose':'virtuoso','visage':'face','visible':'visible',
+  'visibles':'visible','visitées':'visited','vite':'quickly',
+  'vitre':'glass pane','vivant':'living','vivent':'live',
+  'vives':'vivid','voies':'ways/routes','voir':'to see',
+  'voitures':'cars','voix':'voice','volcaniques':'volcanic',
+  'voleur':'thief','volée':'stolen','voulait':'wanted',
+  'vraiment':'truly/really','vues':'views','vus':'seen',
+  'végétale':'plant (adj.)','vénus':'Venus',
+  'xve':'15th (century)','xvi':'XVI','xviiie':'18th (century)',
+  'xxe':'20th (century)','yo':'yo','yosemite':'Yosemite',
+  'zéro':'zero','âge':'age','âgé':'aged','ème':'th (ordinal)',
+  'ère':'era','échapper':'to escape','échelle':'scale',
+  'éclate':'breaks out','éclipses':'eclipses','économie':'economy',
+  'économiser':'to save (money)','écosystème':'ecosystem',
+  'écrasantes':'crushing','écraser':'to crush',
+  'écriture':'writing','également':'also/equally','égalité':'equality',
+  'égypte':'Egypt','égyptienne':'Egyptian','égyptiennes':'Egyptian',
+  'électriques':'electric','elevage':'livestock farming',
+  'élevée':'high/elevated','élimine':'eliminates',
+  'éliminés':'eliminated','élu':'elected','émises':'emitted',
+  'émouvante':'moving/touching','ému':'moved','énergie':'energy',
+  'énigmatique':'enigmatic','énormes':'enormous',
+  'époustouflants':'breathtaking','épreuves':'events/tests',
+  'équinoxes':'equinoxes','équipe':'team','équivalent':'equivalent',
+  'équivaut':'equals','éruptions':'eruptions','établi':'established',
+  'étaient':'were','étair':'was','état':'state','états':'states',
+  'étend':'extends','étonnamment':'surprisingly',
+  'étrangère':'foreign','étudier':'to study','étudié':'studied',
+  'étudiées':'studied','été':'been/summer','évanoui':'fainted',
+  'évoquent':'evoke','îles':'islands'
+
+};
+
+// Simple exact lookup — no normalization, no stemming
+function lookupTranslation(word) {
+  return TRANSLATIONS[word.toLowerCase()] || null;
+}
+
+// Pre-process HTML string: wrap every word in a clickable span
 function linkifyPassage(html) {
-  // Split into alternating [text, tag, text, tag, ...] chunks
   const parts = html.split(/(<[^>]+>)/);
   return parts.map(function(part) {
-    // If it looks like a tag, leave it alone
     if (part.charAt(0) === '<') return part;
-    // Otherwise wrap each non-whitespace token
-    return part.replace(/\S+/g, function(word) {
-      const clean = word.replace(/^[«»"'()\[\].,!?;:\-–—]+|[«»"'()\[\].,!?;:\-–—]+$/g, '');
-      if (clean.length < 2) return word;
-      return '<span class="w" data-word="' + clean.replace(/"/g, '&quot;') + '">' + word + '</span>';
+    return part.replace(/\S+/g, function(token) {
+      // strip surrounding punctuation for display key but keep display intact
+      const clean = token.replace(/^[«»"'()\[\].,!?;:\-–—]+|[«»"'()\[\].,!?;:\-–—]+$/g, '');
+      if (clean.length < 2) return token;
+      return '<span class="w" data-word="' + clean.replace(/"/g,'&quot;') + '">' + token + '</span>';
     });
   }).join('');
 }
 
-// Attach a single delegated click listener on the passage
+// Attach delegated click listener on the whole card
 function initPassageClicks() {
-  const passage = document.getElementById('passageText');
-  if (!passage) return;
-  passage.addEventListener('click', function(e) {
+  const card = document.getElementById('mainCard');
+  if (!card) return;
+  card.addEventListener('click', function(e) {
     const span = e.target.closest('.w');
     if (!span) { closeDict(); return; }
     const word = span.dataset.word || span.textContent.trim();
     if (!word || word.length < 2) return;
-    passage.querySelectorAll('.w.active').forEach(s => s.classList.remove('active'));
+    card.querySelectorAll('.w.active').forEach(s => s.classList.remove('active'));
     span.classList.add('active');
-    showDictTooltip(word, span.getBoundingClientRect());
+    showTranslation(word, span.getBoundingClientRect());
     e.stopPropagation();
   });
 }
 
-// Noun singular map — covers plural nouns found in our passages.
-// Verbs, adjectives, adverbs are deliberately excluded.
-const NOUN_SINGULAR = {
-  // -aux / -eaux (already handled by rule, but included for completeness)
-  'animaux':'animal','chevaux':'cheval','journaux':'journal','tableaux':'tableau',
-  'oiseaux':'oiseau','coraux':'corail','travaux':'travail','vitraux':'vitrail',
-  'idéaux':'idéal','cristaux':'cristal','métaux':'métal','minéraux':'minéral',
-  'tombeaux':'tombeau','rideaux':'rideau','nouveaux':'nouveau',
-  // common nouns from our passages
-  'abeilles':'abeille','activités':'activité','adolescents':'adolescent',
-  'algues':'algue','alvéoles':'alvéole','amandes':'amande','ancêtres':'ancêtre',
-  'années':'année','apiculteurs':'apiculteur','artistes':'artiste',
-  'astronautes':'astronaute','astronomes':'astronome','aurores':'aurore',
-  'autoportraits':'autoportrait','bancs':'banc','blocs':'bloc',
-  'bouleversements':'bouleversement','calculs':'calcul','causes':'cause',
-  'championnats':'championnat','chargées':'chargée',
-  'civilisations':'civilisation','combinaisons':'combinaison',
-  'compositeurs':'compositeur','conséquences':'conséquence','contours':'contour',
-  'coquillages':'coquillage','costumes':'costume','couches':'couche',
-  'couleurs':'couleur','créatures':'créature','crues':'crue','cultures':'culture',
-  'cycles':'cycle','décennies':'décennie','déchets':'déchet',
-  'découvertes':'découverte','défunts':'défunt','descendants':'descendant',
-  'décisions':'décision','détails':'détail','dollars':'dollar',
-  'droits':'droit','effets':'effet','esclaves':'esclave','espèces':'espèce',
-  'exploits':'exploit','figures':'figure','films':'film',
-  'forêts':'forêt','foulées':'foulée','fraises':'fraise','frères':'frère',
-  'glyphes':'glyphe','grimpeurs':'grimpeur','guerres':'guerre',
-  'gènes':'gène','habitudes':'habitude','heures':'heure',
-  'hiéroglyphes':'hiéroglyphe','hormones':'hormone','humains':'humain',
-  'ingénieurs':'ingénieur','jeux':'jeu','jours':'jour',
-  'kilomètres':'kilomètre','langues':'langue','larves':'larve',
-  'lésions':'lésion','maladies':'maladie','mathématiciens':'mathématicien',
-  'mayas':'maya','médailles':'médaille','méduses':'méduse',
-  'merveilles':'merveille','milliards':'milliard','milliers':'millier',
-  'millions':'million','minutes':'minute','missions':'mission','mots':'mot',
-  'muscles':'muscle','mythes':'mythe','mètres':'mètre','neurones':'neurone',
-  'notes':'note','objets':'objet','observations':'observation','océans':'océan',
-  'ouvrières':'ouvrière','parasites':'parasite','parents':'parent',
-  'parisiens':'parisien','particules':'particule','patients':'patient',
-  'pesticides':'pesticide','pharaons':'pharaon','plages':'plage',
-  'plantes':'plante','plateformes':'plateforme','poissons':'poisson',
-  'pollinisateurs':'pollinisateur','pommes':'pomme','populations':'population',
-  'positions':'position','pratiquants':'pratiquant','pressions':'pression',
-  'principes':'principe','prises':'prise','problèmes':'problème',
-  'produits':'produit','profondeurs':'profondeur','psychologues':'psychologue',
-  'pyramides':'pyramide','périodes':'période','qualités':'qualité',
-  'quantités':'quantité','radiotélescopes':'radiotélescope','records':'record',
-  'ressources':'ressource','restaurants':'restaurant','rivales':'rivale',
-  'roches':'roche','récifs':'récif','récoltes':'récolte','régions':'région',
-  'réseaux':'réseau','révolutions':'révolution','rêves':'rêve',
-  'savants':'savant','scientifiques':'scientifique','scènes':'scène',
-  'secondes':'seconde','siècles':'siècle','sites':'site','sociétés':'société',
-  'solutions':'solution','sommets':'sommet','souvenirs':'souvenir',
-  'spectateurs':'spectateur','spectacles':'spectacle','sports':'sport',
-  'squelettes':'squelette','systèmes':'système','sécheresses':'sécheresse',
-  'tableaux':'tableau','techniques':'technique','températures':'température',
-  'terres':'terre','tombeaux':'tombeau','touristes':'touriste','traces':'trace',
-  'transports':'transport','tremblements':'tremblement',
-  'tropicales':'tropicale','trous':'trou','tâches':'tâche','villes':'ville',
-  'visiteurs':'visiteur','zooxanthelles':'zooxanthelle','écoles':'école',
-  'écrans':'écran','égyptiens':'égyptien','élections':'élection',
-  'élèves':'élève','éléments':'élément','émotions':'émotion',
-  'études':'étude','événements':'événement','êtres':'être','îles':'île',
-  'étoiles':'étoile','galaxies':'galaxie','planètes':'planète',
-  'volcans':'volcan','récents':'récent',
-};
-
-function singularize(word) {
-  const w = word.toLowerCase();
-  if (w.length < 3) return w;
-  // Hyphenated compound words — leave as-is
-  if (w.includes('-')) return w;
-  // Noun map lookup first
-  if (NOUN_SINGULAR[w]) return NOUN_SINGULAR[w];
-  // -eaux → -eau  (tableaux→tableau, oiseaux→oiseau)
-  if (w.endsWith('eaux')) return w.slice(0, -1);
-  // -aux → -al   (animaux→animal, chevaux→cheval)
-  if (w.endsWith('aux')) return w.slice(0, -3) + 'al';
-  // Everything else goes as-is (verbs, adjectives, unknown words)
-  return w;
-}
-
-function showDictTooltip(word, rect) {
-  const tooltip = document.getElementById('dictTooltip');
+function showTranslation(word, rect) {
+  const translation = lookupTranslation(word);
   document.getElementById('dictWord').textContent = word;
-  const lookup = singularize(word);
-  document.getElementById('dictLink').href =
-    'https://fr.wiktionary.org/wiki/' + encodeURIComponent(lookup);
-
+  const transEl   = document.getElementById('dictTranslation');
+  const unknownEl = document.getElementById('dictUnknown');
+  if (translation) {
+    transEl.textContent = translation;
+    transEl.style.display = 'block';
+    unknownEl.style.display = 'none';
+  } else {
+    transEl.style.display = 'none';
+    unknownEl.style.display = 'block';
+  }
+  const tooltip = document.getElementById('dictTooltip');
   tooltip.style.display = 'block';
-  const ttW = tooltip.offsetWidth  || 280;
-  const ttH = tooltip.offsetHeight || 90;
-  const vw  = window.innerWidth;
-  const vh  = window.innerHeight;
+  const ttW = tooltip.offsetWidth  || 220;
+  const ttH = tooltip.offsetHeight || 80;
   const gap = 8;
-
-  // Prefer below the word; flip above if not enough room
   let top  = rect.bottom + gap;
-  if (top + ttH > vh - gap) top = rect.top - ttH - gap;
+  if (top + ttH > window.innerHeight - gap) top = rect.top - ttH - gap;
   if (top < gap) top = gap;
-
-  // Align left with the word; shift left if it would overflow right edge
   let left = rect.left;
-  if (left + ttW > vw - gap) left = vw - ttW - gap;
+  if (left + ttW > window.innerWidth - gap) left = window.innerWidth - ttW - gap;
   if (left < gap) left = gap;
-
   tooltip.style.top  = top  + 'px';
   tooltip.style.left = left + 'px';
 }
@@ -1261,14 +1942,21 @@ document.addEventListener('click', function(e) {
 
 function closeDict() {
   document.getElementById('dictTooltip').style.display = 'none';
-  document.querySelectorAll('.passage .w.active').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.w.active').forEach(s => s.classList.remove('active'));
 }
+
+// ═══════════════════════════════════════════════════════════════════
+//  UI HELPERS
 // ═══════════════════════════════════════════════════════════════════
 function updateScore() {
   document.getElementById('scoreBadge').textContent = score + ' pts';
   document.getElementById('xpFill').style.width = Math.min((xp % 100), 100) + '%';
 }
 
+ {
+  document.getElementById('scoreBadge').textContent = score + ' pts';
+  document.getElementById('xpFill').style.width = Math.min((xp % 100), 100) + '%';
+}
 function updateStreak() {
   const d = document.getElementById('streakDiv');
   if (streak >= 2) { d.style.display='block'; d.textContent='&#128293; S&#233;rie de '+streak+' bonnes r&#233;ponses !'; }
