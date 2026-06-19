@@ -96,9 +96,12 @@
   .q-label { font-size: 0.76rem; font-weight: 700; color: #48dbfb; text-transform: uppercase;
     letter-spacing: 0.08em; margin-bottom: 8px; }
   .q-dot-row { display: flex; gap: 6px; margin-bottom: 14px; }
-  .q-dot { width: 10px; height: 10px; border-radius: 50%; background: #2e2b4a; transition: background 0.3s; }
+  .q-dot { width: 10px; height: 10px; border-radius: 50%; background: #2e2b4a; transition: background 0.3s; cursor: pointer; }
+  .q-dot:hover { transform: scale(1.3); }
   .q-dot.done-correct { background: #1dd1a1; }
+  .q-dot.done-correct:hover { background: #25f0b5; }
   .q-dot.done-wrong { background: #ff6b6b; }
+  .q-dot.done-wrong:hover { background: #ff8585; }
   .q-dot.active { background: #48dbfb; }
   .question-text { font-size: 1.08rem; font-weight: 700; color: #fffffe; margin-bottom: 14px; line-height: 1.4; }
   .options { display: flex; flex-direction: column; gap: 9px; }
@@ -813,13 +816,13 @@ function renderLecture(text, qIdx) {
   const q = qs[qIdx];
   const L = ['A','B','C','D'];
 
-  // dots
+  // dots — all clickable at all times
   let dots = '<div class="q-dot-row">';
   for (let i = 0; i < qs.length; i++) {
     let cls = 'q-dot';
     if (i < dotResults.length) cls += dotResults[i] ? ' done-correct' : ' done-wrong';
     else if (i === qIdx) cls += ' active';
-    dots += '<div class="' + cls + '"></div>';
+    dots += '<div class="' + cls + '" onclick="jumpToQuestion(' + i + ')" title="Question ' + (i+1) + '"></div>';
   }
   dots += '</div>';
 
@@ -850,6 +853,36 @@ function renderLecture(text, qIdx) {
 
   document.getElementById('mainCard').innerHTML = html;
   initPassageClicks();
+}
+
+function jumpToQuestion(idx) {
+  const text = LECTURE[currentTextIdx];
+  if (!text) return;
+  textQIdx = idx;
+  const wasAnswered = idx < dotResults.length;
+  answered = wasAnswered;
+  renderLecture(text, idx);
+  if (wasAnswered) {
+    const q = text.questions[idx];
+    const ok = dotResults[idx];
+    const fb = document.getElementById('feedback');
+    const acts = document.getElementById('actions');
+    const expl = q.expl || q.explication || '';
+    const fun = q.fun_fact || q.fun || '';
+    if (ok) {
+      fb.className = 'feedback success';
+      fb.innerHTML = '<strong>&#9989; Bonne r&#233;ponse !</strong><div class="expl">' + expl + '</div>'
+        + (fun ? '<div class="tip">&#127881; <strong>Le savais-tu ?</strong> ' + fun + '</div>' : '');
+    } else {
+      fb.className = 'feedback fail';
+      fb.innerHTML = '<strong>&#10060; Pas tout &#224; fait !</strong><div class="expl">' + expl + '</div>';
+    }
+    document.querySelectorAll('.option-btn').forEach((b, i) => {
+      b.disabled = true;
+      if (i === q.correct) b.classList.add('correct');
+    });
+    acts.style.display = 'flex';
+  }
 }
 
 function renderSimple(q, num, total, mode) {
