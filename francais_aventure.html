@@ -201,6 +201,38 @@
   .export-btn { background:#2e2b4a; color:#a8a4c8; border:none; padding:8px 16px; border-radius:10px;
     font-family:'Nunito',sans-serif; font-weight:700; font-size:0.82rem; cursor:pointer; }
   .export-btn:hover { background:#3d3a5c; color:#fffffe; }
+  /* sidebar layout */
+  .app-layout { display:flex; gap:18px; align-items:flex-start; }
+  .sidebar { width:200px; flex-shrink:0; position:sticky; top:20px; max-height:90vh; overflow-y:auto; }
+  .sidebar::-webkit-scrollbar { width:4px; }
+  .sidebar::-webkit-scrollbar-thumb { background:#2e2b4a; border-radius:4px; }
+  .sidebar-title { font-size:0.7rem; font-weight:800; text-transform:uppercase;
+    letter-spacing:0.08em; color:#6a6890; margin-bottom:8px; padding:0 4px; }
+  .si { display:flex; align-items:flex-start; gap:8px; padding:8px 10px;
+    border-radius:10px; cursor:pointer; transition:all 0.18s; margin-bottom:3px;
+    border:1px solid transparent; background:#1a1830; }
+  .si:hover { border-color:#2e2b4a; background:#201e38; }
+  .si.si-active { background:#48dbfb12; border-color:#48dbfb44; }
+  .si.si-active .si-num { color:#48dbfb; }
+  .si.si-done .si-num { color:#1dd1a1; }
+  .si-num { font-size:0.68rem; font-weight:800; color:#4a4870;
+    width:16px; flex-shrink:0; padding-top:1px; }
+  .si-info { flex:1; min-width:0; }
+  .si-theme { font-size:0.72rem; font-weight:700; color:#a8a4c8; line-height:1.35;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .si-dots { display:flex; gap:3px; margin-top:4px; }
+  .si-dot { width:6px; height:6px; border-radius:50%; background:#2e2b4a; }
+  .si-dot.ok { background:#1dd1a1; }
+  .si-dot.ko { background:#ff6b6b; }
+  .main-content { flex:1; min-width:0; }
+  @media(max-width:680px) {
+    .app-layout { flex-direction:column; }
+    .sidebar { width:100%; position:static; max-height:none;
+      display:flex; flex-wrap:nowrap; overflow-x:auto; gap:6px; padding-bottom:4px; }
+    .sidebar-title { display:none; }
+    .si { flex-shrink:0; flex-direction:row; min-width:80px; }
+    .si-dots { display:none; }
+  }
 </style>
 </head>
 <body>
@@ -243,7 +275,16 @@
     <button class="lvl-btn" onclick="setLevel(3,this)">DIFFICILE</button>
   </div>
 
-  <div id="mainCard" class="card"></div>
+  <div class="app-layout">
+    <div class="sidebar" id="sidebar" style="display:none">
+      <div class="sidebar-title">&#128218; Textes</div>
+      <div id="sidebarList"></div>
+    </div>
+    <div class="main-content">
+      <div id="mainCard" class="card"></div>
+    </div>
+  </div>
+
   <div id="dictTooltip" style="display:none">
     <button class="dict-close" onclick="closeDict()">&#10005;</button>
     <div class="dict-word" id="dictWord"></div>
@@ -260,6 +301,7 @@
 const LECTURE = [
   {
     theme:"&#127912; Art",
+    titre:"La Joconde",
     passage:"<p>La Joconde, peinte par Léonard de Vinci entre 1503 et 1519, est sans doute le tableau le plus célèbre du monde. Pourtant, au moment de sa création, elle n'était qu'un portrait commandé par un marchand florentin pour représenter sa femme, Lisa Gherardini. Léonard a travaillé dessus pendant seize ans, perfectionnant sans cesse les détails, notamment le fameux sourire énigmatique.</p><p>Ce sourire a fasciné les scientifiques et les historiens de l'art pendant des siècles. Des études récentes ont montré que Léonard utilisait une technique appelée <em>sfumato</em> : il appliquait de fines couches de peinture semi-transparente pour créer des contours flous, ce qui donne l'impression que le sourire change selon l'angle depuis lequel on regarde le tableau.</p><p>Aujourd'hui exposée au Musée du Louvre à Paris, la Joconde est protégée derrière une vitre blindée et attire chaque année près de dix millions de visiteurs. Elle a été volée en 1911 par un employé du musée et retrouvée deux ans plus tard en Italie, ce qui a considérablement augmenté sa célébrité mondiale.</p>",
     questions:[
       { q:"Quelle technique Léonard de Vinci utilisait-il pour créer le sourire mystérieux de la Joconde ?", opts:["Le pointillisme","Le sfumato","L'aquarelle","Le clair-obscur"], correct:1, expl:"Le texte explique que Léonard utilisait le 'sfumato' : de fines couches semi-transparentes créant des contours flous.", fun:"La Joconde mesure seulement 77 × 53 cm — beaucoup plus petite que ce que la plupart des visiteurs imaginent !" },
@@ -269,6 +311,7 @@ const LECTURE = [
   },
   {
     theme:"&#127912; Art",
+    titre:"Frida Kahlo",
     passage:"<p>Frida Kahlo est l'une des artistes les plus emblématiques du XXe siècle. Née au Mexique en 1907, elle a commencé à peindre après un grave accident de bus à l'âge de dix-huit ans, qui l'a laissée alitée pendant des mois. Immobilisée, elle a demandé à ses parents d'installer un miroir au-dessus de son lit, et c'est ainsi qu'elle a commencé à peindre des autoportraits.</p><p>Son œuvre est profondément personnelle et souvent douloureuse. Elle a réalisé 55 autoportraits au total, affirmant qu'elle se peignait elle-même parce qu'elle était le sujet qu'elle connaissait le mieux. Ses tableaux mêlent réalisme et symbolisme, incorporant des éléments de la culture mexicaine traditionnelle, comme les costumes colorés et les animaux symboliques.</p><p>Frida Kahlo n'a été reconnue internationalement qu'après sa mort, survenue en 1954. Aujourd'hui, ses œuvres se vendent à des prix records — l'une d'elles a atteint 34,9 millions de dollars en 2021, un record pour une artiste latino-américaine. Son image est devenue un symbole de résistance et d'indépendance dans le monde entier.</p>",
     questions:[
       { q:"Pourquoi Frida Kahlo a-t-elle commencé à peindre des autoportraits ?", opts:["Elle était payée pour le faire","Elle voulait devenir célèbre","Elle était alitée avec un miroir au-dessus d'elle","Son professeur lui avait donné cet exercice"], correct:2, expl:"Immobilisée après son accident, elle avait un miroir au-dessus de son lit et a commencé à se peindre elle-même.", fun:"Frida Kahlo avait des singes araignées, des cerfs et même un aigle comme animaux de compagnie !" },
@@ -278,6 +321,7 @@ const LECTURE = [
   },
   {
     theme:"&#127758; G&#233;ographie",
+    titre:"L'Amazonie",
     passage:"<p>L'Amazonie est la plus grande forêt tropicale du monde, couvrant environ 5,5 millions de kilomètres carrés, soit la superficie de l'Europe occidentale. Elle s'étend sur neuf pays, dont le Brésil qui en possède 60 %. On l'appelle souvent le « poumon de la Terre » car elle produit environ 20 % de l'oxygène terrestre et absorbe d'énormes quantités de CO₂.</p><p>La biodiversité de l'Amazonie est absolument exceptionnelle. On y recense plus de 40 000 espèces de plantes, 1 300 espèces d'oiseaux, 3 000 espèces de poissons et des millions d'espèces d'insectes. Certaines régions de la forêt n'ont jamais été explorées par les scientifiques, et de nouvelles espèces sont découvertes chaque année.</p><p>Malheureusement, la déforestation menace sérieusement cet écosystème. Chaque année, des millions d'hectares sont détruits pour l'agriculture et l'élevage. Les scientifiques avertissent que si la déforestation continue à ce rythme, l'Amazonie pourrait atteindre un « point de basculement » à partir duquel elle se transformerait progressivement en savane.</p>",
     questions:[
       { q:"Pourquoi appelle-t-on l'Amazonie le « poumon de la Terre » ?", opts:["Parce qu'elle est très grande","Parce qu'elle produit de l'oxygène et absorbe le CO₂","Parce qu'elle contient beaucoup d'eau","Parce que les humains y vivent depuis longtemps"], correct:1, expl:"Elle 'produit environ 20 % de l'oxygène terrestre et absorbe d'énormes quantités de CO₂', comme le font les poumons.", fun:"Le fleuve Amazone déverse tellement d'eau dans l'Atlantique qu'on peut encore boire de l'eau douce à 160 km en mer !" },
@@ -287,6 +331,7 @@ const LECTURE = [
   },
   {
     theme:"&#127758; G&#233;ographie",
+    titre:"Le Japon",
     passage:"<p>Le Japon est un archipel composé de 6 852 îles, dont quatre principales : Honshu, Hokkaido, Kyushu et Shikoku. Situé sur la « Ceinture de feu » du Pacifique, c'est l'un des pays les plus sismiques du monde : il subit environ 1 500 tremblements de terre par an, dont la plupart sont si faibles qu'on ne les ressent pas. Pour faire face à ce risque, les Japonais ont développé des techniques de construction antisismiques parmi les plus avancées au monde.</p><p>Le Japon est aussi célèbre pour le mont Fuji, son plus haut sommet avec 3 776 mètres. Ce volcan endormi, considéré comme sacré dans la religion shinto, est l'un des sites les plus photographiés du monde. Chaque année, environ 200 000 personnes tentent de l'escalader, principalement entre juillet et septembre lorsque la neige a fondu.</p><p>Malgré sa petite superficie — le Japon est 18 fois plus petit que les États-Unis — c'est la troisième économie mondiale. Tokyo, sa capitale, est la métropole la plus peuplée du monde avec plus de 37 millions d'habitants dans son aire urbaine. Les Japonais sont également réputés pour leur espérance de vie élevée, l'une des plus longues de la planète.</p>",
     questions:[
       { q:"Pourquoi le Japon a-t-il développé des techniques de construction très avancées ?", opts:["Pour construire des immeubles plus beaux","Pour résister aux typhons tropicaux","Pour faire face aux fréquents tremblements de terre","Pour économiser de l'énergie"], correct:2, expl:"Le Japon subit environ 1 500 tremblements de terre par an et a donc développé des techniques antisismiques.", fun:"Au Japon, les distributeurs automatiques sont si courants qu'il y en a un pour 23 personnes !" },
@@ -296,6 +341,7 @@ const LECTURE = [
   },
   {
     theme:"&#128220; Histoire",
+    titre:"La Révolution française",
     passage:"<p>La Révolution française, qui éclate en 1789, est l'un des événements les plus importants de l'histoire mondiale. Elle met fin à des siècles de monarchie absolue et change profondément la société française. Son déclencheur immédiat est une crise financière grave : le royaume de France est au bord de la faillite après avoir participé à la guerre d'indépendance américaine, et le peuple souffre de la faim à cause de mauvaises récoltes successives.</p><p>Le 14 juillet 1789, les Parisiens prennent d'assaut la forteresse de la Bastille, symbole de l'oppression royale. Cet événement, célébré encore aujourd'hui comme fête nationale française, marque le début d'une période de bouleversements radicaux. L'Assemblée nationale adopte la Déclaration des droits de l'homme et du citoyen, proclamant les principes de liberté, d'égalité et de fraternité.</p><p>La Révolution a des conséquences mondiales considérables. Elle inspire d'autres révolutions en Europe et en Amérique latine, et ses idéaux influencent encore nos sociétés modernes. Cependant, elle traverse aussi des périodes très sombres, comme la Terreur en 1793-1794, durant laquelle des milliers de personnes sont guillotinées, y compris le roi Louis XVI et la reine Marie-Antoinette.</p>",
     questions:[
       { q:"Quelles étaient les deux causes principales de la Révolution française ?", opts:["Une guerre avec l'Angleterre et une sécheresse","Une crise financière et des mauvaises récoltes qui affamaient le peuple","La mort du roi et une révolte de l'armée","Des problèmes religieux et une invasion étrangère"], correct:1, expl:"Le texte mentionne une 'crise financière grave' et des 'mauvaises récoltes successives' qui faisaient souffrir le peuple.", fun:"La guillotine a été inventée pour rendre les exécutions moins douloureuses — son inventeur était contre la peine de mort !" },
@@ -305,6 +351,7 @@ const LECTURE = [
   },
   {
     theme:"&#128220; Histoire",
+    titre:"Nelson Mandela",
     passage:"<p>Nelson Mandela est l'une des figures les plus admirées de l'histoire contemporaine. Né en 1918 en Afrique du Sud, il a consacré sa vie à lutter contre l'apartheid, un système légal de ségrégation raciale qui séparait les Noirs et les Blancs dans tous les aspects de la vie quotidienne : écoles, transports, restaurants, plages, et même bancs publics.</p><p>En raison de son combat pour l'égalité, Mandela a été arrêté en 1964 et condamné à la prison à vie. Il a passé 27 ans incarcéré, dont 18 dans la célèbre prison de Robben Island. Pendant ces longues années, il est devenu le symbole de la résistance mondiale contre l'injustice. Des milliers de personnes à travers le monde réclamaient sa libération.</p><p>Libéré en 1990 sous la pression internationale, Mandela a choisi la voie du dialogue plutôt que de la vengeance. En 1993, il reçoit le prix Nobel de la Paix avec le président Frederik de Klerk. L'année suivante, il devient le premier président noir d'Afrique du Sud, élu lors des premières élections libres et multiraciales du pays.</p>",
     questions:[
       { q:"Qu'était l'apartheid ?", opts:["Un parti politique sud-africain","Un système légal de ségrégation raciale","Une guerre civile en Afrique du Sud","Un mouvement artistique africain"], correct:1, expl:"Le texte définit l'apartheid comme 'un système légal de ségrégation raciale qui séparait les Noirs et les Blancs'.", fun:"Le mot 'apartheid' vient de l'afrikaans et signifie simplement 'séparation' ou 'mise à part'." },
@@ -314,6 +361,7 @@ const LECTURE = [
   },
   {
     theme:"&#127807; Nature",
+    titre:"Les abeilles",
     passage:"<p>Les abeilles sont parmi les animaux les plus essentiels à la vie sur Terre. Elles pollinisent environ un tiers de toute la nourriture que nous consommons, en transportant le pollen d'une fleur à l'autre lorsqu'elles récoltent le nectar. Sans elles, des cultures entières comme les amandes, les fraises, les pommes et le café disparaîtraient ou deviendraient extrêmement rares.</p><p>Une ruche typique contient entre 50 000 et 80 000 abeilles, toutes organisées de façon remarquable. Il n'y a qu'une seule reine, dont le rôle est de pondre des œufs — jusqu'à 2 000 par jour ! Les ouvrières, toutes femelles, accomplissent toutes les autres tâches : construire les alvéoles en cire, nourrir les larves, surveiller l'entrée et récolter le nectar. Les mâles, appelés faux-bourdons, ont un seul but : s'accoupler avec la reine.</p><p>Malheureusement, les populations d'abeilles sont en déclin sérieux depuis plusieurs décennies. Les principales causes sont l'utilisation intensive de pesticides, la destruction de leur habitat naturel, les maladies et les parasites comme le varroa. Des scientifiques et des apiculteurs du monde entier cherchent des solutions pour protéger ces pollinisateurs indispensables.</p>",
     questions:[
       { q:"Quel est le rôle principal de la reine dans une ruche ?", opts:["Diriger les ouvrières dans leur travail","Surveiller l'entrée de la ruche","Pondre des œufs pour assurer la reproduction","Récolter le nectar des fleurs"], correct:2, expl:"Le texte précise que le rôle de la reine est de 'pondre des œufs — jusqu'à 2 000 par jour'.", fun:"Une abeille ouvrière produit environ un douzième de cuillère à café de miel dans toute sa vie !" },
@@ -323,6 +371,7 @@ const LECTURE = [
   },
   {
     theme:"&#127807; Nature",
+    titre:"Les aurores boréales",
     passage:"<p>Les aurores boréales, aussi appelées « Northern Lights » en anglais, sont l'un des spectacles naturels les plus époustouflants de notre planète. Ces rideaux lumineux de couleurs vives — vert, rose, violet, bleu — dansent dans le ciel des régions polaires et attirent des milliers de touristes chaque année en Norvège, en Finlande, en Islande et au Canada.</p><p>Ce phénomène est causé par l'interaction entre les particules chargées émises par le Soleil — appelées vent solaire — et le champ magnétique terrestre. Lorsque ces particules entrent dans l'atmosphère aux pôles, elles entrent en collision avec les gaz atmosphériques comme l'oxygène et l'azote, les faisant briller. La couleur dépend du type de gaz et de l'altitude.</p><p>Les aurores boréales suivent un cycle d'environ onze ans lié à l'activité du Soleil. Durant les périodes d'activité solaire maximale, les aurores sont plus fréquentes et plus intenses, et peuvent même être visibles depuis des régions tempérées comme le nord de la France. Les aurores australes existent aussi dans l'hémisphère sud, mais elles sont bien moins observées car il y a moins de terres habitées dans ces régions.</p>",
     questions:[
       { q:"Qu'est-ce qui cause les aurores boréales ?", opts:["Le reflet de la glace sur les nuages","La collision de particules solaires avec les gaz de l'atmosphère","Les éruptions de volcans arctiques","La lumière de la lune réfractée par le froid"], correct:1, expl:"Les particules du vent solaire 'entrent en collision avec les gaz atmosphériques comme l'oxygène et l'azote, les faisant briller'.", fun:"Les peuples Inuits croyaient que les aurores étaient les esprits de leurs ancêtres qui jouaient au foot avec un crâne de morse !" },
@@ -332,6 +381,7 @@ const LECTURE = [
   },
   {
     theme:"&#128640; Science &amp; Espace",
+    titre:"Apollo 11",
     passage:"<p>En juillet 1969, les astronautes Neil Armstrong et Buzz Aldrin sont devenus les premiers êtres humains à marcher sur la Lune, lors de la mission Apollo 11. Neil Armstrong a prononcé ces mots célèbres en posant le pied sur le sol lunaire : « C'est un petit pas pour l'homme, un bond de géant pour l'humanité. » La mission a nécessité huit ans de travail, 400 000 ingénieurs et scientifiques, et a coûté l'équivalent de 150 milliards de dollars actuels.</p><p>La surface de la Lune est très différente de la Terre : il n'y a ni atmosphère, ni vent, ni eau. Les températures varient de -170°C la nuit à +130°C le jour. Les astronautes devaient porter des combinaisons spéciales pressurisées pour survivre. L'absence d'atmosphère signifie aussi qu'il n'y a aucun son — la Lune est totalement silencieuse.</p><p>Un détail fascinant : les traces de pas laissées par Armstrong et Aldrin sont encore visibles aujourd'hui sur la Lune, et le resteront pendant des millions d'années. Sans vent ni eau pour les effacer, elles sont parfaitement conservées. Les six missions Apollo ont rapporté 382 kg de roches lunaires qui sont encore étudiées par les scientifiques du monde entier.</p>",
     questions:[
       { q:"Pourquoi les traces de pas des astronautes sur la Lune sont-elles encore visibles ?", opts:["Parce qu'elles ont été sculptées profondément","Parce que la Lune est protégée par une vitre","Parce qu'il n'y a ni vent ni eau pour les effacer","Parce que les astronautes ont utilisé un matériau spécial"], correct:2, expl:"Il n'y a 'ni vent ni eau pour les effacer', donc elles sont 'parfaitement conservées'.", fun:"Michael Collins, le 3ème astronaute d'Apollo 11, est resté en orbite — il est la personne la plus isolée de l'histoire humaine, seul de l'autre côté de la Lune !" },
@@ -341,6 +391,7 @@ const LECTURE = [
   },
   {
     theme:"&#128640; Science &amp; Espace",
+    titre:"Les trous noirs",
     passage:"<p>Les trous noirs sont parmi les objets les plus mystérieux de l'univers. Ce sont des régions de l'espace où la gravité est si intense que rien ne peut en échapper, pas même la lumière. C'est pour cela qu'on ne peut pas les voir directement — ils sont, par définition, invisibles. Ils se forment généralement quand une étoile très massive meurt en explosant lors d'une supernova, et que son noyau s'effondre sur lui-même.</p><p>En avril 2019, les scientifiques ont réussi pour la première fois de l'histoire à photographier un trou noir. Cette image, obtenue grâce à un réseau de radiotélescopes répartis sur toute la Terre — appelé Event Horizon Telescope — montre le trou noir au centre de la galaxie M87, situé à 55 millions d'années-lumière de nous. L'image a révélé un anneau lumineux de gaz chauffé entourant une zone sombre centrale.</p><p>Au centre de notre propre galaxie, la Voie Lactée, se trouve également un trou noir supermassif nommé Sagittarius A*, dont la masse équivaut à quatre millions de fois celle du Soleil. Mais ne t'inquiète pas : il est situé à 26 000 années-lumière de la Terre, bien trop loin pour représenter le moindre danger pour nous !</p>",
     questions:[
       { q:"Pourquoi est-il impossible de voir un trou noir directement ?", opts:["Parce qu'ils sont trop petits","Parce qu'ils se déplacent trop vite","Parce que même la lumière ne peut pas en échapper","Parce qu'ils sont derrière d'autres étoiles"], correct:2, expl:"'La gravité est si intense que rien ne peut en échapper, pas même la lumière', les rendant invisibles.", fun:"Si tu tombais dans un trou noir, les observateurs extérieurs te verraient ralentir et ne jamais vraiment franchir le bord — un effet prévu par Einstein !" },
@@ -350,6 +401,7 @@ const LECTURE = [
   },
   {
     theme:"&#127981; Civilisations anciennes",
+    titre:"L'Égypte ancienne",
     passage:"<p>L'Égypte ancienne est l'une des civilisations les plus fascinantes de l'histoire humaine. Pendant plus de 3 000 ans, elle a prospéré le long du Nil, dont les crues annuelles fertilisaient les terres agricoles. Les Égyptiens croyaient en une vie après la mort et consacraient une part considérable de leurs ressources à préparer ce voyage, notamment en momifiant les corps des défunts pour les préserver.</p><p>Les pyramides, construites comme tombeaux des pharaons, sont l'une des merveilles les plus impressionnantes de l'Antiquité. La Grande Pyramide de Gizeh, construite vers 2560 avant J.-C. pour le pharaon Khéops, a nécessité environ 2,3 millions de blocs de pierre. Pendant 3 800 ans, elle a été la construction la plus haute du monde. Des milliers d'ouvriers — et non des esclaves — ont travaillé à sa construction.</p><p>L'écriture égyptienne, les hiéroglyphes, a longtemps été un mystère pour les savants modernes. C'est grâce à la Pierre de Rosette, découverte en 1799 lors de la campagne de Napoléon en Égypte, que le Français Jean-François Champollion a pu déchiffrer ce système d'écriture en 1822. La pierre portait le même texte en trois langues, dont le grec que les savants comprenaient déjà.</p>",
     questions:[
       { q:"Qui a construit les pyramides égyptiennes selon les connaissances actuelles ?", opts:["Des esclaves venus d'autres pays","Des extraterrestres selon des théories scientifiques","Des ouvriers égyptiens (non des esclaves)","Des soldats de l'armée du pharaon"], correct:2, expl:"Le texte précise 'des milliers d'ouvriers — et non des esclaves — ont travaillé à sa construction'.", fun:"Les ouvriers qui construisaient les pyramides recevaient de la bière comme partie de leur salaire — environ 4 litres par jour !" },
@@ -359,6 +411,7 @@ const LECTURE = [
   },
   {
     theme:"&#127981; Civilisations anciennes",
+    titre:"Les Mayas",
     passage:"<p>Les Mayas ont développé l'une des civilisations les plus avancées des Amériques, entre 2000 avant J.-C. et 1500 après J.-C. Leur territoire couvrait le Mexique du sud-est, le Guatemala, le Belize et une partie du Honduras et du Salvador. À leur apogée, des villes comme Tikal ou Chichen Itza comptaient plusieurs dizaines de milliers d'habitants et possédaient des pyramides imposantes et des systèmes d'irrigation sophistiqués.</p><p>Les Mayas étaient des astronomes et des mathématiciens remarquables. Ils avaient développé un calendrier extrêmement précis, basé sur des observations méticuleuses du Soleil, de la Lune et de Vénus. Ils utilisaient également le concept du zéro dans leurs calculs — une innovation mathématique majeure que l'Europe n'a adoptée que bien plus tard. Leur écriture, composée de glyphes complexes, permettait de noter l'histoire, les mythes et les calculs astronomiques.</p><p>L'effondrement de la civilisation maya classique, vers 900 après J.-C., reste en partie mystérieux. Les historiens évoquent plusieurs causes possibles : des sécheresses prolongées, des guerres entre cités-États rivales et la surexploitation des ressources naturelles. Mais les Mayas n'ont pas disparu — leurs descendants, environ six millions de personnes, vivent encore aujourd'hui au Mexique et en Amérique centrale.</p>",
     questions:[
       { q:"Quelle innovation mathématique importante les Mayas avaient-ils développée ?", opts:["Le système décimal","La géométrie avancée","Le concept du zéro","Les fractions"], correct:2, expl:"Le texte mentionne qu'ils 'utilisaient le concept du zéro dans leurs calculs — une innovation mathématique majeure que l'Europe n'a adoptée que bien plus tard'.", fun:"Le calendrier maya était si précis qu'il ne déphasait d'une seconde par rapport au calendrier solaire qu'au bout de 6 000 ans !" },
@@ -368,6 +421,7 @@ const LECTURE = [
   },
   {
     theme:"&#129504; Psychologie",
+    titre:"Le sommeil",
     passage:"<p>Le sommeil est bien plus qu'un simple repos pour le corps. C'est un état actif durant lequel le cerveau accomplit des tâches essentielles. Pendant la nuit, il trie et consolide les souvenirs de la journée, élimine les déchets toxiques accumulés entre les neurones, et libère des hormones de croissance indispensables au développement physique — c'est pour cela que les adolescents, qui grandissent vite, ont particulièrement besoin de dormir.</p><p>Le cerveau traverse plusieurs cycles de sommeil au cours d'une nuit. Le sommeil paradoxal, aussi appelé phase REM (Rapid Eye Movement), est le moment où l'on rêve le plus intensément. Durant cette phase, les yeux bougent rapidement sous les paupières, le cerveau est aussi actif qu'en état de veille, mais les muscles sont paralysés — probablement pour nous empêcher d'agir physiquement nos rêves.</p><p>Les scientifiques s'accordent à dire que les adolescents ont besoin de 8 à 10 heures de sommeil par nuit. Un manque chronique de sommeil affecte la concentration, la mémoire, les émotions et même le système immunitaire. Des études ont montré que les élèves qui dorment suffisamment obtiennent de meilleures notes et gèrent mieux le stress. Pourtant, les écrans et les réseaux sociaux poussent beaucoup de jeunes à dormir bien moins que nécessaire.</p>",
     questions:[
       { q:"Que se passe-t-il dans le cerveau pendant la phase de sommeil paradoxal (REM) ?", opts:["Le cerveau est totalement au repos","On ne rêve pas du tout","Le cerveau est très actif et l'on rêve intensément","Le corps grandit le plus vite"], correct:2, expl:"Le texte décrit la phase REM comme le moment où 'le cerveau est aussi actif qu'en état de veille' et où 'l'on rêve le plus intensément'.", fun:"Les dauphins dorment avec la moitié de leur cerveau à la fois pour continuer à nager et surveiller les prédateurs !" },
@@ -377,6 +431,7 @@ const LECTURE = [
   },
   {
     theme:"&#129504; Psychologie",
+    titre:"Les émotions",
     passage:"<p>Les émotions jouent un rôle fondamental dans nos décisions, bien plus que nous ne le pensons. Le neuroscientifique Antonio Damasio a étudié des patients ayant subi des lésions dans la zone du cerveau qui traite les émotions. Paradoxalement, ces personnes, pourtant parfaitement intelligentes et rationnelles, étaient incapables de prendre des décisions simples comme choisir entre deux restaurants. Sans émotions pour guider leur choix, elles pouvaient analyser indéfiniment sans jamais décider.</p><p>Nos émotions communiquent également à travers notre corps. La peur déclenche une montée d'adrénaline qui accélère le cœur et tend les muscles — une réaction héritée de nos ancêtres qui devaient fuir les prédateurs. La joie libère de la dopamine, un neurotransmetteur qui nous donne envie de répéter ce qui nous a rendus heureux. La tristesse, elle, ralentit notre corps et nous pousse à réfléchir.</p><p>Les psychologues ont identifié six émotions dites « universelles » que tous les êtres humains expriment de la même façon sur leur visage, quelle que soit leur culture : la joie, la tristesse, la peur, la colère, le dégoût et la surprise. Cette universalité suggère que ces émotions ont une origine biologique, gravée dans nos gènes. Reconnaître et accepter ses émotions est aujourd'hui considéré comme une compétence essentielle pour le bien-être mental.</p>",
     questions:[
       { q:"Quelle découverte Damasio a-t-il faite sur les émotions et les décisions ?", opts:["Les émotions nuisent à la prise de décision rationnelle","Des personnes intelligentes sans émotions ne parvenaient plus à décider","Les émotions sont uniquement culturelles","Les décisions sont toujours irrationnelles"], correct:1, expl:"Des patients sans émotions 'étaient incapables de prendre des décisions simples' malgré une intelligence préservée.", fun:"On peut légèrement 'se rendre heureux' en souriant même faussement : le cerveau perçoit les signaux des muscles et libère de la dopamine !" },
@@ -386,6 +441,7 @@ const LECTURE = [
   },
   {
     theme:"&#127754; Oc&#233;ans",
+    titre:"Les océans",
     passage:"<p>Les océans couvrent 71 % de la surface de la Terre et contiennent 97 % de toute l'eau de la planète. Pourtant, nous en avons exploré moins de 20 % : le fond des océans reste plus mystérieux que la surface de la Lune. La zone la plus profonde connue est la fosse des Mariannes dans le Pacifique, qui atteint 11 034 mètres de profondeur — si on y plaçait l'Everest, il serait encore submergé de plus de 2 kilomètres.</p><p>La vie dans les grandes profondeurs est étonnamment riche. Des centaines d'espèces vivent dans une obscurité totale, sous des pressions écrasantes et à des températures proches de zéro. Beaucoup de ces créatures produisent leur propre lumière grâce à un phénomène appelé bioluminescence. Le poisson-lanterne, le calamar géant et certaines méduses font partie de cette faune fascinante et encore largement inconnue.</p><p>Les océans jouent un rôle crucial dans la régulation du climat terrestre. Ils absorbent environ 30 % du CO₂ produit par les activités humaines et 90 % de l'excès de chaleur lié au réchauffement climatique. Cependant, cette absorption a des conséquences graves : l'acidification des océans menace les coraux et les coquillages, et la montée des températures provoque le blanchissement des récifs coralliens.</p>",
     questions:[
       { q:"Qu'est-ce que la bioluminescence ?", opts:["Une technique pour explorer les fonds marins","La capacité de certains animaux à produire leur propre lumière","Un type de plante qui pousse dans l'obscurité","La lumière du soleil qui pénètre dans les profondeurs"], correct:1, expl:"Le texte explique que 'beaucoup de ces créatures produisent leur propre lumière grâce à un phénomène appelé bioluminescence'.", fun:"75 % des animaux des grandes profondeurs sont bioluminescents — dans l'obscurité totale des abysses, la lumière est une arme pour chasser !" },
@@ -395,6 +451,7 @@ const LECTURE = [
   },
   {
     theme:"&#127754; Oc&#233;ans",
+    titre:"Les récifs coralliens",
     passage:"<p>Les récifs coralliens couvrent moins de 1 % du fond des océans, mais ils abritent environ 25 % de toutes les espèces marines connues. On les appelle parfois les « forêts tropicales de la mer ». La Grande Barrière de Corail, au large de l'Australie, est le plus grand organisme vivant du monde : elle s'étend sur 2 300 kilomètres et est visible depuis l'espace.</p><p>Contrairement à ce qu'on pourrait penser, les coraux ne sont pas des plantes mais des animaux. Chaque polype de corail est un petit animal qui sécrète un squelette calcaire. Ces milliards de squelettes s'accumulent sur des milliers d'années pour former les récifs. Les coraux vivent en symbiose avec de minuscules algues appelées zooxanthelles, qui leur fournissent leur énergie et leur donnent leurs couleurs vives.</p><p>Aujourd'hui, les récifs coralliens sont gravement menacés. Le réchauffement des océans provoque le blanchissement des coraux : quand la température monte trop, les coraux expulsent les algues et deviennent blancs. Sans leurs algues, ils meurent lentement. On estime que 50 % des coraux du monde ont disparu depuis les années 1950, et les scientifiques craignent que la majorité disparaisse d'ici la fin du siècle.</p>",
     questions:[
       { q:"Pourquoi les coraux blanchissent-ils quand la température de l'eau monte ?", opts:["Ils produisent plus de squelette calcaire blanc","Ils perdent leur couleur à cause de la pollution","Ils expulsent les algues qui leur donnaient leur couleur","Ils se protègent du soleil en changeant de couleur"], correct:2, expl:"Le texte explique que 'les coraux expulsent les algues et deviennent blancs' quand la température monte trop.", fun:"Le poisson-clown (comme Nemo !) est immunisé contre le venin des anémones grâce à un mucus protecteur — une symbiose parfaite !" },
@@ -404,6 +461,7 @@ const LECTURE = [
   },
   {
     theme:"&#127916; Cin&#233;ma &amp; Musique",
+    titre:"Le cinéma",
     passage:"<p>Le cinéma est né officiellement le 28 décembre 1895, lorsque les frères Lumière ont organisé la première projection publique payante à Paris. Leurs premières « vues » — de courtes scènes de la vie quotidienne — ont stupéfié le public. La légende raconte que des spectateurs ont fui la salle en pensant qu'un train allait les écraser, bien que les historiens doutent aujourd'hui que cette réaction ait vraiment eu lieu.</p><p>En moins d'un siècle, le cinéma est devenu l'art le plus populaire du monde. Les premières œuvres étaient muettes et en noir et blanc. Le premier film parlant, « Le Chanteur de jazz », est sorti aux États-Unis en 1927, révolutionnant l'industrie. La couleur est devenue courante dans les années 1950, et les effets spéciaux numériques ont transformé le cinéma à partir des années 1990 avec des films comme « Jurassic Park ».</p><p>Aujourd'hui, l'industrie du cinéma mondial représente des dizaines de milliards de dollars par an. Hollywood reste la capitale du cinéma mondial, mais Bollywood, à Mumbai en Inde, produit en réalité plus de films chaque année. La façon dont on consomme le cinéma change radicalement : les plateformes de streaming comme Netflix ont bouleversé les habitudes, et des films de qualité sont désormais produits pour être vus directement chez soi.</p>",
     questions:[
       { q:"Quelle innovation le film 'Le Chanteur de jazz' (1927) a-t-il introduite ?", opts:["La couleur","Les effets spéciaux","Le son et la parole","Les sous-titres"], correct:2, expl:"Le texte indique que 'Le Chanteur de jazz' est 'le premier film parlant', révolutionnant l'industrie grâce au son.", fun:"Le film le plus cher jamais réalisé est 'Pirates des Caraïbes : Jusqu'au bout du monde' avec un budget de 300 millions de dollars !" },
@@ -413,6 +471,7 @@ const LECTURE = [
   },
   {
     theme:"&#127916; Cin&#233;ma &amp; Musique",
+    titre:"Beethoven",
     passage:"<p>Ludwig van Beethoven est considéré comme l'un des plus grands compositeurs de l'histoire de la musique occidentale. Né à Bonn en Allemagne en 1770, il a montré un talent musical exceptionnel dès son plus jeune âge. À l'âge de 22 ans, il s'installe à Vienne, la capitale musicale de l'époque, où il devient rapidement célèbre comme pianiste virtuose et compositeur innovant.</p><p>Ce qui rend son histoire particulièrement extraordinaire, c'est qu'à partir de 27 ans, Beethoven a commencé à perdre l'ouïe progressivement. Vers 44 ans, il était complètement sourd. Pourtant, c'est pendant cette période qu'il a composé certaines de ses œuvres les plus grandioses, dont la célèbre Neuvième Symphonie. Il composait en « entendant » la musique dans sa tête et en ressentant les vibrations du piano.</p><p>La Neuvième Symphonie, créée en 1824, est particulièrement remarquable car c'est la première grande symphonie à intégrer des voix humaines et un chœur. Lors de la première représentation, Beethoven dirigeait l'orchestre de dos au public. À la fin, sourd, il ne s'est pas retourné pour saluer. C'est la soliste qui l'a doucement tourné vers la salle, et il a découvert le public debout, en délire.</p>",
     questions:[
       { q:"Pourquoi la scène finale de la première de la Neuvième Symphonie était-elle si émouvante ?", opts:["Beethoven a pleuré sur scène","Beethoven ne pouvait pas entendre les applaudissements et ignorait l'ovation","L'orchestre avait fait de nombreuses erreurs","C'était le dernier concert de Beethoven"], correct:1, expl:"Sourd, Beethoven 'ne s'est pas retourné' car il 'ne les entendait pas' — quelqu'un a dû le tourner vers la salle pour qu'il voie les ovations.", fun:"L'hymne européen est tiré du dernier mouvement de la Neuvième Symphonie de Beethoven, l'Ode à la Joie !" },
@@ -422,6 +481,7 @@ const LECTURE = [
   },
   {
     theme:"&#127941; Sports &amp; Records",
+    titre:"Usain Bolt",
     passage:"<p>Usain Bolt, le sprinter jamaïcain, est universellement reconnu comme l'homme le plus rapide de l'histoire. En 2009, lors des Championnats du monde de Berlin, il a établi le record du monde du 100 mètres en 9 secondes 58, une performance qui semble presque inhumaine. À cette vitesse, il parcourt environ 10,44 mètres par seconde, soit plus de 37 km/h.</p><p>Ce qui est remarquable, c'est que Bolt mesure 1,96 mètre — une taille inhabituellement grande pour un sprinteur. Les spécialistes pensaient que les grands athlètes étaient désavantagés en sprint car ils mettent plus de temps à accélérer. Bolt a prouvé le contraire : sa foulée exceptionnellement longue compense largement ce désavantage. Il lui faut environ 41 foulées pour parcourir 100 mètres, contre 45 à 48 pour ses adversaires.</p><p>Bolt a dominé le sprint mondial pendant plus d'une décennie, remportant huit médailles d'or olympiques aux Jeux de Pékin (2008), Londres (2012) et Rio (2016). Il a pris sa retraite sportive en 2017, laissant des records qui semblent destinés à durer longtemps. Depuis lors, personne n'est passé sous les 9 secondes 60 au 100 mètres.</p>",
     questions:[
       { q:"Quel avantage Bolt tirait-il de sa grande taille ?", opts:["Il pesait plus lourd et avait plus de puissance","Sa foulée longue lui permettait de couvrir plus de distance","Il pouvait mieux voir la ligne d'arrivée","Il résistait mieux à la fatigue"], correct:1, expl:"Le texte explique que 'sa foulée exceptionnellement longue compense largement ce désavantage' — il fait moins de foulées que ses adversaires.", fun:"Lors de sa course record à Berlin, Bolt a regardé à droite et célébré avant la ligne — il aurait pu courir encore plus vite !" },
@@ -431,6 +491,7 @@ const LECTURE = [
   },
   {
     theme:"&#127941; Sports &amp; Records",
+    titre:"L'escalade",
     passage:"<p>L'escalade est l'un des sports qui connaît la croissance la plus rapide au monde. Après son apparition aux Jeux Olympiques de Tokyo en 2021, elle a attiré des millions de nouveaux pratiquants. La discipline olympique combine trois spécialités : la vitesse, le bloc et la difficulté. Chacune exige des qualités physiques et mentales très différentes.</p><p>En falaise naturelle, certains grimpeurs atteignent des sommets à peine croyables. En 2017, Alex Honnold a réalisé l'un des exploits sportifs les plus extraordinaires de l'histoire : il a gravi en solitaire et sans corde le mur d'El Capitan dans le parc de Yosemite, en Californie. Cette paroi verticale de 900 mètres, que les meilleurs grimpeurs avec corde mettent plusieurs jours à franchir, il l'a escaladée en 3 heures 56 minutes. La moindre erreur aurait été fatale.</p><p>Ce qui est fascinant dans l'escalade, c'est l'importance de la réflexion et de la résolution de problèmes, presque autant que la force physique. Les grimpeurs parlent de « lire » le rocher : analyser les prises disponibles, planifier chaque mouvement, trouver les positions où le corps peut se reposer. C'est pour cette combinaison unique d'intelligence et d'athlétisme que beaucoup considèrent l'escalade comme l'un des sports les plus complets qui soit.</p>",
     questions:[
       { q:"Qu'est-ce qui rend l'exploit d'Alex Honnold particulièrement exceptionnel ?", opts:["Il a grimpé El Capitan en moins d'une heure","Il a grimpé une paroi de 900 m seul et sans corde, où toute erreur était mortelle","Il était le premier à gravir El Capitan avec une équipe","Il a battu un record de vitesse avec corde"], correct:1, expl:"Honnold a gravi 900 mètres 'en solitaire et sans corde' — 'la moindre erreur aurait été fatale', rendant l'exploit unique.", fun:"Des chercheurs ont scanné le cerveau d'Alex Honnold et découvert que son amygdale — la zone de la peur — réagit bien moins que chez une personne ordinaire !" },
@@ -655,7 +716,7 @@ function saveState() {
   try {
     localStorage.setItem(SAVE_KEY, JSON.stringify({
       score, xp, streak,
-      usedTexts, textQIdx,
+      usedTexts, textQIdx, currentTextIdx, textProgress,
       usedGrammaire, usedConjugaison,
       currentMode, answerLog, selectedLevel
     }));
@@ -673,6 +734,8 @@ function loadState() {
     streak = s.streak || 0;
     usedTexts = s.usedTexts || [];
     textQIdx = s.textQIdx !== undefined ? s.textQIdx : -1;
+    currentTextIdx = s.currentTextIdx !== undefined ? s.currentTextIdx : -1;
+    textProgress = s.textProgress || {};
     usedGrammaire = s.usedGrammaire || [];
     usedConjugaison = s.usedConjugaison || [];
     currentMode = s.currentMode || 'lecture';
@@ -689,7 +752,8 @@ function confirmReset() {
   if (confirm('Remettre le score à zéro et recommencer depuis le début ?')) {
     localStorage.removeItem(SAVE_KEY);
     score = 0; xp = 0; streak = 0;
-    usedTexts = []; textQIdx = -1;
+    usedTexts = []; textQIdx = -1; currentTextIdx = -1;
+    textProgress = {};
     usedGrammaire = []; usedConjugaison = [];
     answerLog = [];
     currentMode = 'lecture';
@@ -707,10 +771,12 @@ let score = 0, xp = 0, streak = 0;
 let currentMode = 'lecture';
 let answered = false;
 // lecture: track which text we're on, and which question index within it
-let usedTexts = [];       // indexes of texts already shown
-let textQIdx = -1;        // question index within current text (-1 = pick new text)
+let usedTexts = [];       // kept for backwards compat
+let textQIdx = -1;
 let currentTextIdx = -1;
 let currentQ = null;
+// per-text dot results: textProgress[i] = array of booleans for text i
+let textProgress = {};
 // grammaire / conjugaison
 let usedGrammaire = [];
 let usedConjugaison = [];
@@ -730,9 +796,10 @@ function switchMode(mode, btn) {
   btn.classList.add('active');
   currentMode = mode;
   streak = 0; updateStreak();
-  // show level filter only for grammaire and conjugaison
   document.getElementById('levelFilterBar').style.display =
     (mode === 'grammaire' || mode === 'conjugaison') ? 'flex' : 'none';
+  // show sidebar only for lecture mode
+  document.getElementById('sidebar').style.display = (mode === 'lecture') ? 'block' : 'none';
   saveState();
   loadQuestion();
 }
@@ -759,26 +826,79 @@ function loadQuestion() {
 }
 
 function loadLecture() {
-  // if we have a current text and more questions in it, advance
+  // Go in order: advance to next question in current text, or next text
   if (currentTextIdx >= 0 && textQIdx + 1 < LECTURE[currentTextIdx].questions.length) {
     textQIdx++;
-  } else {
-    // pick a new text
-    if (usedTexts.length >= LECTURE.length) usedTexts = [];
-    let idx;
-    do { idx = Math.floor(Math.random() * LECTURE.length); }
-    while (usedTexts.includes(idx));
-    usedTexts.push(idx);
-    currentTextIdx = idx;
+  } else if (currentTextIdx < 0) {
+    // Fresh start
+    currentTextIdx = 0;
     textQIdx = 0;
-    dotResults = [];
+    dotResults = textProgress[0] ? textProgress[0].slice() : [];
+  } else {
+    // Move to next text in order (wrap around)
+    navigateToText((currentTextIdx + 1) % LECTURE.length);
+    return;
   }
   const text = LECTURE[currentTextIdx];
   currentQ = text.questions[textQIdx];
   currentQ._mode = 'lecture';
   currentQ._theme = text.theme.replace(/<[^>]+>/g,'').trim();
   renderLecture(text, textQIdx);
+  renderSidebar();
   saveState();
+}
+
+function navigateToText(idx) {
+  // Save dot results for current text before switching
+  if (currentTextIdx >= 0) {
+    textProgress[currentTextIdx] = dotResults.slice();
+  }
+  currentTextIdx = idx;
+  textQIdx = 0;
+  dotResults = textProgress[idx] ? textProgress[idx].slice() : [];
+  answered = false;
+  const text = LECTURE[idx];
+  currentQ = text.questions[0];
+  currentQ._mode = 'lecture';
+  currentQ._theme = text.theme.replace(/<[^>]+>/g,'').trim();
+  renderLecture(text, 0);
+  renderSidebar();
+  saveState();
+}
+
+function renderSidebar() {
+  const list = document.getElementById('sidebarList');
+  if (!list) return;
+  let html = '';
+  LECTURE.forEach((text, i) => {
+    const progress = i === currentTextIdx ? dotResults : (textProgress[i] || []);
+    const isDone = progress.length >= text.questions.length;
+    const isActive = i === currentTextIdx;
+    const themeEmoji = text.theme
+      .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(parseInt(n)))
+      .replace(/&amp;/g,'&').replace(/&[a-z]+;/g,'').replace(/<[^>]+>/g,'')
+      .trim().split(' ')[0]; // just the emoji
+    const label = text.titre || themeEmoji;
+    let cls = 'si';
+    if (isActive) cls += ' si-active';
+    else if (isDone) cls += ' si-done';
+    let dotsHtml = '';
+    text.questions.forEach((_, qi) => {
+      let dotCls = 'si-dot';
+      if (qi < progress.length) dotCls += progress[qi] ? ' ok' : ' ko';
+      dotsHtml += '<div class="' + dotCls + '"></div>';
+    });
+    html += '<div class="' + cls + '" onclick="navigateToText(' + i + ')">'
+      + '<div class="si-num">' + (i+1) + '</div>'
+      + '<div class="si-info">'
+      + '<div class="si-theme">' + themeEmoji + ' ' + label + '</div>'
+      + '<div class="si-dots">' + dotsHtml + '</div>'
+      + '</div></div>';
+  });
+  list.innerHTML = html;
+  // Scroll active item into view
+  const activeEl = list.querySelector('.si-active');
+  if (activeEl) activeEl.scrollIntoView({ block:'nearest', behavior:'smooth' });
 }
 
 function loadSimple(bank, usedArr, modeName) {
@@ -962,7 +1082,11 @@ function checkQCM(btn, chosen, correct) {
     if (i===chosen && chosen!==correct) b.classList.add('wrong');
   });
   const ok = chosen === correct;
-  if (currentQ._mode === 'lecture') dotResults.push(ok);
+  if (currentQ._mode === 'lecture') {
+    dotResults.push(ok);
+    textProgress[currentTextIdx] = dotResults.slice();
+    renderSidebar();
+  }
   // build log entry
   const opts = currentQ.opts || currentQ.options || [];
   logAnswer({
@@ -2008,15 +2132,25 @@ document.querySelectorAll('.mode-tab').forEach((btn, i) => {
     btn.setAttribute('onclick', "switchMode('" + modeOrder[i] + "',this)");
   }
 });
-// restore filter bar visibility
 if (currentMode === 'grammaire' || currentMode === 'conjugaison') {
   document.getElementById('levelFilterBar').style.display = 'flex';
-  // restore active level button
   document.querySelectorAll('.lvl-btn').forEach((btn, i) => {
     btn.classList.toggle('active', i === selectedLevel);
   });
 }
+if (currentMode === 'lecture') {
+  document.getElementById('sidebar').style.display = 'block';
+  // start at text 0 if fresh
+  if (currentTextIdx < 0) {
+    currentTextIdx = 0;
+    textQIdx = 0;
+    dotResults = [];
+  } else {
+    dotResults = textProgress[currentTextIdx] ? textProgress[currentTextIdx].slice() : [];
+  }
+}
 loadQuestion();
+if (currentMode === 'lecture') renderSidebar();
 </script>
 </body>
 </html>
