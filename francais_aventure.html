@@ -218,7 +218,19 @@
   .sidebar::-webkit-scrollbar-thumb { background:#2e2b4a; border-radius:4px; }
   .sidebar-title { font-size:0.7rem; font-weight:800; text-transform:uppercase;
     letter-spacing:0.08em; color:#6a6890; margin-bottom:8px; padding:0 4px; }
-  .si { display:flex; align-items:flex-start; gap:8px; padding:8px 10px;
+  .si-group { margin-bottom: 4px; }
+  .si-group-header { display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+    border-radius: 10px; cursor: pointer; transition: all 0.18s;
+    background: #12112a; border: 1px solid #2e2b4a; user-select: none; }
+  .si-group-header:hover { background: #1a1830; border-color: #3a3860; }
+  .si-group-header.has-active { border-color: #48dbfb55; background: #48dbfb08; }
+  .si-group-label { flex: 1; font-size: 0.75rem; font-weight: 800; color: #d4d0f0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .si-group-arrow { font-size: 0.65rem; color: #4a4870; transition: transform 0.2s; flex-shrink: 0; }
+  .si-group-arrow.open { transform: rotate(90deg); }
+  .si-group-body { overflow: hidden; max-height: 0; transition: max-height 0.25s ease; }
+  .si-group-body.open { max-height: 200px; }
+  .si-group-body .si { margin-left: 8px; border-radius: 8px; }
     border-radius:10px; cursor:pointer; transition:all 0.18s; margin-bottom:3px;
     border:1px solid transparent; background:#1a1830; }
   .si:hover { border-color:#2e2b4a; background:#201e38; }
@@ -509,6 +521,109 @@ const LECTURE = [
       { q:"Pourquoi dit-on que l'escalade ressemble à résoudre un puzzle ?", opts:["Parce qu'il faut assembler des pièces pour grimper","Parce qu'il faut réfléchir, analyser la paroi et planifier ses mouvements","Parce que c'est un sport calme","Parce qu'on grimpe en équipe"], correct:1, expl:"Le texte explique qu'il faut 'analyser la paroi, planifier ses mouvements et trouver où se reposer' — comme résoudre un puzzle.", fun:"Le bloc, une des disciplines olympiques, se pratique sur des murs de seulement 4 mètres — mais certains mouvements prennent des mois à réussir !" }
     ]
   }
+
+  ,
+  // ── BATCH 2 — 10 more texts ────────────────────────────────────
+  {
+    theme:"&#127912; Art",
+    titre:"Van Gogh",
+    wikiTerm:"Vincent_van_Gogh",
+    passage:"<p>Vincent van Gogh est l'un des peintres les plus célèbres du monde, mais il n'a vendu qu'un seul tableau de son vivant ! Cet artiste néerlandais a peint plus de 900 tableaux en seulement dix ans. Ses œuvres les plus connues sont <em>La Nuit étoilée</em> et ses séries de tournesols.</p><p>Ce qui rend les tableaux de Van Gogh si reconnaissables, c'est sa façon de peindre : il utilisait de très épaisses couches de peinture et des coups de pinceau tourbillonnants qui donnent l'impression que tout est en mouvement. Cette technique s'appelle l'empâtement.</p><p>Van Gogh a eu une vie très difficile. Il souffrait de problèmes de santé mentale et a passé du temps dans un hôpital psychiatrique. C'est là qu'il a peint <em>La Nuit étoilée</em>. Après sa mort en 1890, sa sœur a tout fait pour que son travail soit reconnu — et aujourd'hui ses tableaux valent des centaines de millions de dollars !</p>",
+    questions:[
+      { q:"Combien de tableaux Van Gogh a-t-il vendu de son vivant ?", opts:["Aucun","Un seul","Cent","Des milliers"], correct:1, expl:"Le texte dit clairement qu'il 'n'a vendu qu'un seul tableau de son vivant'.", fun:"La Nuit étoilée de Van Gogh est aujourd'hui au MoMA de New York et attire des millions de visiteurs chaque année !" },
+      { q:"Comment appelle-t-on la technique de Van Gogh consistant à appliquer de très épaisses couches de peinture ?", opts:["Le sfumato","L'aquarelle","L'empâtement","Le pointillisme"], correct:2, expl:"Le texte explique que la technique des épaisses couches s'appelle 'l'empâtement'.", fun:"Van Gogh a créé La Nuit étoilée depuis la fenêtre de sa chambre d'hôpital, en regardant le ciel avant le lever du soleil !" }
+    ]
+  },
+  {
+    theme:"&#127758; G&#233;ographie",
+    titre:"L'Afrique",
+    wikiTerm:"Africa",
+    passage:"<p>L'Afrique est le deuxième plus grand continent du monde, après l'Asie. Elle est immense : on pourrait y faire tenir les États-Unis, l'Europe, la Chine et l'Inde en même temps ! Elle est composée de 54 pays et abrite plus de 1,4 milliard d'habitants, ce qui en fait le continent le plus peuplé après l'Asie.</p><p>L'Afrique est incroyablement diverse. On y trouve des déserts comme le Sahara — le plus grand désert chaud du monde — mais aussi des forêts tropicales, des savanes, des montagnes enneigées et même des plages magnifiques. Le Nil, qui traverse l'Égypte, est le plus long fleuve du monde.</p><p>L'Afrique est aussi le berceau de l'humanité : les scientifiques pensent que les premiers êtres humains sont apparus sur ce continent il y a environ 300 000 ans. Aujourd'hui, l'Afrique est le continent qui grandit le plus vite, avec une population très jeune et des économies en pleine croissance.</p>",
+    questions:[
+      { q:"Pourquoi dit-on que l'Afrique est 'le berceau de l'humanité' ?", opts:["Parce que c'est le continent le plus grand","Parce que les premiers êtres humains y sont apparus","Parce qu'il y fait très chaud","Parce que le Nil s'y trouve"], correct:1, expl:"Le texte explique que 'les scientifiques pensent que les premiers êtres humains sont apparus sur ce continent'.", fun:"L'Afrique compte plus de 2 000 langues différentes — c'est plus que n'importe quel autre continent !" },
+      { q:"Quel est le plus grand désert chaud du monde mentionné dans le texte ?", opts:["Le Kalahari","Le Namib","Le Sahara","Le Gobi"], correct:2, expl:"Le texte mentionne 'le Sahara — le plus grand désert chaud du monde'.", fun:"Le Sahara est presque aussi grand que les États-Unis entiers, mais seulement 25% de sa surface est constituée de sable — le reste est de la roche !" }
+    ]
+  },
+  {
+    theme:"&#128220; Histoire",
+    titre:"Les Jeux Olympiques antiques",
+    wikiTerm:"Ancient_Olympic_Games",
+    passage:"<p>Les Jeux Olympiques ont été inventés il y a près de 3 000 ans, dans la Grèce antique. Ils se déroulaient tous les quatre ans dans la ville d'Olympie, en l'honneur du dieu Zeus. Pendant les Jeux, toutes les guerres entre les cités grecques s'arrêtaient — on appelait ça la Trêve Olympique.</p><p>Les épreuves étaient très différentes des Jeux modernes. Les athlètes participaient à la course à pied, au lancer de disque, à la lutte et à la course de chars tirés par des chevaux. Il n'y avait pas de médailles : les vainqueurs recevaient une simple couronne de feuilles d'olivier, mais ils étaient célébrés comme des héros dans toute la Grèce.</p><p>Les Jeux Olympiques antiques ont duré plus de 1 000 ans, jusqu'en 393 après Jésus-Christ, quand l'empereur romain Théodose les a interdits. Ce sont les Jeux modernes qui ont été relancés en 1896 à Athènes, grâce au baron Pierre de Coubertin.</p>",
+    questions:[
+      { q:"Qu'est-ce que la Trêve Olympique dans la Grèce antique ?", opts:["Un repas partagé entre athlètes","Une période où toutes les guerres s'arrêtaient","La cérémonie d'ouverture des Jeux","Un entraînement commun avant les Jeux"], correct:1, expl:"Le texte explique que 'toutes les guerres entre les cités grecques s'arrêtaient' pendant les Jeux — c'est la Trêve Olympique.", fun:"Dans la Grèce antique, seuls les hommes libres grecs pouvaient participer aux Jeux. Les femmes n'avaient même pas le droit d'assister en tant que spectatrices !" },
+      { q:"Quelle récompense les vainqueurs des Jeux antiques recevaient-ils ?", opts:["Une médaille d'or","Une bourse d'argent","Une couronne de feuilles d'olivier","Un trophée en marbre"], correct:2, expl:"Le texte précise que 'les vainqueurs recevaient une simple couronne de feuilles d'olivier'.", fun:"Les Jeux Olympiques antiques ont duré plus de 1 000 ans — c'est 5 fois plus que les Jeux modernes jusqu'à aujourd'hui !" }
+    ]
+  },
+  {
+    theme:"&#127807; Nature",
+    titre:"Les requins",
+    wikiTerm:"Shark",
+    passage:"<p>Les requins existent sur Terre depuis environ 450 millions d'années — bien avant les dinosaures ! Ils ont survécu à cinq grandes extinctions massives. On en compte plus de 500 espèces différentes, du minuscule requin nain de 20 cm au gigantesque requin baleine qui peut atteindre 12 mètres.</p><p>Contrairement à leur réputation dans les films, les requins attaquent très rarement les humains. En moyenne, moins de dix personnes par an meurent d'une attaque de requin dans le monde. En revanche, les humains tuent environ 100 millions de requins chaque année, principalement pour leurs ailerons.</p><p>Les requins jouent un rôle crucial dans l'équilibre des océans. En tant que prédateurs au sommet de la chaîne alimentaire, ils régulent les populations d'autres poissons. Sans eux, les écosystèmes marins seraient gravement perturbés. Malheureusement, beaucoup d'espèces de requins sont aujourd'hui menacées d'extinction.</p>",
+    questions:[
+      { q:"Quelle est la vraie menace dans la relation entre les humains et les requins ?", opts:["Les requins tuent des milliers d'humains chaque année","Les requins envahissent les plages","Les humains tuent environ 100 millions de requins par an","Les requins détruisent les bateaux"], correct:2, expl:"Le texte indique que 'les humains tuent environ 100 millions de requins chaque année', alors que peu d'humains meurent d'attaques de requin.", fun:"Un requin peut perdre plus de 30 000 dents au cours de sa vie — et en fait repousser de nouvelles en permanence !" },
+      { q:"Depuis combien de temps les requins existent-ils sur Terre ?", opts:["Depuis 65 millions d'années","Depuis 200 millions d'années","Depuis 450 millions d'années","Depuis 1 milliard d'années"], correct:2, expl:"Le texte précise que 'les requins existent sur Terre depuis environ 450 millions d'années'.", fun:"Le requin baleine, le plus grand poisson du monde, se nourrit uniquement de minuscules organismes comme le plancton — pas de grands animaux !" }
+    ]
+  },
+  {
+    theme:"&#128640; Science &amp; Espace",
+    titre:"La Lune",
+    wikiTerm:"Moon",
+    passage:"<p>La Lune est le seul satellite naturel de la Terre. Elle se trouve à environ 384 000 kilomètres de nous — ce qui peut paraître très loin, mais c'est la chose la plus proche de nous dans l'espace ! La Lune tourne autour de la Terre en 27 jours, et elle tourne aussi sur elle-même en exactement le même temps. C'est pourquoi on voit toujours la même face de la Lune depuis la Terre.</p><p>La Lune a une influence très importante sur notre planète. C'est elle qui provoque les marées dans les océans, grâce à la force de gravité qu'elle exerce sur l'eau. Sans la Lune, la Terre oscilierait de façon incontrôlée sur son axe, ce qui rendrait le climat beaucoup plus instable.</p><p>La Lune n'a ni atmosphère ni eau liquide. Sa surface est couverte de cratères formés par des météorites. La température y varie de -170°C la nuit à +130°C le jour. Douze astronautes américains ont marché sur la Lune entre 1969 et 1972, lors des missions Apollo.</p>",
+    questions:[
+      { q:"Pourquoi voit-on toujours la même face de la Lune depuis la Terre ?", opts:["Parce que l'autre côté est trop sombre","Parce que la Lune met le même temps pour tourner sur elle-même et autour de la Terre","Parce que la Lune ne tourne pas","Parce que la Terre tourne trop vite"], correct:1, expl:"Le texte explique que 'la Lune tourne autour de la Terre en 27 jours, et elle tourne aussi sur elle-même en exactement le même temps'.", fun:"La face cachée de la Lune n'a jamais été vue directement depuis la Terre jusqu'en 1959, quand une sonde soviétique l'a photographiée pour la première fois !" },
+      { q:"Quel phénomène sur Terre est provoqué par la gravité de la Lune ?", opts:["Les tremblements de terre","Les éclipses","Les marées","Les ouragans"], correct:2, expl:"Le texte précise que 'c'est elle qui provoque les marées dans les océans, grâce à la force de gravité qu'elle exerce sur l'eau'.", fun:"La Lune s'éloigne de la Terre d'environ 3,8 cm chaque année — dans des millions d'années, les éclipses solaires totales ne seront plus possibles !" }
+    ]
+  },
+  {
+    theme:"&#127981; Civilisations anciennes",
+    titre:"La Rome antique",
+    wikiTerm:"Ancient_Rome",
+    passage:"<p>La Rome antique était l'une des civilisations les plus puissantes de l'histoire. À son apogée, l'Empire romain contrôlait un territoire immense, de l'Angleterre jusqu'à la Mésopotamie. Rome était gouvernée d'abord par des rois, puis par une République, et enfin par des empereurs.</p><p>Les Romains ont apporté de nombreuses inventions qui influencent encore notre vie aujourd'hui. Ils ont construit des routes droites qui traversaient tout l'empire — certaines existent encore ! Ils ont inventé le béton, les aqueducs pour transporter l'eau, et ont développé un système de lois dont beaucoup de pays s'inspirent encore.</p><p>La langue des Romains s'appelait le latin. Beaucoup de langues modernes en descendent : le français, l'espagnol, l'italien, le portugais et le roumain sont toutes des langues latines. Même en anglais, la moitié des mots viennent du latin. L'Empire romain a fini par s'effondrer en 476 après Jésus-Christ, mais son héritage est encore partout autour de nous.</p>",
+    questions:[
+      { q:"Quelles langues modernes descendent du latin romain ?", opts:["L'anglais et l'allemand","Le français, l'espagnol, l'italien, le portugais et le roumain","Le grec et l'arabe","Le russe et le polonais"], correct:1, expl:"Le texte liste ces langues : 'le français, l'espagnol, l'italien, le portugais et le roumain sont toutes des langues latines'.", fun:"L'expression 'tous les chemins mènent à Rome' vient du fait que les Romains avaient construit un réseau de plus de 400 000 km de routes à travers l'empire !" },
+      { q:"Quelle invention romaine permettait de transporter l'eau à travers l'empire ?", opts:["Les canaux","Les aqueducs","Les fontaines","Les puits"], correct:1, expl:"Le texte mentionne 'les aqueducs pour transporter l'eau' parmi les inventions romaines.", fun:"Le Colisée de Rome pouvait accueillir 50 000 à 80 000 spectateurs — autant que beaucoup de stades modernes !" }
+    ]
+  },
+  {
+    theme:"&#129504; Psychologie",
+    titre:"La mémoire",
+    wikiTerm:"Memory",
+    passage:"<p>La mémoire est la capacité du cerveau à enregistrer, conserver et retrouver des informations. Sans elle, tu ne pourrais pas reconnaître le visage de tes amis, te souvenir de ce que tu as appris à l'école, ou même savoir comment faire du vélo !</p><p>Il existe plusieurs types de mémoire. La mémoire à court terme peut stocker environ 7 éléments à la fois pendant quelques secondes — c'est ce qui te permet de retenir un numéro de téléphone le temps de le composer. La mémoire à long terme, elle, peut stocker des informations pendant des années, voire toute une vie.</p><p>Pour mémoriser quelque chose efficacement, il ne suffit pas de le lire une fois. Les scientifiques ont découvert que répéter l'information à intervalles réguliers — une technique appelée la répétition espacée — est bien plus efficace. Dormir est aussi crucial : c'est pendant le sommeil que le cerveau consolide les souvenirs de la journée.</p>",
+    questions:[
+      { q:"Combien d'éléments environ la mémoire à court terme peut-elle stocker à la fois ?", opts:["2 ou 3","7 environ","50","Des milliers"], correct:1, expl:"Le texte précise que 'la mémoire à court terme peut stocker environ 7 éléments à la fois'.", fun:"Certaines personnes ont une mémoire photographique (ou eidétique) qui leur permet de se souvenir d'images avec une précision extraordinaire — mais c'est extrêmement rare !" },
+      { q:"Quelle technique les scientifiques recommandent-ils pour mieux mémoriser ?", opts:["Lire le plus vite possible","Écrire les informations en rouge","La répétition espacée à intervalles réguliers","Étudier toute la nuit sans dormir"], correct:2, expl:"Le texte explique que 'la répétition espacée — répéter l'information à intervalles réguliers — est bien plus efficace'.", fun:"Après seulement 20 minutes sans révision, on oublie environ 40% de ce qu'on vient d'apprendre. Après une semaine sans révision, on en oublie 90% !" }
+    ]
+  },
+  {
+    theme:"&#127754; Oc&#233;ans",
+    titre:"Les dauphins",
+    wikiTerm:"Dolphin",
+    passage:"<p>Les dauphins sont des mammifères marins extraordinairement intelligents. Ils vivent en groupes appelés pods et communiquent entre eux grâce à un système complexe de clics et de sifflements — chaque dauphin a même son propre sifflement unique qui lui sert de 'nom' !</p><p>Les dauphins utilisent l'écholocation pour se repérer et chasser : ils émettent des sons qui rebondissent sur les objets et les poissons, ce qui leur permet de 'voir' même dans une eau trouble ou dans l'obscurité. Ils peuvent aussi nager à plus de 50 km/h et sauter jusqu'à 6 mètres hors de l'eau.</p><p>Les dauphins ont montré des comportements très complexes : ils utilisent des éponges marines comme outils pour chercher de la nourriture, ils jouent, ils semblent ressentir de la tristesse quand ils perdent un membre de leur groupe. Certains scientifiques pensent qu'ils ont une forme de conscience et de culture, transmise de génération en génération.</p>",
+    questions:[
+      { q:"Comment chaque dauphin se reconnaît-il parmi les autres ?", opts:["Par la couleur de sa peau","Par sa taille","Par son propre sifflement unique","Par l'odeur de ses nageoires"], correct:2, expl:"Le texte explique que 'chaque dauphin a son propre sifflement unique qui lui sert de nom'.", fun:"Les dauphins sont l'un des rares animaux à pouvoir se reconnaître dans un miroir — une capacité qui indique une conscience de soi !" },
+      { q:"Qu'est-ce que l'écholocation chez les dauphins ?", opts:["Une danse de communication","L'émission de sons qui rebondissent pour localiser les objets","Une forme de vision nocturne","Un système de nage en groupe"], correct:1, expl:"Le texte explique que l'écholocation consiste à 'émettre des sons qui rebondissent sur les objets' pour se repérer.", fun:"Les dauphins dorment avec la moitié de leur cerveau seulement, pour continuer à nager et surveiller les prédateurs !" }
+    ]
+  },
+  {
+    theme:"&#127916; Cin&#233;ma &amp; Musique",
+    titre:"Le hip-hop",
+    wikiTerm:"Hip_hop_music",
+    passage:"<p>Le hip-hop est né dans le Bronx, un quartier de New York, au début des années 1970. À l'époque, c'était un quartier pauvre, et les jeunes ont créé une nouvelle forme de musique avec les moyens du bord : des platines vinyle, des micros et leur voix. DJ Kool Herc est souvent considéré comme le père fondateur du hip-hop.</p><p>Le hip-hop ne se résume pas qu'à la musique : c'est toute une culture. Elle comprend le rap (chanter des paroles rythmées), le DJing (mixer des disques), le breakdance (une forme de danse acrobatique) et le graffiti (un art urbain visuel). Ces quatre éléments forment les piliers du hip-hop.</p><p>Aujourd'hui, le hip-hop est le genre musical le plus écouté dans le monde. Des artistes comme Kendrick Lamar, Drake ou Stromae ont porté cette musique sur tous les continents. En France, des rappeurs comme IAM, NTM ou MC Solaar ont créé un hip-hop français unique, mêlant les influences américaines à la culture et à la langue françaises.</p>",
+    questions:[
+      { q:"Quels sont les quatre piliers de la culture hip-hop mentionnés dans le texte ?", opts:["La guitare, la batterie, le chant et la danse","Le rap, le DJing, le breakdance et le graffiti","Le jazz, le blues, le soul et le funk","La mode, le sport, la cuisine et la musique"], correct:1, expl:"Le texte liste clairement : 'le rap, le DJing, le breakdance et le graffiti' comme les quatre piliers du hip-hop.", fun:"Le terme 'hip-hop' vient de deux mots : 'hip' (branché) et 'hop' qui évoque le mouvement. C'est le DJ Afrika Bambaataa qui a popularisé ce nom !" },
+      { q:"Où le hip-hop est-il né ?", opts:["À Los Angeles","À Chicago","Dans le Bronx, à New York","À Detroit"], correct:2, expl:"Le texte précise que 'le hip-hop est né dans le Bronx, un quartier de New York, au début des années 1970'.", fun:"La première grande fête hip-hop de l'histoire a eu lieu le 11 août 1973 dans le Bronx — c'est aujourd'hui considéré comme l'anniversaire officiel du hip-hop !" }
+    ]
+  },
+  {
+    theme:"&#127941; Sports &amp; Records",
+    titre:"Les Jeux Paralympiques",
+    wikiTerm:"Paralympic_Games",
+    passage:"<p>Les Jeux Paralympiques sont les Jeux Olympiques des athlètes en situation de handicap. Ils ont lieu quelques semaines après les Jeux Olympiques, dans la même ville et souvent dans les mêmes stades. Le mot 'paralympique' vient du grec 'para', qui signifie 'à côté de' — les Jeux Paralympiques sont donc les Jeux 'à côté des Olympiques'.</p><p>Les premiers Jeux Paralympiques modernes ont eu lieu en 1960 à Rome, avec 400 athlètes venus de 23 pays. Aujourd'hui, ils réunissent plus de 4 000 athlètes de 160 pays. Les sports proposés sont nombreux : basketball en fauteuil roulant, natation, athlétisme, escrime, tir à l'arc et bien d'autres.</p><p>Les performances des athlètes paralympiques sont impressionnantes. Certains sprinteurs amputés courent le 100 mètres en moins de 11 secondes. Des nageurs sans bras réalisent des chronos que peu de nageurs valides pourraient égaler. Ces athlètes montrent que le handicap n'empêche pas l'excellence sportive.</p>",
+    questions:[
+      { q:"Que signifie le mot 'para' dans 'paralympique' ?", opts:["Au-dessus","Contre","À côté de","Pour"], correct:2, expl:"Le texte explique que 'para' vient du grec et signifie 'à côté de' — les Jeux Paralympiques sont 'à côté des Olympiques'.", fun:"Les athlètes paralympiques sont souvent plus respectueux les uns des autres que dans d'autres compétitions — il est courant de voir des adversaires s'aider mutuellement après une épreuve !" },
+      { q:"Quand ont eu lieu les premiers Jeux Paralympiques modernes ?", opts:["En 1948 à Londres","En 1960 à Rome","En 1972 à Munich","En 1980 à Moscou"], correct:1, expl:"Le texte précise que 'les premiers Jeux Paralympiques modernes ont eu lieu en 1960 à Rome, avec 400 athlètes'.", fun:"Oscar Pistorius, le sprinter sud-africain amputé des deux jambes, a participé aux Jeux Olympiques normaux de 2012 — une première historique !" }
+    ]
+  }
 ];
 const GRAMMAIRE = [
   {
@@ -516,167 +631,198 @@ const GRAMMAIRE = [
     consigne: "Choisis la bonne forme.",
     phrase: "Mon frère [___] oublié son sac à l'école.",
     question: "Quel mot complète correctement cette phrase ?",
-    options: ["a", "à", "as", "est"],
+    options: ["a", "à", "as"],
     correct: 0,
-    explication: "'A' est ici le verbe 'avoir' conjugué à la 3ème personne du singulier (il a oublié).",
+    explication: "'A' est ici le verbe 'avoir' à la 3ème personne. On peut le remplacer par 'avait' : 'Mon frère avait oublié' ✓.",
     astuce: "Si tu peux remplacer par 'avait', c'est le verbe → écris 'a'. Sinon c'est la préposition → écris 'à'.",
-    plus_loin: "<strong>La règle complète : a / à</strong><br><br>'<strong>a</strong>' (sans accent) = le verbe <em>avoir</em> conjugué au présent, 3ème personne du singulier.<br>→ On peut toujours le remplacer par <em>avait</em> : « Mon frère <u>avait</u> oublié son sac. » ✓<br><br>'<strong>à</strong>' (avec accent) = une préposition qui indique un lieu, un moment, une manière.<br>→ On <em>ne peut pas</em> le remplacer par <em>avait</em> : « Il va <u>à</u> l'école. » (avait l'école ✗)<br><br><strong>Exemples :</strong><br>• Elle <u>a</u> mangé une pomme. (verbe avoir → avait ✓)<br>• Il habite <u>à</u> Paris. (préposition → avait Paris ✗)<br>• Tu <u>as</u> raison — attention ! 'as' est aussi le verbe avoir (2ème personne), mais ne se confond pas avec 'à'."
+    plus_loin: "<strong>La règle : a / à</strong><br><br>'<strong>a</strong>' = verbe avoir au présent, 3ème personne → remplaçable par 'avait'.<br>'<strong>à</strong>' = préposition (lieu, moment) → pas remplaçable par 'avait'.<br><br>• Elle <u>a</u> mangé une pomme. (avait ✓)<br>• Il habite <u>à</u> Paris. (avait Paris ✗)"
   },
   {
     niveau: 1,
     consigne: "Choisis le bon homophone.",
-    phrase: "Tu veux du gâteau [___] de la glace ?",
+    phrase: "Je ne sais pas [___] il est allé.",
     question: "Quel mot complète correctement cette phrase ?",
-    options: ["ou", "où", "au", "et"],
-    correct: 0,
-    explication: "'Ou' sans accent exprime un choix entre deux options (= ou bien).",
-    astuce: "Remplace par 'ou bien' : si la phrase reste correcte, c'est 'ou'. Sinon (lieu/situation) c'est 'où'.",
-    plus_loin: "<strong>La règle complète : ou / où</strong><br><br>'<strong>ou</strong>' (sans accent) = conjonction de coordination qui exprime un choix, une alternative.<br>→ Remplaçable par <em>ou bien</em>.<br>→ « Tu veux du gâteau <u>ou bien</u> de la glace ? » ✓<br><br>'<strong>où</strong>' (avec accent) = pronom ou adverbe qui indique un lieu ou une situation.<br>→ <em>Non</em> remplaçable par <em>ou bien</em>.<br>→ « La ville <u>où</u> j'habite est belle. » (ou bien j'habite ✗)<br><br><strong>Exemples :</strong><br>• On va au cinéma <u>ou</u> au bowling ? (choix → ou bien ✓)<br>• Je ne sais pas <u>où</u> il est. (lieu → ou bien ✗)<br>• <u>Où</u> vas-tu ? (question de lieu → ou bien ✗)"
+    options: ["ou", "où"],
+    correct: 1,
+    explication: "'Où' avec accent indique un lieu. Ici on demande l'endroit où il est allé. 'Ou' sans accent exprime un choix.",
+    astuce: "Remplace par 'ou bien' : si ça marche → 'ou'. Sinon (lieu/situation) → 'où'.",
+    plus_loin: "<strong>La règle : ou / où</strong><br><br>'<strong>ou</strong>' = choix → remplaçable par 'ou bien' : « Tu veux du jus <u>ou</u> de l'eau ? »<br>'<strong>où</strong>' = lieu/situation → pas remplaçable par 'ou bien' : « Je ne sais pas <u>où</u> il est. »"
   },
   {
     niveau: 1,
     consigne: "Choisis le bon homophone.",
     phrase: "[___] chien aboie très fort la nuit.",
     question: "Quel mot complète correctement cette phrase ?",
-    options: ["Son", "Sont", "S'on", "Ont"],
+    options: ["Son", "Sont", "Ont"],
     correct: 0,
-    explication: "'Son' est ici un adjectif possessif accompagnant 'chien'. 'Sont' est le verbe être au pluriel.",
-    astuce: "Si tu peux remplacer par 'ils sont', écris 'sont'. Sinon, écris 'son' (= mon/ton/son).",
-    plus_loin: "<strong>La règle complète : son / sont</strong><br><br>'<strong>son</strong>' = adjectif possessif (= mon, ton, son). Il accompagne toujours un nom.<br>→ « <u>Son</u> chien » = le chien qui lui appartient. Remplaçable par <em>mon</em> ou <em>ton</em>.<br><br>'<strong>sont</strong>' = verbe <em>être</em> au présent, 3ème personne du pluriel.<br>→ Remplaçable par <em>ils sont</em> ou <em>elles sont</em>.<br>→ « Ils <u>sont</u> fatigués. » = « <u>ils sont</u> fatigués. » ✓<br><br><strong>Exemples :</strong><br>• <u>Son</u> sac est rouge. (→ mon sac ✓ = possessif)<br>• Elles <u>sont</u> parties. (→ ils sont parties ✓ = verbe être)<br>• <u>Sont</u>-ils là ? (→ ils sont là ? ✓ = verbe être)"
+    explication: "'Son' est un adjectif possessif qui accompagne le nom 'chien'. On pourrait dire 'mon chien' ou 'ton chien'.",
+    astuce: "Si tu peux dire 'ils sont' à la place → c'est 'sont'. Si tu peux dire 'mon/ton' → c'est 'son'.",
+    plus_loin: "<strong>La règle : son / sont</strong><br><br>'<strong>son</strong>' = possessif (= mon, ton) → accompagne un nom : « <u>son</u> chien » = mon chien ✓<br>'<strong>sont</strong>' = verbe être au pluriel → remplaçable par 'ils sont' : « Elles <u>sont</u> parties. »"
   },
   {
     niveau: 1,
     consigne: "Accorde correctement l'adjectif.",
     phrase: "Ces chaussures sont vraiment [___].",
     question: "Quelle est la bonne forme de l'adjectif 'beau' ?",
-    options: ["beau", "belle", "belles", "beaux"],
-    correct: 2,
-    explication: "'Chaussures' est féminin pluriel. L'adjectif s'accorde : beau → belle → belles.",
-    astuce: "Pour accorder un adjectif : 1) Trouve le nom qu'il décrit. 2) Regarde son genre (M/F) et son nombre (S/P).",
-    plus_loin: "<strong>L'accord de l'adjectif</strong><br><br>Un adjectif qualificatif s'accorde toujours en <strong>genre</strong> (masculin/féminin) et en <strong>nombre</strong> (singulier/pluriel) avec le nom qu'il décrit.<br><br><strong>Tableau de 'beau' :</strong><br>• Masculin singulier → <em>beau</em> (un beau garçon)<br>• Masculin pluriel → <em>beaux</em> (de beaux garçons)<br>• Féminin singulier → <em>belle</em> (une belle fille)<br>• Féminin pluriel → <em>belles</em> (de belles filles)<br><br><strong>Piège !</strong> 'Beau' devient 'bel' devant un nom masculin commençant par une voyelle : un <em>bel</em> homme, un <em>bel</em> arbre.<br><br><strong>Méthode :</strong> remplace le nom par un pronom pour identifier le genre : 'chaussures' → 'elles' → féminin pluriel → belles ✓"
+    options: ["belle", "belles", "beaux"],
+    correct: 1,
+    explication: "'Chaussures' est féminin pluriel. L'adjectif s'accorde : beau → belle (féminin) → belles (féminin pluriel).",
+    astuce: "Pour accorder un adjectif : trouve le nom, vérifie s'il est M/F et S/P, puis accorde.",
+    plus_loin: "<strong>L'accord de l'adjectif 'beau'</strong><br><br>• Masculin singulier → <em>beau</em> (un beau garçon)<br>• Masculin pluriel → <em>beaux</em> (de beaux garçons)<br>• Féminin singulier → <em>belle</em> (une belle fille)<br>• Féminin pluriel → <em>belles</em> (de belles filles)<br><br>Méthode : 'chaussures' → 'elles' → féminin pluriel → belles ✓"
   },
   {
     niveau: 2,
     consigne: "Choisis le bon homophone.",
-    phrase: "Je ne sais pas [___] tu viens ce soir.",
+    phrase: "Elles [___] parties en vacances ce matin.",
     question: "Quel mot complète correctement cette phrase ?",
-    options: ["ou", "où", "et", "si"],
+    options: ["son", "sont", "ont"],
     correct: 1,
-    explication: "'Où' avec accent introduit une interrogation indirecte sur une situation.",
-    astuce: "'Où' avec accent = lieu ou situation. 'Ou' sans accent = ou bien (choix).",
-    plus_loin: "<strong>'Où' dans les interrogations indirectes</strong><br><br>'Où' ne sert pas seulement à indiquer un lieu physique. Il peut aussi introduire une <strong>proposition subordonnée interrogative indirecte</strong> portant sur une situation.<br><br>→ « Je ne sais pas <u>où</u> tu en es. » (= dans quelle situation)<br>→ « Je me demande <u>où</u> cela va mener. » (= vers quelle situation)<br><br>Dans la phrase de l'exercice, 'où tu viens ce soir' = 'si tu viens ce soir / dans quelle situation tu es par rapport à ce soir'.<br><br><strong>Comment distinguer :</strong><br>• Essaie de remplacer par <em>ou bien</em> → ça ne marche pas ici (ou bien tu viens ? → sens différent)<br>• Le 'où' avec accent introduit une idée de situation, de condition, de lieu au sens large.<br><br><strong>Autre exemple :</strong> « Dis-moi <u>où</u> tu habites. » (lieu) vs « Choisis <u>ou</u> tu viens <u>ou</u> tu restes. » (choix)"
+    explication: "'Sont' est le verbe 'être' au pluriel. 'Partir' se conjugue avec 'être' au passé composé.",
+    astuce: "Si tu peux dire 'ils/elles sont' → c'est 'sont'. Si tu peux dire 'mon/ton' → c'est 'son'.",
+    plus_loin: "<strong>Être ou Avoir au passé composé ?</strong><br><br>'Partir' utilise <strong>être</strong> : « Elles <u>sont</u> parties. »<br>Verbes avec être : aller, venir, partir, arriver, entrer, sortir, naître, mourir, tomber, rester...<br><br>Avec ÊTRE, le participe passé s'accorde avec le sujet :<br>→ « Les filles sont parti<u>es</u>. » (féminin pluriel → +es)"
   },
   {
     niveau: 2,
     consigne: "Identifie la nature du mot.",
     phrase: "Les enfants courent rapidement dans le jardin.",
     question: "Quelle est la nature du mot 'rapidement' ?",
-    options: ["Un adjectif", "Un nom commun", "Un adverbe", "Un verbe"],
-    correct: 2,
-    explication: "'Rapidement' est un adverbe : il modifie le verbe 'courent' et indique comment les enfants courent.",
-    astuce: "Les adverbes répondent aux questions : comment ? quand ? où ? combien ? Et ils sont invariables !",
-    plus_loin: "<strong>Les adverbes de manière</strong><br><br>Un <strong>adverbe</strong> est un mot invariable (il ne change jamais) qui modifie un verbe, un adjectif ou un autre adverbe.<br><br><strong>Formation des adverbes en -ment :</strong><br>• Adjectif féminin + <em>-ment</em> → lente → <em>lentement</em>, douce → <em>doucement</em><br>• Si l'adjectif masculin finit par une voyelle : poli → <em>poliment</em>, vrai → <em>vraiment</em><br>• Exceptions : gentiment (gentil), brièvement (bref), etc.<br><br><strong>Types d'adverbes :</strong><br>• Manière : vite, bien, mal, rapidement<br>• Temps : hier, demain, souvent, toujours<br>• Lieu : ici, là, partout, dedans<br>• Quantité : très, trop, peu, beaucoup<br><br><strong>Attention !</strong> L'adverbe ne s'accorde pas : « Elles courent <u>rapidement</u> » (pas 'rapidements')"
+    options: ["Un adjectif", "Un adverbe", "Un verbe"],
+    correct: 1,
+    explication: "'Rapidement' est un adverbe : il modifie le verbe 'courent' et répond à la question 'comment ?'.",
+    astuce: "Les adverbes répondent aux questions : comment ? quand ? où ? combien ? Ils ne s'accordent jamais !",
+    plus_loin: "<strong>Les adverbes</strong><br><br>Un adverbe est un mot <strong>invariable</strong> qui modifie un verbe, un adjectif ou un autre adverbe.<br><br>Formation en -ment : adjectif féminin + -ment → lente → <em>lentement</em><br><br>Types : vite, bien (manière) · hier, souvent (temps) · ici, là (lieu) · très, trop (quantité)"
   },
   {
     niveau: 2,
     consigne: "Identifie la fonction du groupe de mots.",
     phrase: "Le chat de ma voisine dort sur le canapé.",
     question: "Quelle est la fonction de 'Le chat de ma voisine' ?",
-    options: ["Complément d'objet direct", "Sujet", "Complément circonstanciel", "Attribut du sujet"],
+    options: ["Complément d'objet direct", "Sujet", "Complément circonstanciel"],
     correct: 1,
-    explication: "C'est le sujet de la phrase. Pour le trouver, on pose la question 'Qui est-ce qui dort ?'",
+    explication: "C'est le sujet : il fait l'action. Question : 'Qui est-ce qui dort ?' → Le chat de ma voisine.",
     astuce: "Pour trouver le sujet : pose la question 'Qui est-ce qui + verbe ?' ou 'Qu'est-ce qui + verbe ?'",
-    plus_loin: "<strong>Les fonctions dans la phrase</strong><br><br>Le <strong>sujet</strong> est le mot ou groupe de mots qui fait l'action ou dont on parle.<br>→ Question : <em>Qui est-ce qui / Qu'est-ce qui + verbe ?</em><br>→ « <u>Le chat de ma voisine</u> dort. » — Qui est-ce qui dort ? Le chat de ma voisine. ✓<br><br>Le <strong>COD</strong> (Complément d'Objet Direct) répond à la question <em>quoi ? qui ?</em> après le verbe, sans préposition.<br>→ « Elle mange <u>une pomme</u>. » — Elle mange quoi ? Une pomme.<br><br>Le <strong>complément circonstanciel</strong> indique les circonstances (lieu, temps, manière).<br>→ <em>où ? quand ? comment ?</em> → « Il dort <u>sur le canapé</u>. »<br><br>L'<strong>attribut du sujet</strong> est relié au sujet par un verbe d'état (être, paraître, sembler...).<br>→ « Il <em>est</em> <u>fatigué</u>. » — 'fatigué' est attribut du sujet 'il'."
+    plus_loin: "<strong>Les fonctions principales</strong><br><br><strong>Sujet</strong> : fait l'action → Qui/Qu'est-ce qui + verbe ?<br>→ « <u>Le chat</u> dort. »<br><br><strong>COD</strong> : reçoit l'action, sans préposition → verbe + quoi/qui ?<br>→ « Elle mange <u>une pomme</u>. »<br><br><strong>CC</strong> : circonstance (lieu, temps, manière) → où ? quand ? comment ?<br>→ « Il dort <u>sur le canapé</u>. »"
   },
   {
     niveau: 2,
     consigne: "Choisis la bonne forme.",
-    phrase: "Les filles [___] parties en vacances hier.",
+    phrase: "Mon père [___] acheté une nouvelle voiture hier.",
     question: "Quel auxiliaire complète correctement cette phrase ?",
-    options: ["ont", "sont", "seront", "avons"],
-    correct: 1,
-    explication: "'Partir' se conjugue avec 'être' au passé composé. Le participe passé s'accorde avec le sujet : parties.",
-    astuce: "Les verbes de mouvement (aller, venir, partir, arriver, entrer, sortir...) utilisent souvent 'être' comme auxiliaire.",
-    plus_loin: "<strong>Être ou Avoir ? — Les auxiliaires au passé composé</strong><br><br>La majorité des verbes se conjuguent avec <strong>avoir</strong> : « Il a mangé, elle a fini, ils ont joué. »<br><br>Environ 17 verbes se conjuguent avec <strong>être</strong>. Moyen mnémotechnique : la <em>maison d'être</em> ou l'acronyme <strong>DR MRS VANDERTRAMP</strong> :<br>Devenir, Revenir · Mourir, Retourner · Sortir · Venir, Aller, Naître · Descendre, Entrer, Rentrer · Tomber, Rester, Arriver, Monter, Partir<br><br><strong>Règle d'accord avec ÊTRE :</strong> le participe passé s'accorde avec le sujet.<br>→ « Les filles sont parti<u>es</u>. » (féminin pluriel → +es)<br>→ « Le garçon est parti. » (masculin singulier → rien)<br><br><strong>Tous les verbes pronominaux</strong> (se lever, se laver...) utilisent aussi être :<br>→ « Elles se sont levées tôt. »"
+    options: ["a", "est", "ont"],
+    correct: 0,
+    explication: "'Acheter' se conjugue avec 'avoir' au passé composé. La plupart des verbes utilisent 'avoir'.",
+    astuce: "La majorité des verbes utilisent 'avoir'. Environ 17 verbes de mouvement utilisent 'être'.",
+    plus_loin: "<strong>Avoir ou Être au passé composé ?</strong><br><br><strong>AVOIR</strong> → majorité des verbes : manger, finir, acheter, prendre...<br>→ « Il <u>a</u> mangé. » / « Elle <u>a</u> acheté. »<br><br><strong>ÊTRE</strong> → verbes de mouvement : aller, venir, partir, arriver, entrer, sortir...<br>→ « Il <u>est</u> parti. » / « Elle <u>est</u> arrivée. »<br><br>Moyen mnémotechnique : <strong>DR MRS VANDERTRAMP</strong>"
   },
   {
     niveau: 3,
     consigne: "Choisis la bonne expression.",
     phrase: "[___] le monde était présent à la fête.",
     question: "Quel mot complète correctement cette phrase ?",
-    options: ["Tout", "Tous", "Toute", "Toutes"],
+    options: ["Tout", "Tous", "Toute"],
     correct: 0,
-    explication: "'Tout le monde' est une expression figée, toujours au singulier masculin.",
-    astuce: "'Tout le monde' → toujours singulier. Le verbe et les participes qui suivent sont au singulier.",
-    plus_loin: "<strong>Les formes de 'tout'</strong><br><br>'Tout' peut être adjectif, pronom, adverbe ou faire partie d'expressions figées.<br><br><strong>Adjectif (s'accorde) :</strong><br>• <em>Tout</em> le gâteau (M.S.) · <em>Toute</em> la classe (F.S.)<br>• <em>Tous</em> les élèves (M.P.) · <em>Toutes</em> les filles (F.P.)<br><br><strong>Pronom (remplace un nom) :</strong><br>• « <em>Tous</em> sont arrivés. » (masculin pluriel)<br>• « <em>Toutes</em> étaient là. » (féminin pluriel)<br><br><strong>Expression figée :</strong><br>• '<em>Tout le monde</em>' = chaque personne → <strong>toujours singulier</strong><br>→ « Tout le monde <u>est</u> parti. » (pas 'sont partis')<br>→ « Tout le monde <u>était</u> content. » (pas 'étaient')<br><br><strong>Piège fréquent :</strong> on entend souvent 'Tout le monde sont...' à l'oral — c'est une erreur. Le verbe reste au singulier."
+    explication: "'Tout le monde' est une expression figée, toujours au singulier masculin. Le verbe est toujours au singulier.",
+    astuce: "'Tout le monde' → toujours singulier : 'Tout le monde était' (jamais 'étaient').",
+    plus_loin: "<strong>Les formes de 'tout'</strong><br><br>Adjectif (s'accorde) : <em>Tout</em> le gâteau · <em>Toute</em> la classe · <em>Tous</em> les élèves · <em>Toutes</em> les filles<br><br>Expression figée : '<em>Tout le monde</em>' → <strong>toujours singulier</strong><br>→ « Tout le monde <u>est</u> parti. » (pas 'sont partis')"
   },
   {
     niveau: 3,
     consigne: "Repère la phrase correctement écrite.",
     phrase: "",
     question: "Laquelle de ces phrases est correcte ?",
-    options: ["Ces livres sont très intéressants.", "Ces livres est très intéressant.", "Ce livres sont très intéressants.", "Ces livre sont très intéressants."],
+    options: ["Ces livres sont très intéressants.", "Ces livres est très intéressant.", "Ce livres sont très intéressants."],
     correct: 0,
-    explication: "'Ces livres' → pluriel → verbe 'sont' + adjectif 'intéressants' au masculin pluriel.",
-    astuce: "Vérifie toujours la chaîne complète : déterminant + nom + verbe + adjectif doivent tous s'accorder.",
-    plus_loin: "<strong>La chaîne d'accord dans la phrase nominale</strong><br><br>En français, plusieurs éléments de la phrase doivent s'accorder entre eux. On appelle ça la <strong>chaîne d'accord</strong> :<br><br><strong>Déterminant → Nom → Verbe → Adjectif attribut</strong><br><br>Exemple : « <u>Ces</u> (déterminant pluriel) <u>livres</u> (nom M.P.) <u>sont</u> (verbe 3ème P.P.) très <u>intéressants</u> (adj. M.P.) »<br><br><strong>Analyse des erreurs :</strong><br>• ❌ « Ces livres <u>est</u> très intéressant. » → verbe singulier avec sujet pluriel + adj. singulier<br>• ❌ « <u>Ce</u> livres... » → déterminant singulier avec nom pluriel ('ce' → 'ces')<br>• ❌ « Ces <u>livre</u> sont... » → nom singulier avec déterminant/verbe pluriels<br><br><strong>Méthode :</strong> identifie d'abord le nom principal (ici : livres, masculin pluriel), puis vérifie que tout s'accorde avec lui."
+    explication: "'Ces livres' est masculin pluriel → verbe 'sont' + adjectif 'intéressants'. Tout s'accorde en genre et nombre.",
+    astuce: "Vérifie la chaîne : déterminant + nom + verbe + adjectif doivent tous s'accorder en genre et nombre.",
+    plus_loin: "<strong>La chaîne d'accord</strong><br><br>Déterminant → Nom → Verbe → Adjectif<br>« <u>Ces</u> (pluriel) <u>livres</u> (M.P.) <u>sont</u> (pluriel) très <u>intéressants</u> (M.P.) »<br><br>Erreurs :<br>• ❌ « Ces livres <u>est</u> très intéressant. » → singulier avec sujet pluriel<br>• ❌ « <u>Ce</u> livres... » → 'ce' singulier avec nom pluriel (→ 'ces')"
   }
+,
+  // ── BATCH 2 ─────────────────────────────────────────────────────
+  { niveau:1, consigne:"Choisis la bonne forme.", phrase:"Elle [___] allée au supermarché ce matin.", question:"Quel auxiliaire complète cette phrase ?", options:["a","est","ont"], correct:1, explication:"'Aller' utilise 'être'. Le participe s'accorde avec le sujet féminin : allée.", astuce:"Verbes de mouvement (aller, venir, partir...) → être au passé composé.", plus_loin:"<strong>ÊTRE comme auxiliaire</strong><br><br>Verbes avec être : aller, venir, partir, arriver, entrer, sortir, naître, mourir, tomber, rester...<br><br>Accord avec le sujet :<br>• Elle <em>est allée</em>. (féminin → +e)<br>• Ils <em>sont allés</em>. (masculin pluriel → +s)<br>• Elles <em>sont allées</em>. (féminin pluriel → +es)" },
+  { niveau:1, consigne:"Accorde correctement.", phrase:"Ces filles sont très [___].", question:"Quelle est la bonne forme de 'intelligent' ?", options:["intelligent","intelligente","intelligentes"], correct:2, explication:"'Filles' est féminin pluriel. Accord : intelligent → intelligente → intelligentes.", astuce:"Féminin : +e. Pluriel : +s. Féminin pluriel : +es.", plus_loin:"<strong>Accord adjectif en -ent</strong><br><br>• Masculin singulier : <em>intelligent</em><br>• Féminin singulier : <em>intelligente</em><br>• Masculin pluriel : <em>intelligents</em><br>• Féminin pluriel : <em>intelligentes</em><br><br>'filles' → elles → féminin pluriel → intelligentes ✓" },
+  { niveau:1, consigne:"Choisis le bon mot.", phrase:"J'ai perdu [___] clés ce matin.", question:"Quel mot complète correctement ?", options:["mes","ses","ces"], correct:0, explication:"Le sujet est 'je', donc le possessif correspondant est 'mes' (mes clés = les miennes).", astuce:"je → mes/mon/ma · tu → tes/ton/ta · il/elle → ses/son/sa", plus_loin:"<strong>Adjectifs possessifs</strong><br><br>• je : <em>mon</em> sac / <em>ma</em> sœur / <em>mes</em> clés<br>• tu : <em>ton</em> livre / <em>ta</em> chambre / <em>tes</em> affaires<br>• il/elle : <em>son</em> vélo / <em>sa</em> maison / <em>ses</em> amis<br><br>Devant un nom féminin commençant par une voyelle → 'mon' : <em>mon</em> amie." },
+  { niveau:1, consigne:"Choisis la bonne forme.", phrase:"Nous [___] visité le musée hier.", question:"Quel auxiliaire complète cette phrase ?", options:["avons","sommes","avez"], correct:0, explication:"'Visiter' utilise 'avoir' au passé composé. Avec 'nous' : 'nous avons visité'.", astuce:"La majorité des verbes utilisent 'avoir'. Les verbes de mouvement/état utilisent 'être'.", plus_loin:"<strong>AVOIR comme auxiliaire</strong><br><br>Majorité des verbes : manger, visiter, finir, prendre, voir, faire...<br>• Nous <em>avons</em> visité. / Ils <em>ont</em> mangé.<br><br>Avec AVOIR, pas d'accord du participe avec le sujet." },
+  { niveau:1, consigne:"Choisis le bon homophone.", phrase:"Tu [___] bien travaillé cette semaine, bravo !", question:"Quel mot complète correctement ?", options:["as","à","a"], correct:0, explication:"'As' est le verbe 'avoir' à la 2ème personne (tu as). Remplaçable par 'avais' ✓.", astuce:"tu + avoir = as. Remplace par 'avais' pour vérifier.", plus_loin:"<strong>a / as / à</strong><br><br>'<strong>as</strong>' = avoir 2ème personne (tu as) → avais ✓<br>'<strong>a</strong>' = avoir 3ème personne (il/elle a) → avait ✓<br>'<strong>à</strong>' = préposition → pas remplaçable par avait/avais<br><br>• Tu <u>as</u> réussi ! (avais ✓) · Il <u>a</u> faim. (avait ✓) · Elle va <u>à</u> Paris. (avait Paris ✗)" },
+  { niveau:1, consigne:"Choisis la bonne forme.", phrase:"Les enfants [___] fatigués après la journée.", question:"Quel verbe complète cette phrase ?", options:["est","sont","a"], correct:1, explication:"'Les enfants' est un sujet pluriel. Le verbe 'être' au pluriel est 'sont'.", astuce:"Sujet singulier → est. Sujet pluriel → sont.", plus_loin:"<strong>Accord sujet-verbe avec ÊTRE</strong><br><br>• Il/Elle <em>est</em> fatigué(e). (singulier)<br>• Ils/Elles <em>sont</em> fatigué(e)s. (pluriel)<br><br>Attention aux sujets éloignés : « Les enfants qui jouent <em>sont</em> fatigués. »" },
+  { niveau:1, consigne:"Choisis le bon homophone.", phrase:"Mes parents [___] très contents de mes résultats.", question:"Quel mot complète correctement cette phrase ?", options:["son","sont","ont"], correct:1, explication:"'Sont' est le verbe être au pluriel. On peut le remplacer par 'ils sont' ✓.", astuce:"Remplace par 'ils sont' : si ça marche → 'sont'. Sinon → 'son' (possessif).", plus_loin:"<strong>son / sont</strong><br><br>'<strong>sont</strong>' = verbe être pluriel → remplaçable par 'ils sont'<br>'<strong>son</strong>' = possessif → accompagne un nom (= mon/ton/son)<br><br>• Mes parents <u>sont</u> contents. (ils sont ✓)<br>• <u>Son</u> frère est gentil. (mon frère ✓)" },
+  { niveau:2, consigne:"Choisis le bon homophone.", phrase:"Ce livre [___] très intéressant, je te le conseille.", question:"Quel mot complète correctement ?", options:["est","et","es"], correct:0, explication:"'Est' est le verbe être 3ème personne singulier. Remplaçable par 'était' ✓.", astuce:"Remplace par 'était' : si ça marche → 'est'. Sinon → 'et' (conjonction).", plus_loin:"<strong>est / et / es</strong><br><br>'<strong>est</strong>' = verbe être (il est) → était ✓<br>'<strong>et</strong>' = conjonction → relie deux éléments<br>'<strong>es</strong>' = verbe être (tu es) → étais ✓<br><br>• Ce livre <u>est</u> bien. (était ✓) · J'aime la musique <u>et</u> le sport." },
+  { niveau:2, consigne:"Choisis le bon mot.", phrase:"Je me souviens [___] jour où nous avons gagné.", question:"Quel mot complète cette phrase ?", options:["du","de","au"], correct:0, explication:"'Du' = contraction de 'de + le'. 'Se souvenir de le jour' → 'du jour'.", astuce:"de + le → du · de + les → des · à + le → au · à + les → aux", plus_loin:"<strong>Articles contractés</strong><br><br>• de + le → <em>du</em> : je parle <em>du</em> film<br>• de + les → <em>des</em> : je parle <em>des</em> films<br>• à + le → <em>au</em> : je vais <em>au</em> cinéma<br>• à + les → <em>aux</em> : je parle <em>aux</em> enfants<br><br>Pas de contraction avec 'la' et 'l'' : de la fille / à la piscine." },
+  { niveau:2, consigne:"Accorde correctement.", phrase:"Les robes que j'ai achetées sont très [___].", question:"Quelle est la bonne forme de 'joli' ?", options:["joli","jolie","jolies"], correct:2, explication:"'Robes' est féminin pluriel. L'adjectif attribut s'accorde : joli → jolie → jolies.", astuce:"L'adjectif après 'être', 'paraître', 'sembler' s'accorde avec le sujet.", plus_loin:"<strong>Adjectif attribut du sujet</strong><br><br>Relié au sujet par un verbe d'état (être, paraître, sembler...), il s'accorde avec le sujet :<br>• Les robes <em>sont</em> jolies. (féminin pluriel)<br>• Le film <em>semble</em> intéressant. (masculin singulier)<br>• Les élèves <em>paraissent</em> fatigués. (masculin pluriel)" },
+  { niveau:2, consigne:"Choisis la bonne forme.", phrase:"Hier, mes amis et moi [___] joué au foot.", question:"Quel auxiliaire complète cette phrase ?", options:["avons","ont","sommes"], correct:0, explication:"'Mes amis et moi' = 'nous'. 'Jouer' utilise 'avoir' → nous avons joué.", astuce:"Sujet incluant 'moi' → 1ère personne du pluriel (nous).", plus_loin:"<strong>Sujet composé incluant 'moi'</strong><br><br>Quand le sujet contient 'moi' → verbe à la 1ère personne du pluriel :<br>• Mes amis et moi <em>avons</em> joué. (= nous)<br>• Ma sœur et moi <em>sommes</em> allées. (être, féminin pluriel)<br><br>Avec 'toi' → 2ème personne du pluriel : Lui et toi <em>avez</em> gagné." },
+  { niveau:2, consigne:"Identifie la nature du mot.", phrase:"Le petit chien court vite dans le jardin.", question:"Quelle est la nature du mot 'petit' ?", options:["Un adverbe","Un adjectif qualificatif","Un nom commun"], correct:1, explication:"'Petit' est un adjectif : il décrit le nom 'chien' et s'accorde avec lui.", astuce:"Adjectif : décrit un nom, s'accorde. Adverbe : modifie un verbe, invariable.", plus_loin:"<strong>Adjectif vs Adverbe</strong><br><br><strong>Adjectif</strong> : décrit un nom, s'accorde<br>→ « Le <em>petit</em> chien » — décrit 'chien'<br><br><strong>Adverbe</strong> : modifie un verbe/adjectif, invariable<br>→ « Il court <em>vite</em> » — modifie 'court'<br><br>Test : peut prendre -e/-s → adjectif. Invariable → adverbe." },
+  { niveau:2, consigne:"Choisis le bon mot.", phrase:"C'est [___] histoire vraiment incroyable !", question:"Quel article complète cette phrase ?", options:["un","une","des"], correct:1, explication:"'Histoire' est féminin. L'article indéfini féminin est 'une'.", astuce:"un (masculin singulier) · une (féminin singulier) · des (pluriel).", plus_loin:"<strong>Articles indéfinis et genre</strong><br><br>• <em>un</em> + masculin : <em>un</em> livre, <em>un</em> garçon<br>• <em>une</em> + féminin : <em>une</em> histoire, <em>une</em> fille<br>• <em>des</em> + pluriel : <em>des</em> livres, <em>des</em> histoires<br><br>Astuce : teste avec 'ce' (M) ou 'cette' (F) → <em>cette</em> histoire ✓ → féminin." },
+  { niveau:2, consigne:"Choisis la bonne forme.", phrase:"Il faut que tu [___] tes devoirs avant de sortir.", question:"Quelle forme du verbe 'finir' est correcte ici ?", options:["finis","finisses","finiras"], correct:1, explication:"Après 'il faut que' → subjonctif. Subjonctif de 'finir' pour 'tu' : finisses.", astuce:"Après 'il faut que', 'pour que', 'bien que' → toujours le subjonctif !", plus_loin:"<strong>Le subjonctif présent</strong><br><br>Après : il faut que, pour que, bien que, avant que, afin que...<br><br>Formation : radical (ils au présent) + -e, -es, -e, -ions, -iez, -ent<br><br>FINIR : que je <em>finisse</em> · que tu <em>finisses</em> · qu'il <em>finisse</em><br>que nous <em>finissions</em> · que vous <em>finissiez</em> · qu'ils <em>finissent</em>" },
+  { niveau:2, consigne:"Choisis la bonne négation.", phrase:"Je [___] mange [___] de viande.", question:"Quelle paire forme une négation correcte ?", options:["ne … pas","ne … plus","ne … jamais"], correct:0, explication:"'Ne … pas' est la négation simple et la plus courante. 'Plus' et 'jamais' ont un sens spécifique.", astuce:"Négation de base : ne … pas. Plus = arrêt d'une habitude. Jamais = aucune fois.", plus_loin:"<strong>Les formes de négation</strong><br><br>• <em>ne … pas</em> : négation simple → « Je ne mange <em>pas</em> de viande. »<br>• <em>ne … plus</em> : action qui a cessé → « Il ne fume <em>plus</em>. »<br>• <em>ne … jamais</em> : aucune fois → « Elle n'est <em>jamais</em> en retard. »<br>• <em>ne … rien</em> : aucune chose → « Je ne sais <em>rien</em>. »" },
+  { niveau:3, consigne:"Choisis la bonne forme.", phrase:"Si j'[___] plus de temps, je lirais plus.", question:"Quelle forme du verbe 'avoir' est correcte ici ?", options:["ai","avais","aurai"], correct:1, explication:"Après 'si' (hypothèse) → imparfait dans la condition. 'Si j'avais'.", astuce:"Si + imparfait → conditionnel présent. Jamais 'si + conditionnel' !", plus_loin:"<strong>Phrases hypothétiques avec 'si'</strong><br><br>Structure : <strong>Si + imparfait → conditionnel présent</strong><br><br>• « Si j'<em>avais</em> plus de temps, je <em>lirais</em> plus. »<br>• « Si elle <em>venait</em>, nous <em>serions</em> contents. »<br><br>Erreur : ❌ « Si je <em>voudrais</em>... » — le conditionnel ne peut pas suivre 'si' !" },
+  { niveau:3, consigne:"Choisis la bonne forme.", phrase:"La robe [___] tu m'as offerte est magnifique.", question:"Quel pronom relatif complète cette phrase ?", options:["qui","que","dont"], correct:1, explication:"'Que' est le pronom relatif COD. La robe est l'objet de 'offrir' → que.", astuce:"qui = sujet · que = COD · dont = complément avec 'de'.", plus_loin:"<strong>Pronoms relatifs</strong><br><br>• <em>qui</em> = sujet : « La fille <em>qui</em> chante est douée. »<br>• <em>que</em> = COD : « La robe <em>que</em> tu portes est belle. »<br>• <em>dont</em> = avec 'de' : « Le livre <em>dont</em> je parle est célèbre. »<br>• <em>où</em> = lieu/temps : « La ville <em>où</em> j'habite est grande. »" },
+  { niveau:3, consigne:"Choisis la bonne forme.", phrase:"Il faudrait que vous [___] plus attentifs en classe.", question:"Quelle forme du verbe 'être' est correcte ici ?", options:["êtes","soyez","serez"], correct:1, explication:"Après 'il faudrait que' → subjonctif. Subjonctif de 'être' pour 'vous' : soyez.", astuce:"Après 'il faut que / il faudrait que' → toujours le subjonctif !", plus_loin:"<strong>ÊTRE au subjonctif</strong><br><br>Irrégulier :<br>que je <em>sois</em> · que tu <em>sois</em> · qu'il <em>soit</em><br>que nous <em>soyons</em> · que vous <em>soyez</em> · qu'ils <em>soient</em><br><br>AVOIR au subjonctif :<br>que j'<em>aie</em> · que tu <em>aies</em> · qu'il <em>ait</em><br>que nous <em>ayons</em> · que vous <em>ayez</em> · qu'ils <em>aient</em>" },
+  { niveau:3, consigne:"Repère la phrase correctement écrite.", phrase:"", question:"Laquelle de ces phrases est correcte ?", options:["Les fleurs que j'ai cueillies sont belles.","Les fleurs que j'ai cueillis sont belles.","Les fleurs que j'ai cueilli sont belles."], correct:0, explication:"'Que' remplace 'les fleurs' (féminin pluriel) placé avant 'ai cueilli' → le participe s'accorde : cueillies.", astuce:"Avec 'avoir', si le COD est placé AVANT le verbe → le participe passé s'accorde avec ce COD.", plus_loin:"<strong>Accord du participe passé avec 'avoir'</strong><br><br>Règle générale : avec avoir → pas d'accord.<br>EXCEPTION : si le COD est placé AVANT le verbe → accord avec le COD :<br><br>• « J'ai cueilli des fleurs. » (COD après → rien)<br>• « Les fleurs <em>que</em> j'ai cueilli<u>es</u>. » (COD avant → accord féminin pluriel)" }
+,
+  { niveau:2, consigne:"Choisis la bonne forme.", phrase:"Ma sœur et moi [___] allées au cinéma hier.", question:"Quel auxiliaire complète cette phrase ?", options:["avons","sommes","sont"], correct:1, explication:"'Aller' utilise 'être'. Le sujet 'ma sœur et moi' = nous (féminin pluriel) → nous sommes allées.", astuce:"Ma sœur et moi = nous. Aller → être. Féminin pluriel → allées.", plus_loin:"<strong>Sujet composé avec 'moi' et verbe avec ÊTRE</strong><br><br>'Ma sœur et moi' = nous → 1ère personne du pluriel.<br>Aller utilise ÊTRE → accord avec le sujet féminin pluriel :<br>• Nous sommes <em>allées</em>. (deux filles)<br>• Nous sommes <em>allés</em>. (groupe mixte ou deux garçons)" }
 ];
-
 const CONJUGAISON = [
   {
     niveau: 1,
     temps: "Présent de l'indicatif", sujet: "nous", verbe_infinitif: "aller",
-    contexte: "Demain, ___ au cinéma voir le nouveau film Marvel.", hint: "nous ___",
+    contexte: "Demain, ___ au cinéma avec la classe.", hint: "nous ___",
     reponse: "nous allons", reponses_acceptees: ["nous allons","allons"],
-    explication: "'Aller' est irrégulier. Au présent : je vais, tu vas, il va, nous allons, vous allez, ils vont.",
+    explication: "'Aller' est irrégulier au présent. La seule forme correcte pour 'nous' est 'allons'.",
     groupe: "3ème groupe (irrégulier)",
-    plus_loin: "<strong>Le verbe ALLER au présent</strong><br><br>'Aller' est l'un des verbes les plus irréguliers du français. Il faut absolument le connaître par cœur car il est utilisé constamment.<br><br><strong>Conjugaison complète :</strong><br>Je <em>vais</em> · Tu <em>vas</em> · Il/Elle <em>va</em><br>Nous <em>allons</em> · Vous <em>allez</em> · Ils/Elles <em>vont</em><br><br><strong>Usages importants :</strong><br>• Se déplacer : « Je <em>vais</em> à l'école. »<br>• Futur proche (aller + infinitif) : « Il <em>va</em> pleuvoir. » / « Nous <em>allons</em> partir. »<br>• Salutation : « Comment <em>vas</em>-tu ? — Je <em>vais</em> bien ! »<br><br><strong>Piège !</strong> On dit 'ils <em>vont</em>' et non 'ils allent' (qui n'existe pas). La racine change complètement entre certaines personnes : va-/all-/vont."
+    plus_loin: "<strong>ALLER au présent</strong><br><br>Je <em>vais</em> · Tu <em>vas</em> · Il/Elle <em>va</em><br>Nous <em>allons</em> · Vous <em>allez</em> · Ils/Elles <em>vont</em><br><br>Usages : déplacement (« je vais à l'école ») et futur proche (« il va pleuvoir »).<br><br>Attention : on dit 'ils <em>vont</em>' et jamais 'ils allent' !"
   },
   {
     niveau: 1,
     temps: "Présent de l'indicatif", sujet: "je", verbe_infinitif: "être",
-    contexte: "___ tellement content(e) d'avoir eu 20/20 en maths !", hint: "je ___",
+    contexte: "Aujourd'hui ___ très fatigué(e) après le match.", hint: "je ___",
     reponse: "je suis", reponses_acceptees: ["je suis","suis"],
-    explication: "'Être' est très irrégulier. Au présent : je suis, tu es, il est, nous sommes, vous êtes, ils sont.",
+    explication: "'Être' est irrégulier. La seule forme pour 'je' au présent est 'suis'.",
     groupe: "Auxiliaire (irrégulier)",
-    plus_loin: "<strong>Le verbe ÊTRE au présent</strong><br><br>'Être' est le verbe le plus fondamental du français. Il sert de verbe principal ET d'auxiliaire (pour former le passé composé de certains verbes).<br><br><strong>Conjugaison complète :</strong><br>Je <em>suis</em> · Tu <em>es</em> · Il/Elle <em>est</em><br>Nous <em>sommes</em> · Vous <em>êtes</em> · Ils/Elles <em>sont</em><br><br><strong>Usages :</strong><br>• Verbe principal : « Je <em>suis</em> fatigué. » / « Nous <em>sommes</em> en France. »<br>• Auxiliaire du passé composé : « Elle <em>est</em> arrivée. » / « Ils <em>sont</em> partis. »<br><br><strong>Ne pas confondre :</strong><br>• 'son' (possessif) ≠ 'sont' (verbe être, pluriel)<br>• 'est' (verbe être) ≠ 'et' (conjonction) ≠ 'ai' (verbe avoir)"
+    plus_loin: "<strong>ÊTRE au présent</strong><br><br>Je <em>suis</em> · Tu <em>es</em> · Il/Elle <em>est</em><br>Nous <em>sommes</em> · Vous <em>êtes</em> · Ils/Elles <em>sont</em><br><br>Utilisé comme verbe principal (« je suis fatigué ») et comme auxiliaire du passé composé (« elle est arrivée »).<br><br>Ne pas confondre : 'son' (possessif) ≠ 'sont' (verbe être pluriel)."
+  },
+  {
+    niveau: 1,
+    temps: "Présent de l'indicatif", sujet: "ils", verbe_infinitif: "avoir",
+    contexte: "Mes parents ___ une nouvelle voiture depuis hier.", hint: "ils ___",
+    reponse: "ils ont", reponses_acceptees: ["ils ont","ont"],
+    explication: "'Avoir' au présent : j'ai, tu as, il a, nous avons, vous avez, ils ont.",
+    groupe: "Auxiliaire (irrégulier)",
+    plus_loin: "<strong>AVOIR au présent</strong><br><br>J'<em>ai</em> · Tu <em>as</em> · Il/Elle <em>a</em><br>Nous <em>avons</em> · Vous <em>avez</em> · Ils/Elles <em>ont</em><br><br>Utilisé comme verbe principal (« j'ai faim ») et comme auxiliaire du passé composé (« il a mangé »).<br><br>Attention : 'a' (verbe avoir) ≠ 'à' (préposition) — teste avec 'avait' !"
   },
   {
     niveau: 1,
     temps: "Imparfait", sujet: "ils", verbe_infinitif: "jouer",
-    contexte: "Quand ils étaient petits, ___ aux Lego tous les weekends.", hint: "ils ___",
+    contexte: "Quand ils étaient petits, ___ au foot tous les soirs.", hint: "ils ___",
     reponse: "ils jouaient", reponses_acceptees: ["ils jouaient","jouaient"],
-    explication: "À l'imparfait, les verbes du 1er groupe (-er) prennent : -ais, -ais, -ait, -ions, -iez, -aient.",
+    explication: "À l'imparfait, les verbes en -er prennent les terminaisons -ais/-ais/-ait/-ions/-iez/-aient.",
     groupe: "1er groupe",
-    plus_loin: "<strong>L'imparfait des verbes du 1er groupe (-er)</strong><br><br>L'imparfait exprime une action passée <strong>habituelle, répétée ou en cours</strong>. On l'utilise souvent avec des expressions comme 'quand j'étais petit', 'tous les jours', 'chaque été'.<br><br><strong>Formation :</strong> radical (nous au présent, sans -ons) + terminaisons :<br>-ais · -ais · -ait · -ions · -iez · -aient<br><br><strong>Exemple avec JOUER :</strong><br>Je <em>jouais</em> · Tu <em>jouais</em> · Il <em>jouait</em><br>Nous <em>jouions</em> · Vous <em>jouiez</em> · Ils <em>jouaient</em><br><br><strong>Attention :</strong> les terminaisons -ais, -ait, -aient se prononcent pareil [ɛ] mais s'écrivent différemment.<br><br><strong>Imparfait vs Passé composé :</strong><br>• Imparfait = action habituelle/continue : « Il <em>jouait</em> souvent. »<br>• Passé composé = action ponctuelle/terminée : « Il <em>a joué</em> hier. »"
+    plus_loin: "<strong>L'imparfait — 1er groupe (-er)</strong><br><br>Formation : radical + terminaisons -ais · -ais · -ait · -ions · -iez · -aient<br><br>Exemple JOUER :<br>Je <em>jouais</em> · Tu <em>jouais</em> · Il <em>jouait</em><br>Nous <em>jouions</em> · Vous <em>jouiez</em> · Ils <em>jouaient</em><br><br>Imparfait = action habituelle ou en cours dans le passé : « Il <em>jouait</em> souvent. »<br>Passé composé = action terminée et précise : « Il <em>a joué</em> hier. »"
   },
   {
     niveau: 1,
     temps: "Passé composé", sujet: "elle", verbe_infinitif: "finir",
     contexte: "Hier soir, ___ tous ses devoirs avant le dîner.", hint: "elle ___",
     reponse: "elle a fini", reponses_acceptees: ["elle a fini","a fini"],
-    explication: "'Finir' → auxiliaire 'avoir' + participe passé 'fini'. Pas d'accord car pas de COD avant le verbe.",
+    explication: "'Finir' (2ème groupe) → auxiliaire 'avoir' + participe passé 'fini'. Finir → ôter le -r → fini.",
     groupe: "2ème groupe",
-    plus_loin: "<strong>Le passé composé des verbes du 2ème groupe (-ir)</strong><br><br>Le passé composé = auxiliaire (avoir ou être au présent) + participe passé.<br><br><strong>Verbes du 2ème groupe :</strong> ils finissent par -ir et font -issons à la 1ère personne du pluriel.<br>Exemples : finir, choisir, grandir, réussir, rougir, obéir...<br><br><strong>Participe passé des verbes en -ir (2ème groupe) :</strong><br>→ Enlève le -r de l'infinitif : finir → <em>fini</em>, choisir → <em>choisi</em>, grandir → <em>grandi</em><br><br><strong>Conjugaison complète (finir) :</strong><br>J'<em>ai fini</em> · Tu <em>as fini</em> · Il <em>a fini</em><br>Nous <em>avons fini</em> · Vous <em>avez fini</em> · Ils <em>ont fini</em><br><br><strong>Accord :</strong> avec l'auxiliaire 'avoir', le participe passé ne s'accorde pas (sauf si le COD est placé avant le verbe)."
+    plus_loin: "<strong>Le passé composé — 2ème groupe (-ir)</strong><br><br>Passé composé = avoir/être + participe passé<br><br>2ème groupe : enlever le -r de l'infinitif → finir → <em>fini</em>, choisir → <em>choisi</em>, grandir → <em>grandi</em><br><br>Conjugaison de FINIR :<br>J'<em>ai fini</em> · Tu <em>as fini</em> · Il <em>a fini</em><br>Nous <em>avons fini</em> · Vous <em>avez fini</em> · Ils <em>ont fini</em>"
   },
   {
     niveau: 2,
     temps: "Futur simple", sujet: "tu", verbe_infinitif: "venir",
-    contexte: "___ à ma fête d'anniversaire samedi prochain ?", hint: "tu ___",
+    contexte: "Est-ce que ___ à mon anniversaire samedi prochain ?", hint: "tu ___",
     reponse: "tu viendras", reponses_acceptees: ["tu viendras","viendras"],
-    explication: "'Venir' est irrégulier au futur. Son radical change : viendr-. Tu viendras.",
+    explication: "'Venir' est irrégulier au futur. Son radical devient 'viendr-' : tu viendras.",
     groupe: "3ème groupe (irrégulier)",
-    plus_loin: "<strong>Le futur simple — verbes irréguliers</strong><br><br>Au futur simple, la plupart des verbes gardent leur infinitif comme radical et ajoutent les terminaisons : -ai, -as, -a, -ons, -ez, -ont.<br><br>Mais certains verbes ont un <strong>radical irrégulier</strong> au futur qu'il faut mémoriser :<br><br>• être → <em>ser-</em> : je <em>serai</em><br>• avoir → <em>aur-</em> : j'<em>aurai</em><br>• aller → <em>ir-</em> : j'<em>irai</em><br>• faire → <em>fer-</em> : je <em>ferai</em><br>• venir → <em>viendr-</em> : je <em>viendrai</em><br>• voir → <em>verr-</em> : je <em>verrai</em><br>• pouvoir → <em>pourr-</em> : je <em>pourrai</em><br>• vouloir → <em>voudr-</em> : je <em>voudrai</em><br>• savoir → <em>saur-</em> : je <em>saurai</em><br><br><strong>Conjugaison de VENIR au futur :</strong><br>Je <em>viendrai</em> · Tu <em>viendras</em> · Il <em>viendra</em><br>Nous <em>viendrons</em> · Vous <em>viendrez</em> · Ils <em>viendront</em>"
+    plus_loin: "<strong>Le futur simple — radicaux irréguliers</strong><br><br>La plupart des verbes = infinitif + terminaisons (-ai, -as, -a, -ons, -ez, -ont)<br><br>Radicaux irréguliers à mémoriser :<br>• être → <em>ser-</em> · avoir → <em>aur-</em> · aller → <em>ir-</em><br>• faire → <em>fer-</em> · venir → <em>viendr-</em> · voir → <em>verr-</em><br>• pouvoir → <em>pourr-</em> · vouloir → <em>voudr-</em><br><br>VENIR : je <em>viendrai</em> · tu <em>viendras</em> · il <em>viendra</em> · nous <em>viendrons</em>"
   },
   {
     niveau: 2,
     temps: "Passé composé", sujet: "nous", verbe_infinitif: "partir",
-    contexte: "___ en vacances au Portugal cet été, c'était génial !", hint: "nous ___",
+    contexte: "L'année dernière, ___ en vacances en Espagne.", hint: "nous ___",
     reponse: "nous sommes partis", reponses_acceptees: ["nous sommes partis","sommes partis","nous sommes parties","sommes parties"],
-    explication: "'Partir' → auxiliaire 'être' + participe passé 'parti'. Accord avec le sujet : partis/parties.",
+    explication: "'Partir' utilise 'être' comme auxiliaire. Le participe passé 'parti' s'accorde avec le sujet.",
     groupe: "3ème groupe — auxiliaire ÊTRE",
-    plus_loin: "<strong>Le passé composé avec ÊTRE — accord du participe passé</strong><br><br>Environ 17 verbes (+ tous les pronominaux) se conjuguent avec <strong>être</strong> au passé composé.<br><br><strong>Règle d'accord :</strong> avec être, le participe passé s'accorde en genre et en nombre avec le <strong>sujet</strong>.<br><br><strong>Exemple avec PARTIR :</strong><br>• Je (m.) <em>suis parti</em> · Je (f.) <em>suis partie</em><br>• Tu (m.) <em>es parti</em> · Tu (f.) <em>es partie</em><br>• Il <em>est parti</em> · Elle <em>est partie</em><br>• Nous (m.) <em>sommes partis</em> · Nous (f.) <em>sommes parties</em><br>• Vous (m.) <em>êtes partis</em> · Vous (f.) <em>êtes parties</em><br>• Ils <em>sont partis</em> · Elles <em>sont parties</em><br><br><strong>Astuce :</strong> 'nous' peut être masculin ou féminin selon le groupe qui parle. Si on ne sait pas, on met le masculin par défaut (règle traditionnelle)."
+    plus_loin: "<strong>Passé composé avec ÊTRE — accord</strong><br><br>Avec ÊTRE, le participe passé s'accorde en genre et nombre avec le sujet :<br><br>PARTIR :<br>Je <em>suis parti(e)</em> · Tu <em>es parti(e)</em> · Il <em>est parti</em> / Elle <em>est partie</em><br>Nous <em>sommes partis/parties</em> · Vous <em>êtes partis/parties</em> · Ils <em>sont partis</em> / Elles <em>sont parties</em><br><br>Autres verbes avec être : aller, venir, arriver, entrer, sortir, naître, mourir, tomber, rester..."
   },
   {
     niveau: 2,
@@ -685,35 +831,48 @@ const CONJUGAISON = [
     reponse: "elle avait", reponses_acceptees: ["elle avait","avait"],
     explication: "'Avoir' à l'imparfait : j'avais, tu avais, il/elle avait, nous avions, vous aviez, ils avaient.",
     groupe: "Auxiliaire (irrégulier)",
-    plus_loin: "<strong>Le verbe AVOIR à l'imparfait</strong><br><br>'Avoir' est un auxiliaire essentiel, utilisé pour former le passé composé de la majorité des verbes.<br><br><strong>Conjugaison complète à l'imparfait :</strong><br>J'<em>avais</em> · Tu <em>avais</em> · Il/Elle <em>avait</em><br>Nous <em>avions</em> · Vous <em>aviez</em> · Ils/Elles <em>avaient</em><br><br><strong>Usages de l'imparfait d'AVOIR :</strong><br>• Description dans le passé : « Elle <em>avait</em> les yeux bleus. »<br>• Habitude passée : « Ils <em>avaient</em> toujours faim après le sport. »<br>• Action en cours interrompue : « Il <em>avait</em> froid quand elle est arrivée. »<br><br><strong>À ne pas confondre :</strong><br>• 'avait' (imparfait) ≠ 'a eu' (passé composé)<br>• « Elle <em>avait</em> faim. » (état continu) vs « Elle <em>a eu</em> faim. » (moment précis)"
-  },
-  {
-    niveau: 2,
-    temps: "Futur simple", sujet: "vous", verbe_infinitif: "manger",
-    contexte: "Ce soir, ___ des pâtes à la carbonara, c'est promis !", hint: "vous ___",
-    reponse: "vous mangerez", reponses_acceptees: ["vous mangerez","mangerez"],
-    explication: "Au futur, les verbes en -ger gardent le 'e' pour conserver le son doux : manger → mangerez.",
-    groupe: "1er groupe",
-    plus_loin: "<strong>Le futur simple — verbes en -ger et -cer</strong><br><br>Au futur simple, les verbes réguliers du 1er groupe prennent l'infinitif complet comme radical :<br>manger → manger + <em>ez</em> = <em>mangerez</em><br><br><strong>Particularité des verbes en -ger :</strong><br>On garde le 'e' avant toutes les terminaisons (pour que le 'g' reste prononcé [ʒ] et non [g]) :<br>• Nager : je <em>nagerai</em>, tu <em>nageras</em>, il <em>nagera</em>...<br>• Manger : je <em>mangerai</em>, tu <em>mangeras</em>...<br><br><strong>Terminaisons complètes du futur simple :</strong><br>-ai · -as · -a · -ons · -ez · -ont<br><br><strong>Exemples :</strong><br>• « Demain, tu <em>mangeras</em> chez moi. »<br>• « L'été prochain, nous <em>nagerons</em> dans la mer. »<br>• « Ils <em>protégeront</em> la forêt. » (protéger)"
+    plus_loin: "<strong>AVOIR à l'imparfait</strong><br><br>J'<em>avais</em> · Tu <em>avais</em> · Il/Elle <em>avait</em><br>Nous <em>avions</em> · Vous <em>aviez</em> · Ils/Elles <em>avaient</em><br><br>Usages : description dans le passé (« elle avait les yeux bleus »), habitude passée (« ils avaient toujours faim »).<br><br>Ne pas confondre : 'avait' (imparfait) ≠ 'a eu' (passé composé ponctuel)."
   },
   {
     niveau: 3,
     temps: "Conditionnel présent", sujet: "je", verbe_infinitif: "vouloir",
-    contexte: "___ bien une part de pizza supplémentaire, s'il vous plaît !", hint: "je ___",
+    contexte: "___ bien un peu plus de temps pour finir ce devoir.", hint: "je ___",
     reponse: "je voudrais", reponses_acceptees: ["je voudrais","voudrais"],
-    explication: "Au conditionnel, 'vouloir' a le radical 'voudr-' + terminaison -ais. C'est la forme polie de 'je veux'.",
+    explication: "Au conditionnel, 'vouloir' prend le radical 'voudr-' + terminaison -ais. Forme polie de 'je veux'.",
     groupe: "3ème groupe (irrégulier)",
-    plus_loin: "<strong>Le conditionnel présent</strong><br><br>Le conditionnel présent exprime une action <strong>hypothétique, polie ou soumise à une condition</strong>.<br><br><strong>Formation :</strong> radical du futur + terminaisons de l'imparfait (-ais, -ais, -ait, -ions, -iez, -aient)<br><br><strong>Exemple avec VOULOIR :</strong><br>Je <em>voudrais</em> · Tu <em>voudrais</em> · Il <em>voudrait</em><br>Nous <em>voudrions</em> · Vous <em>voudriez</em> · Ils <em>voudraient</em><br><br><strong>Usages :</strong><br>• Politesse : « Je <em>voudrais</em> un café. » (plus poli que 'je veux')<br>• Hypothèse : « Si j'avais de l'argent, je <em>voyagerais</em>. »<br>• Conseil : « Tu <em>devrais</em> dormir plus tôt. »<br>• Souhait : « J'<em>aimerais</em> visiter le Japon. »<br><br><strong>Verbes irréguliers au conditionnel</strong> (même radical qu'au futur) :<br>être → <em>serais</em> · avoir → <em>aurais</em> · aller → <em>irais</em> · faire → <em>ferais</em>"
+    plus_loin: "<strong>Le conditionnel présent</strong><br><br>Formation : radical du futur + terminaisons de l'imparfait (-ais, -ais, -ait, -ions, -iez, -aient)<br><br>VOULOIR : je <em>voudrais</em> · tu <em>voudrais</em> · il <em>voudrait</em><br><br>Usages :<br>• Politesse : « Je <em>voudrais</em> un café. » (plus poli que 'je veux')<br>• Hypothèse : « Si j'avais plus de temps, je <em>lirais</em> plus. »<br>• Conseil : « Tu <em>devrais</em> dormir plus tôt. »"
   },
   {
     niveau: 3,
     temps: "Présent de l'indicatif", sujet: "ils", verbe_infinitif: "faire",
     contexte: "Chaque matin, ___ du sport avant d'aller à l'école.", hint: "ils ___",
     reponse: "ils font", reponses_acceptees: ["ils font","font"],
-    explication: "'Faire' est très irrégulier. Au présent : je fais, tu fais, il fait, nous faisons, vous faites, ils font.",
+    explication: "'Faire' est très irrégulier au présent. La forme 'ils font' est à mémoriser par cœur.",
     groupe: "3ème groupe (irrégulier)",
-    plus_loin: "<strong>Le verbe FAIRE — un verbe exceptionnel</strong><br><br>'Faire' est l'un des verbes les plus irréguliers et les plus utilisés du français. Sa conjugaison a plusieurs particularités uniques.<br><br><strong>Conjugaison complète au présent :</strong><br>Je <em>fais</em> · Tu <em>fais</em> · Il <em>fait</em><br>Nous <em>faisons</em> · Vous <em>faites</em> · Ils <em>font</em><br><br><strong>Particularités :</strong><br>• 'Vous <em>faites</em>' — seule forme en -tes avec 'être' (vous êtes) et 'dire' (vous dites)<br>• 'Ils <em>font</em>' — radical complètement différent (pas 'ils faisent' qui n'existe pas)<br>• 'Nous <em>faisons</em>' — le 'ai' se prononce [ə] comme dans 'je' (et non [ɛ] comme dans 'faire')<br><br><strong>Expressions courantes avec FAIRE :</strong><br>• Faire du sport / de la musique / des maths<br>• Il fait beau / froid / chaud (météo)<br>• Faire attention · Faire semblant · Faire confiance<br>• Ça fait combien ? / Qu'est-ce que tu fais ?"
+    plus_loin: "<strong>FAIRE au présent</strong><br><br>Je <em>fais</em> · Tu <em>fais</em> · Il <em>fait</em><br>Nous <em>faisons</em> · Vous <em>faites</em> · Ils <em>font</em><br><br>Particularités :<br>• 'Vous <em>faites</em>' (pas 'faisez')<br>• 'Ils <em>font</em>' (pas 'ils faisent')<br>• 'Nous <em>faisons</em>' — le 'ai' se prononce comme dans 'je'<br><br>Expressions : faire du sport / il fait beau / faire attention / qu'est-ce que tu fais ?"
   }
+,
+  // ── BATCH 2 ─────────────────────────────────────────────────────
+  { niveau:1, temps:"Présent de l'indicatif", sujet:"tu", verbe_infinitif:"parler", contexte:"Est-ce que tu ___ français à la maison ?", hint:"tu ___", reponse:"tu parles", reponses_acceptees:["tu parles","parles"], explication:"1er groupe au présent : tu + radical + -es. Parler → tu parles.", groupe:"1er groupe", plus_loin:"<strong>Présent — 1er groupe</strong><br><br>Terminaisons : -e · -es · -e · -ons · -ez · -ent<br><br>PARLER : je <em>parle</em> · tu <em>parles</em> · il <em>parle</em><br>nous <em>parlons</em> · vous <em>parlez</em> · ils <em>parlent</em>" },
+  { niveau:1, temps:"Présent de l'indicatif", sujet:"vous", verbe_infinitif:"choisir", contexte:"Vous ___ toujours les meilleures places au cinéma !", hint:"vous ___", reponse:"vous choisissez", reponses_acceptees:["vous choisissez","choisissez"], explication:"2ème groupe au présent : on ajoute '-iss-'. Choisir → vous choisissez.", groupe:"2ème groupe", plus_loin:"<strong>Présent — 2ème groupe</strong><br><br>On ajoute '-iss-' entre le radical et les terminaisons :<br><br>CHOISIR : je <em>choisis</em> · tu <em>choisis</em> · il <em>choisit</em><br>nous <em>choisissons</em> · vous <em>choisissez</em> · ils <em>choisissent</em>" },
+  { niveau:1, temps:"Présent de l'indicatif", sujet:"elle", verbe_infinitif:"prendre", contexte:"Chaque matin, elle ___ le bus pour aller à l'école.", hint:"elle ___", reponse:"elle prend", reponses_acceptees:["elle prend","prend"], explication:"'Prendre' est irrégulier. Pour 'il/elle' au présent : prend (sans -s).", groupe:"3ème groupe (irrégulier)", plus_loin:"<strong>PRENDRE au présent</strong><br><br>Je <em>prends</em> · Tu <em>prends</em> · Il/Elle <em>prend</em><br>Nous <em>prenons</em> · Vous <em>prenez</em> · Ils/Elles <em>prennent</em><br><br>Famille : apprendre, comprendre, surprendre." },
+  { niveau:1, temps:"Présent de l'indicatif", sujet:"nous", verbe_infinitif:"finir", contexte:"Nous ___ toujours nos devoirs avant le dîner.", hint:"nous ___", reponse:"nous finissons", reponses_acceptees:["nous finissons","finissons"], explication:"2ème groupe au présent : nous + radical + -issons. Finir → nous finissons.", groupe:"2ème groupe", plus_loin:"<strong>2ème groupe — rappel</strong><br><br>Verbes en -ir qui font '-issons' à la 1ère personne du pluriel :<br>• Finir → nous <em>finissons</em><br>• Grandir → nous <em>grandissons</em><br>• Réussir → nous <em>réussissons</em>" },
+  { niveau:1, temps:"Passé composé", sujet:"je", verbe_infinitif:"manger", contexte:"Hier midi, j'___ une pizza avec mes amis.", hint:"j'___", reponse:"ai mangé", reponses_acceptees:["ai mangé","j'ai mangé"], explication:"'Manger' utilise 'avoir'. Participe passé : manger → mangé. → j'ai mangé.", groupe:"1er groupe", plus_loin:"<strong>Passé composé — 1er groupe</strong><br><br>Participe passé : enlever -er, ajouter -é<br>• manger → <em>mangé</em> · parler → <em>parlé</em> · jouer → <em>joué</em><br><br>J'<em>ai mangé</em> · Tu <em>as mangé</em> · Il <em>a mangé</em><br>Nous <em>avons mangé</em> · Vous <em>avez mangé</em> · Ils <em>ont mangé</em>" },
+  { niveau:1, temps:"Passé composé", sujet:"ils", verbe_infinitif:"arriver", contexte:"Les invités ___ en retard à la fête.", hint:"ils ___", reponse:"ils sont arrivés", reponses_acceptees:["ils sont arrivés","sont arrivés"], explication:"'Arriver' utilise 'être'. Accord masculin pluriel → arrivés.", groupe:"3ème groupe — auxiliaire ÊTRE", plus_loin:"<strong>Passé composé avec ÊTRE</strong><br><br>Accord avec le sujet :<br>• Il <em>est arrivé</em>. · Elle <em>est arrivée</em>.<br>• Ils <em>sont arrivés</em>. · Elles <em>sont arrivées</em>." },
+  { niveau:1, temps:"Imparfait", sujet:"tu", verbe_infinitif:"habiter", contexte:"Avant, tu ___ à Lyon, non ?", hint:"tu ___", reponse:"tu habitais", reponses_acceptees:["tu habitais","habitais"], explication:"Imparfait 1er groupe : radical + -ais pour 'tu'. Habiter → tu habitais.", groupe:"1er groupe", plus_loin:"<strong>Imparfait — terminaisons</strong><br><br>-ais · -ais · -ait · -ions · -iez · -aient<br><br>HABITER : je <em>habitais</em> · tu <em>habitais</em> · il <em>habitait</em><br>nous <em>habitions</em> · vous <em>habitiez</em> · ils <em>habitaient</em>" },
+  { niveau:1, temps:"Futur simple", sujet:"nous", verbe_infinitif:"partir", contexte:"L'été prochain, nous ___ en vacances en Grèce.", hint:"nous ___", reponse:"nous partirons", reponses_acceptees:["nous partirons","partirons"], explication:"Futur simple régulier : infinitif + terminaison. Partir + -ons = partirons.", groupe:"3ème groupe", plus_loin:"<strong>Futur simple — régulier</strong><br><br>Formation : infinitif + terminaisons (-ai, -as, -a, -ons, -ez, -ont)<br><br>PARTIR : je <em>partirai</em> · tu <em>partiras</em> · il <em>partira</em><br>nous <em>partirons</em> · vous <em>partirez</em> · ils <em>partiront</em>" },
+  { niveau:1, temps:"Présent de l'indicatif", sujet:"vous", verbe_infinitif:"être", contexte:"Vous ___ vraiment courageux d'avoir participé !", hint:"vous ___", reponse:"vous êtes", reponses_acceptees:["vous êtes","êtes"], explication:"'Être' est irrégulier. Pour 'vous' au présent : 'êtes' (avec accent circonflexe).", groupe:"Auxiliaire (irrégulier)", plus_loin:"<strong>ÊTRE — rappel</strong><br><br>Je <em>suis</em> · Tu <em>es</em> · Il/Elle <em>est</em><br>Nous <em>sommes</em> · Vous <em>êtes</em> · Ils/Elles <em>sont</em><br><br>Attention : 'êtes' prend un accent circonflexe !" },
+  { niveau:1, temps:"Passé composé", sujet:"tu", verbe_infinitif:"voir", contexte:"Est-ce que tu ___ ce film la semaine dernière ?", hint:"tu ___", reponse:"tu as vu", reponses_acceptees:["tu as vu","as vu"], explication:"'Voir' → participe passé irrégulier : 'vu'. Avec avoir → tu as vu.", groupe:"3ème groupe (irrégulier)", plus_loin:"<strong>Participes passés irréguliers courants</strong><br><br>• voir → <em>vu</em> · faire → <em>fait</em> · dire → <em>dit</em><br>• prendre → <em>pris</em> · venir → <em>venu</em> · pouvoir → <em>pu</em><br>• vouloir → <em>voulu</em> · savoir → <em>su</em> · être → <em>été</em> · avoir → <em>eu</em>" },
+  { niveau:1, temps:"Présent de l'indicatif", sujet:"il", verbe_infinitif:"vouloir", contexte:"Mon frère ___ devenir footballeur professionnel.", hint:"il ___", reponse:"il veut", reponses_acceptees:["il veut","veut"], explication:"'Vouloir' est irrégulier au présent. Pour 'il/elle' : 'veut'.", groupe:"3ème groupe (irrégulier)", plus_loin:"<strong>VOULOIR au présent</strong><br><br>Je <em>veux</em> · Tu <em>veux</em> · Il/Elle <em>veut</em><br>Nous <em>voulons</em> · Vous <em>voulez</em> · Ils/Elles <em>veulent</em><br><br>Au conditionnel (forme polie) : je <em>voudrais</em>, tu <em>voudrais</em>..." },
+  { niveau:1, temps:"Imparfait", sujet:"nous", verbe_infinitif:"être", contexte:"Quand nous ___ petits, nous adorions les dessins animés.", hint:"nous ___", reponse:"nous étions", reponses_acceptees:["nous étions","étions"], explication:"'Être' à l'imparfait pour 'nous' : étions.", groupe:"Auxiliaire (irrégulier)", plus_loin:"<strong>ÊTRE à l'imparfait</strong><br><br>J'<em>étais</em> · Tu <em>étais</em> · Il/Elle <em>était</em><br>Nous <em>étions</em> · Vous <em>étiez</em> · Ils/Elles <em>étaient</em><br><br>• Description : « La maison <em>était</em> grande. »<br>• État passé : « Nous <em>étions</em> fatigués. »" },
+  { niveau:1, temps:"Futur simple", sujet:"je", verbe_infinitif:"avoir", contexte:"L'année prochaine, j'___ 12 ans.", hint:"j'___", reponse:"aurai", reponses_acceptees:["aurai","j'aurai"], explication:"'Avoir' est irrégulier au futur. Radical : 'aur-' → j'aurai.", groupe:"Auxiliaire (irrégulier)", plus_loin:"<strong>AVOIR au futur</strong><br><br>Radical irrégulier : <strong>aur-</strong><br><br>J'<em>aurai</em> · Tu <em>auras</em> · Il/Elle <em>aura</em><br>Nous <em>aurons</em> · Vous <em>aurez</em> · Ils/Elles <em>auront</em>" },
+  { niveau:1, temps:"Présent de l'indicatif", sujet:"tu", verbe_infinitif:"pouvoir", contexte:"Est-ce que tu ___ m'aider avec ce problème de maths ?", hint:"tu ___", reponse:"tu peux", reponses_acceptees:["tu peux","peux"], explication:"'Pouvoir' est irrégulier. Pour 'tu' au présent : 'peux'.", groupe:"3ème groupe (irrégulier)", plus_loin:"<strong>POUVOIR au présent</strong><br><br>Je <em>peux</em> · Tu <em>peux</em> · Il/Elle <em>peut</em><br>Nous <em>pouvons</em> · Vous <em>pouvez</em> · Ils/Elles <em>peuvent</em><br><br>Question soutenue : « <em>Puis</em>-je vous aider ? »" },
+  { niveau:1, temps:"Passé composé", sujet:"nous", verbe_infinitif:"faire", contexte:"Ce week-end, nous ___ une randonnée en montagne.", hint:"nous ___", reponse:"nous avons fait", reponses_acceptees:["nous avons fait","avons fait"], explication:"'Faire' utilise 'avoir'. Participe passé irrégulier : 'fait' → nous avons fait.", groupe:"3ème groupe (irrégulier)", plus_loin:"<strong>FAIRE au passé composé</strong><br><br>Participe passé irrégulier : <em>fait</em><br><br>J'<em>ai fait</em> · Tu <em>as fait</em> · Il <em>a fait</em><br>Nous <em>avons fait</em> · Vous <em>avez fait</em> · Ils <em>ont fait</em>" },
+  { niveau:1, temps:"Imparfait", sujet:"vous", verbe_infinitif:"savoir", contexte:"Est-ce que vous ___ nager quand vous étiez petits ?", hint:"vous ___", reponse:"vous saviez", reponses_acceptees:["vous saviez","saviez"], explication:"'Savoir' à l'imparfait pour 'vous' : saviez. Radical : sav- + -iez.", groupe:"3ème groupe (irrégulier)", plus_loin:"<strong>SAVOIR à l'imparfait</strong><br><br>Je <em>savais</em> · Tu <em>savais</em> · Il <em>savait</em><br>Nous <em>savions</em> · Vous <em>saviez</em> · Ils <em>savaient</em><br><br>• « Je <em>savais</em> nager à 6 ans. »<br>• « Elle <em>savait</em> parler trois langues. »" },
+  { niveau:1, temps:"Futur simple", sujet:"il", verbe_infinitif:"être", contexte:"Demain, il ___ trop tard pour changer d'avis.", hint:"il ___", reponse:"il sera", reponses_acceptees:["il sera","sera"], explication:"'Être' est irrégulier au futur. Radical : 'ser-' → il sera.", groupe:"Auxiliaire (irrégulier)", plus_loin:"<strong>ÊTRE au futur</strong><br><br>Radical irrégulier : <strong>ser-</strong><br><br>Je <em>serai</em> · Tu <em>seras</em> · Il/Elle <em>sera</em><br>Nous <em>serons</em> · Vous <em>serez</em> · Ils/Elles <em>seront</em>" },
+  { niveau:1, temps:"Présent de l'indicatif", sujet:"ils", verbe_infinitif:"venir", contexte:"Mes cousins ___ nous rendre visite ce week-end.", hint:"ils ___", reponse:"ils viennent", reponses_acceptees:["ils viennent","viennent"], explication:"'Venir' est irrégulier. La forme 'ils viennent' double le 'n'.", groupe:"3ème groupe (irrégulier)", plus_loin:"<strong>VENIR au présent</strong><br><br>Je <em>viens</em> · Tu <em>viens</em> · Il/Elle <em>vient</em><br>Nous <em>venons</em> · Vous <em>venez</em> · Ils/Elles <em>viennent</em><br><br>Même conjugaison : tenir, devenir, revenir." },
+  { niveau:1, temps:"Passé composé", sujet:"elle", verbe_infinitif:"naître", contexte:"Ma petite sœur ___ en juillet dernier.", hint:"elle ___", reponse:"elle est née", reponses_acceptees:["elle est née","est née"], explication:"'Naître' utilise 'être'. Participe 'né' s'accorde avec 'elle' (féminin) → née.", groupe:"3ème groupe — auxiliaire ÊTRE", plus_loin:"<strong>NAÎTRE au passé composé</strong><br><br>Participe passé : <em>né(e)(s)</em><br><br>Il <em>est né</em> · Elle <em>est née</em><br>Ils <em>sont nés</em> · Elles <em>sont nées</em><br><br>Naître ∈ DR MRS VANDERTRAMP." },
+  { niveau:1, temps:"Imparfait", sujet:"je", verbe_infinitif:"aller", contexte:"Avant, j'___ à l'école à pied tous les matins.", hint:"j'___", reponse:"allais", reponses_acceptees:["allais","j'allais"], explication:"'Aller' à l'imparfait : radical 'all-' + terminaison -ais → j'allais.", groupe:"3ème groupe (irrégulier)", plus_loin:"<strong>ALLER à l'imparfait</strong><br><br>J'<em>allais</em> · Tu <em>allais</em> · Il/Elle <em>allait</em><br>Nous <em>allions</em> · Vous <em>alliez</em> · Ils/Elles <em>allaient</em><br><br>Présent : je <em>vais</em> · Imparfait : j'<em>allais</em> · Futur : j'<em>irai</em>" }
 ];
 
 // ═══════════════════════════════════════════════════════════════════
@@ -875,37 +1034,86 @@ function navigateToText(idx) {
   saveState();
 }
 
+// Track which sidebar groups are open (by theme key)
+const openGroups = new Set();
+
+function decodeTheme(raw) {
+  return raw
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(parseInt(n)))
+    .replace(/&amp;/g, '&').replace(/&[a-z]+;/g, '')
+    .replace(/<[^>]+>/g, '').trim();
+}
+
+function toggleGroup(key) {
+  if (openGroups.has(key)) openGroups.delete(key);
+  else openGroups.add(key);
+  renderSidebar();
+}
+
 function renderSidebar() {
   const list = document.getElementById('sidebarList');
   if (!list) return;
-  let html = '';
+
+  // Group texts by theme
+  const groups = {}; // themeKey -> { label, emoji, texts: [{text, i}] }
   LECTURE.forEach((text, i) => {
-    const progress = i === currentTextIdx ? dotResults : (textProgress[i] || []);
-    const isDone = progress.length >= text.questions.length;
-    const isActive = i === currentTextIdx;
-    const themeEmoji = text.theme
-      .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(parseInt(n)))
-      .replace(/&amp;/g,'&').replace(/&[a-z]+;/g,'').replace(/<[^>]+>/g,'')
-      .trim().split(' ')[0]; // just the emoji
-    const label = text.titre || themeEmoji;
-    let cls = 'si';
-    if (isActive) cls += ' si-active';
-    else if (isDone) cls += ' si-done';
-    let dotsHtml = '';
-    text.questions.forEach((_, qi) => {
-      let dotCls = 'si-dot';
-      if (qi < progress.length) dotCls += progress[qi] ? ' ok' : ' ko';
-      dotsHtml += '<div class="' + dotCls + '"></div>';
-    });
-    html += '<div class="' + cls + '" onclick="navigateToText(' + i + ')">'
-      + '<div class="si-num">' + (i+1) + '</div>'
-      + '<div class="si-info">'
-      + '<div class="si-theme">' + themeEmoji + ' ' + label + '</div>'
-      + '<div class="si-dots">' + dotsHtml + '</div>'
-      + '</div></div>';
+    const themeDecoded = decodeTheme(text.theme);
+    const emoji = themeDecoded.split(' ')[0];
+    const themeLabel = themeDecoded.slice(emoji.length).trim();
+    const key = themeLabel; // use label as key (unique per theme)
+    if (!groups[key]) groups[key] = { label: themeLabel, emoji, items: [] };
+    groups[key].items.push({ text, i });
   });
+
+  // Auto-open the group containing the active text on first render
+  if (openGroups.size === 0 && currentTextIdx >= 0) {
+    const activeTheme = decodeTheme(LECTURE[currentTextIdx].theme);
+    const activeLabel = activeTheme.slice(activeTheme.split(' ')[0].length).trim();
+    openGroups.add(activeLabel);
+  }
+
+  let html = '';
+  Object.entries(groups).forEach(([key, group]) => {
+    const isOpen = openGroups.has(key);
+    const hasActive = group.items.some(({i}) => i === currentTextIdx);
+    const allDone = group.items.every(({text, i}) => {
+      const p = i === currentTextIdx ? dotResults : (textProgress[i] || []);
+      return p.length >= text.questions.length;
+    });
+
+    html += '<div class="si-group">'
+      + '<div class="si-group-header' + (hasActive ? ' has-active' : '') + '" data-gkey="' + key.replace(/"/g,'&quot;') + '" onclick="toggleGroup(this.dataset.gkey)">'
+      + '<span style="font-size:1rem">' + group.emoji + '</span>'
+      + '<span class="si-group-label">' + group.label + '</span>'
+      + '<span class="si-group-arrow' + (isOpen ? ' open' : '') + '">&#9654;</span>'
+      + '</div>'
+      + '<div class="si-group-body' + (isOpen ? ' open' : '') + '">';
+
+    group.items.forEach(({ text, i }) => {
+      const progress = i === currentTextIdx ? dotResults : (textProgress[i] || []);
+      const isDone = progress.length >= text.questions.length;
+      const isActive = i === currentTextIdx;
+      let cls = 'si';
+      if (isActive) cls += ' si-active';
+      else if (isDone) cls += ' si-done';
+      let dotsHtml = '';
+      text.questions.forEach((_, qi) => {
+        let dotCls = 'si-dot';
+        if (qi < progress.length) dotCls += progress[qi] ? ' ok' : ' ko';
+        dotsHtml += '<div class="' + dotCls + '"></div>';
+      });
+      html += '<div class="' + cls + '" onclick="navigateToText(' + i + ')">'
+        + '<div class="si-num">' + (i+1) + '</div>'
+        + '<div class="si-info">'
+        + '<div class="si-theme">' + (text.titre || '') + '</div>'
+        + '<div class="si-dots">' + dotsHtml + '</div>'
+        + '</div></div>';
+    });
+
+    html += '</div></div>'; // close body + group
+  });
+
   list.innerHTML = html;
-  // Scroll active item into view
   const activeEl = list.querySelector('.si-active');
   if (activeEl) activeEl.scrollIntoView({ block:'nearest', behavior:'smooth' });
 }
@@ -1117,7 +1325,7 @@ function renderSimple(q, num, total, mode) {
   if (q.plus_loin) {
     html += '<div class="plus-loin-wrap" id="plusLoinWrap" style="display:none">'
       + '<button class="plus-loin-toggle" onclick="togglePlusLoin(this)" id="plusLoinBtn">'
-      + '<span class="arrow">&#9654;</span> &#128218; En savoir plus sur cette règle</button>'
+      + '<span class="arrow">&#9654;</span> &#128218; Know More</button>'
       + '<div class="plus-loin-body" id="plusLoinBody">' + q.plus_loin + '</div>'
       + '</div>';
   }
@@ -1587,7 +1795,123 @@ const TRANSLATIONS = {
   'wiktionnaire':'Wiktionary','yeux':'eyes','zone':'zone','zones':'zones',
   'zooxanthelles':'zooxanthellae',
   // Additional words
-  // Words added for simplified 11-year-old texts
+  // Words from new lecture texts (batch 2)
+  'abord':'first/initially','acrobatique':'acrobatic','africa':'Africa',
+  'afrika':'Afrika','ailerons':'fins','alimentaire':'food (adj.)',
+  'allemand':'German','alors':'then/so','amis':'friends','amputé':'amputee',
+  'amputés':'amputees','américaines':'American','angeles':'Angeles',
+  'anniversaire':'birthday/anniversary','antique':'ancient','antiques':'ancient',
+  'août':'August','apparus':'appeared','appliquer':'to apply',
+  'apprendre':'to learn','aqueducs':'aqueducts','arabe':'Arabic',
+  'arc':'arc/bow','argent':'silver/money','arrêtaient':'were stopping',
+  'as':'ace/you have','assister':'to attend','athènes':'Athens',
+  'attaque':'attack','attaques':'attacks','axe':'axis','baleine':'whale',
+  'bambaataa':'Bambaataa','baron':'baron','basketball':'basketball',
+  'bateaux':'boats','batterie':'drums/battery','berceau':'cradle/birthplace',
+  'blues':'blues','bourse':'scholarship/purse','branché':'trendy',
+  'bras':'arms','breakdance':'breakdancing','bronx':'Bronx','béton':'concrete',
+  'cachée':'hidden','canaux':'canals','cent':'hundred','chambre':'room/bedroom',
+  'chant':'singing','chanter':'to sing','chars':'chariots','chaud':'hot',
+  'chaîne':'chain','chemins':'paths/roads','chercher':'to look for',
+  'chevaux':'horses','chicago':'Chicago','chronos':'times (sports)',
+  'clics':'clicks','colisée':'Colosseum','communication':'communication',
+  'comportements':'behaviours','compte':'counts','compétitions':'competitions',
+  'conscience':'consciousness','conserver':'to preserve','consistant':'consisting',
+  'constituée':'made up of','continent':'continent','continents':'continents',
+  'contrôlait':'controlled','coubertin':'Coubertin','coups':'strokes/blows',
+  'courent':'run','couronne':'crown','couverte':'covered','cratères':'craters',
+  'cuisine':'cooking/kitchen','célébrés':'celebrated','cérémonie':'ceremony',
+  'danse':'dance','dents':'teeth','detroit':'Detroit','deuxième':'second',
+  'dieu':'god','dinosaures':'dinosaurs','diverse':'diverse','dj':'DJ',
+  'djing':'DJing','dolphin':'dolphin','drake':'Drake','droit':'law/right/straight',
+  'droites':'straight','duré':'lasted','déroulaient':'took place',
+  'désert':'desert','déserts':'deserts','détruisent':'destroy',
+  'efficace':'effective','efficacement':'effectively','effondrer':'to collapse',
+  'eidétique':'eidetic','empereur':'emperor','empereurs':'emperors',
+  'empâtement':'impasto','empêche':'prevents','enfin':'finally',
+  'enneigées':'snow-capped','enregistrer':'to record','entiers':'whole/entire',
+  'entraînement':'training','envahissent':'invade','escrime':'fencing',
+  'espacée':'spaced','espagnol':'Spanish','excellence':'excellence',
+  'exerce':'exerts','extinction':'extinction','extinctions':'extinctions',
+  'extraordinairement':'extraordinarily','fauteuil':'armchair/wheelchair',
+  'femmes':'women','fenêtre':'window','feuilles':'leaves','fontaines':'fountains',
+  'formés':'formed','françaises':'French','funk':'funk','games':'games',
+  'gigantesque':'gigantic','gobi':'Gobi','gogh':'Gogh','gouvernée':'governed',
+  'graffiti':'graffiti','grecques':'Greek','grecs':'Greeks','groupe':'group',
+  'groupes':'groups','grèce':'Greece','génération':'generation',
+  'handicap':'disability','herc':'Herc','hip':'hip','hommes':'men',
+  'hop':'hop','hors':'outside/out of','héritage':'heritage','héros':'hero',
+  'hôpital':'hospital','iam':'IAM','immense':'immense','importe':'matters',
+  'incontrôlée':'uncontrolled','influence':'influence','influences':'influences',
+  'information':'information','informations':'information','inspirent':'inspire',
+  'instable':'unstable','intelligents':'intelligent','interdits':'forbidden',
+  'intervalles':'intervals','inventions':'inventions','inventés':'invented',
+  'jambes':'legs','kalahari':'Kalahari','kendrick':'Kendrick','kool':'Kool',
+  'lamar':'Lamar','lancer':'throwing/to throw','latin':'Latin',
+  'latines':'Latin (languages)','lever':'rising/to rise','liquide':'liquid',
+  'localiser':'to locate','lois':'laws','los':'Los','lutte':'wrestling/struggle',
+  'là':'there','magnifiques':'magnificent','mammifères':'mammals',
+  'marbre':'marble','marché':'market/worked','marées':'tides','massives':'massive',
+  'mc':'MC','membre':'member','memory':'memory','menacées':'threatened',
+  'mentale':'mental','mentionné':'mentioned','mentionnés':'mentioned',
+  'micros':'microphones','minuscule':'tiny','mixer':'to mix','mode':'fashion/mode',
+  'moma':'MoMA','montagnes':'mountains','montrent':'show','moon':'moon',
+  'moscou':'Moscow','moyens':'means/average','munich':'Munich','music':'music',
+  'mutuellement':'mutually','mènent':'lead','mémoriser':'to memorise',
+  'mésopotamie':'Mesopotamia','météorites':'meteorites','mêlant':'mixing',
+  'nage':'swimming','nageoires':'fins/flippers','nageurs':'swimmers',
+  'nain':'dwarf','namib':'Namib','natation':'swimming','new':'new',
+  'nocturne':'nocturnal','normaux':'normal','nourrit':'feeds','ntm':'NTM',
+  'numéro':'number','néerlandais':'Dutch','odeur':'smell',
+  'officiel':'official','olivier':'olive (tree)','olympic':'Olympic',
+  'olympie':'Olympia','organismes':'organisms','oscar':'Oscar',
+  'oscilierait':'would oscillate','oublie':'forgets','ouragans':'hurricanes',
+  'outils':'tools','ouverture':'opening','para':'para','paralympic':'Paralympic',
+  'paralympique':'Paralympic','paralympiques':'Paralympic Games',
+  'paraître':'to seem','paroles':'lyrics/words','partagé':'shared',
+  'participaient':'participated','participer':'to participate','pauvre':'poor',
+  'peau':'skin','peintres':'painters','pensent':'think',
+  'performances':'performances','permanence':'permanence','perturbés':'disrupted',
+  'peu':'few/little','peuplé':'populated','photographique':'photographic',
+  'photographiée':'photographed','piliers':'pillars','pinceau':'paintbrush',
+  'pistorius':'Pistorius','plancton':'plankton','platines':'turntables',
+  'pods':'pods','polonais':'Polish','popularisé':'popularised',
+  'portugais':'Portuguese','porté':'carried/worn','possible':'possible',
+  'pourrais':'could','proche':'close/near','proposés':'offered',
+  'provoqué':'triggered/caused','précision':'precision',
+  'psychiatrique':'psychiatric','puits':'wells','père':'father',
+  'quartier':'neighbourhood','rap':'rap','rappeurs':'rappers',
+  'rebondissent':'bounce','reconnaissables':'recognisable',
+  'reconnaît':'recognises','regardant':'looking at','relancés':'relaunched',
+  'relation':'relationship','rendrait':'would make','repousser':'to grow back',
+  'respectueux':'respectful','retenir':'to retain/remember',
+  'retrouver':'to find/retrieve','revanche':'revenge/on the other hand',
+  'rois':'kings','romain':'Roman','romaine':'Roman','romaines':'Roman',
+  'romains':'Romans','rome':'Rome','rouge':'red','roulant':'rolling',
+  'roumain':'Romanian','routes':'roads','russe':'Russian','rythmées':'rhythmic',
+  'réalisent':'achieve','récompense':'reward','réguliers':'regular',
+  'réputation':'reputation','répétition':'repetition','résume':'sums up',
+  'réunissent':'bring together','révision':'revision','sable':'sand',
+  'sahara':'Sahara','santé':'health','satellite':'satellite','sauter':'to jump',
+  'savanes':'savannas','seraient':'would be','seuls':'alone/only',
+  'shark':'shark','sifflement':'whistle/signature call','sifflements':'whistles',
+  'solaar':'Solaar','sons':'sounds','soul':'soul','soviétique':'Soviet',
+  'spectatrices':'female spectators','sprinteurs':'sprinters','stades':'stadiums',
+  'stocker':'to store','stromae':'Stromae','séries':'series','tenir':'to hold',
+  'terme':'term','texts':'texts','théodose':'Theodosius','tir':'shooting',
+  'tirés':'pulled','totales':'total','tourbillonnants':'swirling',
+  'tournesols':'sunflowers','transmise':'transmitted','transporter':'to transport',
+  'traversaient':'crossed','trophée':'trophy','trouble':'murky/cloudy',
+  'trêve':'truce','tuent':'kill','types':'types','uns':'some/ones',
+  'urbain':'urban','utilisent':'use','vainqueurs':'winners','valent':'are worth',
+  'valides':'able-bodied','varie':'varies','vincent':'Vincent',
+  'vinyle':'vinyl','vision':'vision','visuel':'visual','voire':'indeed/or even',
+  'voit':'sees','vraie':'true','york':'York','zeus':'Zeus',
+  'écholocation':'echolocation','écosystèmes':'ecosystems',
+  'écouté':'listened to','écrire':'to write','égaler':'to equal',
+  'éloigne':'moves away','émettent':'emit','émettre':'to emit',
+  'épaisses':'thick','éponges':'sponges','épreuve':'event/test',
+  'équilibre':'balance','étoilée':'starry','évoque':'evokes',
   'accueillir':'to welcome','accélération':'acceleration','acteurs':'actors',
   'aident':'help','albert':'Albert','amazon':'Amazon','amitié':'friendship',
   'américains':'Americans','anciens':'ancient/former','animés':'lively',
@@ -1675,7 +1999,9 @@ const TRANSLATIONS = {
   'quels':'which','rainforest':'rainforest','reef':'reef',
   'revolution':'revolution','reçu':'received','rock':'rock',
   'situations':'situations','sleep':'sleep','wikiterm':'(internal)',
-  'retraite':'retirement','salaire':'salary/wage','ufs':'eggs',
+  'batch':'batch','rarement':'rarely','semaine':'week',
+  'rare':'rare','savoir':'to know','more':'more',
+  'londres':'London','retraite':'retirement','salaire':'salary/wage','ufs':'eggs',
   'vitesse':'speed','élevage':'livestock farming','était':'was',
 'accepter':'to accept','ainsi':'thus/so','ait':'has (subj.)','amériques':'Americas',
   'an':'year','ans':'years','appelées':'called','appelés':'called',
